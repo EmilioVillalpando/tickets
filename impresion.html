@@ -1,0 +1,103 @@
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabase = window.supabase.createClient(
+  "https://bjebybdqcqscouxlinfd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqZWJ5YmRxY3FzY291eGxpbmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYzMjQ3MTksImV4cCI6MjA3MTkwMDcxOX0.mQgWtiYEyJTiF04pdcLv63SqPNrU1Iehws0vKqr82O0"
+);
+
+// 1) Crea el bucket público (solo una vez). Si ya existe, puedes omitir esto.
+async function ensureBucket(){
+  const { data, error } = await supabase.storage.createBucket('tickets', {
+    public: true
+  });
+  if (error && !/exists/i.test(error.message)) {
+    console.error(error);
+    alert('Error creando bucket: ' + error.message);
+  }
+}
+
+// 2) Sube el archivo HTML con el content-type correcto
+async function uploadHtml(path, htmlString){
+  const file = new File([htmlString], 'test-print.html', { type: 'text/html' });
+  const { data, error } = await supabase
+    .storage.from('tickets')
+    .upload(path, file, { upsert: true, contentType: 'text/html', cacheControl: '3600' });
+  if (error) { console.error(error); alert('Error subiendo archivo: ' + error.message); return; }
+  const { data: pub } = supabase.storage.from('tickets').getPublicUrl(path);
+  alert('Listo. URL pública:\n' + pub.publicUrl);
+  console.log('URL:', pub.publicUrl);
+}
+
+// 3) Ejemplo: sube el contenido mínimo de la página de prueba
+const html = `
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Prueba impresión</title>
+<style>
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:fixed;left:0;top:0}
+  #printArea.ticket80{width:76mm !important; padding:2mm !important}
+  @page{size:80mm auto;margin:0}
+  #printArea.ticket80 .mono{font-family: ui-monospace, Menlo, "Courier New", monospace; font-size:11px}
+  #printArea.ticket80 .line{border-top:1px dashed #000;margin:6px 0}
+}
+</style>
+</head><body>
+<h3>Prueba</h3>
+<button onclick="printHtml80()">Imprimir HTML 80 mm</button>
+<button onclick="printWithRawBT()">Imprimir con RawBT</button>
+<div id="printArea"></div>
+<script>
+function to2(n){return Number(n||0).toFixed(2)}
+function buildHtmlTicket(){
+  const items=[{p:'Panza de res',kg:2.35,pu:98},{p:'Libro',kg:1.1,pu:85},{p:'Pata blanca',kg:3,pu:42}];
+  const total=items.reduce((a,b)=>a+b.kg*b.pu,0);
+  return \`
+    <div class="ticket80">
+      <div class="mono">Carnes y Vísceras del Centro</div>
+      <div class="line"></div>
+      \${items.map(x=>\`
+        <div>\${x.p}</div>
+        <div class="mono">\${to2(x.kg)}kg × $\${to2(x.pu)} — $\${to2(x.kg*x.pu)}</div>\`).join('')}
+      <div class="line"></div>
+      <div><b>Total:</b> $\${to2(total)}</div>
+      <div class="mono"><b>Notas:</b> cortar pata en rodajas</div>
+    </div>\`;
+}
+function printHtml80(){
+  const el=document.getElementById('printArea');
+  el.classList.add('ticket80'); el.innerHTML=buildHtmlTicket(); el.style.display='block';
+  window.print();
+  setTimeout(()=>{ el.style.display='none'; el.classList.remove('ticket80'); el.innerHTML=''; }, 400);
+}
+// ===== RawBT ESC/POS minimal =====
+function esc(...b){return Uint8Array.from(b)}
+function text(s){return new TextEncoder().encode(s)}
+function cat(...arr){const len=arr.reduce((a,b)=>a+b.length,0);const out=new Uint8Array(len);let o=0;for(const a of arr){out.set(a,o);o+=a.length}return out}
+function toB64(u8){let bin="";for(let i=0;i<u8.length;i++)bin+=String.fromCharCode(u8[i]);return btoa(bin)}
+function buildEsc(){
+  const INIT=esc(0x1B,0x40), CUT=esc(0x1D,0x56,0x00), B=esc(0x1B,0x45,0x01), b0=esc(0x1B,0x45,0x00);
+  const L=esc(0x1B,0x61,0x00), C=esc(0x1B,0x61,0x01), LF=esc(0x0A);
+  const items=[{p:'Panza de res',kg:2.35,pu:98},{p:'Libro',kg:1.1,pu:85},{p:'Pata blanca',kg:3,pu:42}], total=items.reduce((a,b)=>a+b.kg*b.pu,0);
+  let arr=[INIT,C,B,text('Carnes y Vísceras del Centro\\n'),b0,L,text('--------------------------------\\n')];
+  for(const it of items){arr.push(text(it.p+'\\n'));arr.push(text(\`\${to2(it.kg)}kg x $\${to2(it.pu)}  $\${to2(it.kg*it.pu)}\\n\`));}
+  arr.push(text('--------------------------------\\n'),B,text(\`Total: $\${to2(total)}\\n\`),b0,text('Notas: cortar pata en rodajas\\n'),LF,LF,C,text('¡Gracias!\\n'),LF,LF,LF,CUT);
+  return cat(...arr);
+}
+function printWithRawBT(){
+  const b64=toB64(buildEsc());
+  const url=\`rawbt://print?data=\${encodeURIComponent(b64)}\`;
+  let w; try{w=window.open(url,'_blank');}catch(e){}
+  setTimeout(()=>{ if(!w||w.closed) location.href=url; },200);
+}
+<\/script>
+</body></html>
+`;
+
+(async ()=>{
+  await ensureBucket();
+  await uploadHtml('test-print.html', html);
+})();
+</script>
