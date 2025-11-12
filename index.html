@@ -41,20 +41,20 @@
       body *{visibility:hidden}
       #printArea, #printArea *{visibility:visible}
       #printArea{position:fixed; left:0; top:0}
-      /* A4 */
+      /* A4 por defecto */
       #printArea:not(.ticket80){width:210mm; padding:12mm}
       #printArea:not(.ticket80) h3{margin:0 0 6mm 0}
       #printArea:not(.ticket80) table{width:100%; border-collapse:collapse}
       #printArea:not(.ticket80) th, #printArea:not(.ticket80) td{border:1px solid #aaa; padding:4px; font-size:12px}
-      /* Ticket 80mm (HTML) */
-      #printArea.ticket80{width:80mm; padding:3mm}
+
+      /* Ticket 80mm (el tamaño real del papel lo inyecto en JS con @page dinámico) */
+      #printArea.ticket80{width:80mm; padding:2mm}
       #printArea.ticket80 .tk-header{ text-align:center; font-size:12px; line-height:1.2; margin-bottom:6px }
       #printArea.ticket80 .tk-header .store{ font-weight:700; font-size:14px }
       #printArea.ticket80 .tk-meta{ font-size:11px; margin-bottom:6px }
       #printArea.ticket80 .tk-line{ border-top:1px dashed #000; margin:6px 0 }
       #printArea.ticket80 .tk-items{ width:100%; font-size:11px; border-collapse:collapse }
-      #printArea.ticket80 .tk-items th,
-      #printArea.ticket80 .tk-items td{ padding:2px 0; }
+      #printArea.ticket80 .tk-items th, #printArea.ticket80 .tk-items td{ padding:2px 0; }
       #printArea.ticket80 .right{ float:right }
       #printArea.ticket80 .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New", monospace }
       #printArea.ticket80 .totals{ font-size:12px; font-weight:700; margin-top:4px }
@@ -78,6 +78,7 @@
       <span class="pill" id="slotALabel">—</span>
       <button class="slotbtn" id="slotB">Slot B</button>
       <span class="pill" id="slotBLabel">—</span>
+
       <span class="right flex" style="gap:6px">
         <input type="checkbox" id="exitGuardToggle" />
         <label for="exitGuardToggle" class="muted">Confirmar al salir</label>
@@ -85,7 +86,7 @@
     </div>
   </section>
 
-  <!-- CONTROLES -->
+  <!-- CONTROLES (slot activo) -->
   <section class="card">
     <h2>🧾 Nota (Slot activo)</h2>
     <div class="row">
@@ -215,7 +216,7 @@
     </table>
   </section>
 
-  <!-- REPORTE DIARIO -->
+  <!-- REPORTE DIARIO GENERAL -->
   <section class="card">
     <h2>📄 Reporte diario GENERAL (todos los clientes)</h2>
     <div class="row">
@@ -240,15 +241,13 @@
       <button class="btn btn-ghost" id="btnWA">WhatsApp Cuenta</button>
       <button class="btn btn-ghost" id="btnImprimir">Imprimir A4</button>
       <button class="btn btn-ghost" id="btnImprimir80">Imprimir 80mm</button>
-      <!-- NUEVO: impresión directa ESC/POS por RawBT -->
-      <button class="btn btn-ghost" id="btnImprimir80RawBT">Imprimir 80mm (RawBT)</button>
+      <button class="btn btn-ghost" id="btnImprimir80Rawbt">Imprimir 80mm (RawBT)</button>
       <button class="btn btn-ghost" id="btnCSV">Exportar CSV</button>
       <button class="btn btn-ghost danger right" id="btnCerrar">Cerrar Nota</button>
     </div>
   </section>
 </main>
 
-<!-- PRINT AREA + CATÁLOGO -->
 <div id="printArea" style="display:none"></div>
 <datalist id="catProductos"></datalist>
 
@@ -268,45 +267,17 @@ function todayISO(){ const d=new Date(); const z=d.getTimezoneOffset()*60000; re
 function addDays(dateISO, days){ const d=new Date(dateISO); d.setDate(d.getDate()+Number(days||0)); const z=d.getTimezoneOffset()*60000; return new Date(d - z).toISOString().slice(0,10); }
 function genFolio(){ const d=new Date(); const pad=n=>String(n).padStart(2,'0'); return `CVC-${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`; }
 function csvEscape(s){ return '"'+String(s).replaceAll('"','""')+'"'; }
-function openWA(text, phone){
-  const msg=encodeURIComponent(text);
-  if(phone && /\d{10,13}/.test(phone)){
-    const num=String(phone).replace(/\D/g,'');
-    window.open(`https://wa.me/${num}?text=${msg}`,"_blank");
-  } else {
-    const u=`https://wa.me/?text=${msg}`; const u2=`https://api.whatsapp.com/send?text=${msg}`;
-    const w=window.open(u,"_blank"); setTimeout(()=>{ if(!w||w.closed) window.open(u2,"_blank"); }, 600);
-  }
-}
 
-/* ===== Helpers ESC/POS + RawBT ===== */
-function esc(...b){ return Uint8Array.from(b); }
-function text(s){ return new TextEncoder().encode(s); } // UTF-8
-function cat(...arr){
-  const len = arr.reduce((a,b)=>a+b.length,0);
-  const out = new Uint8Array(len);
-  let o=0; for(const a of arr){ out.set(a,o); o+=a.length; }
-  return out;
-}
-function toB64(u8){
-  let bin=""; for(let i=0;i<u8.length;i++) bin += String.fromCharCode(u8[i]);
-  return btoa(bin);
-}
-function openRawBT(bytes){
-  const b64 = toB64(bytes);
-  const rawUrl    = `rawbt://print?data=${encodeURIComponent(b64)}`;
-  const intentUrl = `intent://print#Intent;scheme=rawbt;S.data=${encodeURIComponent(b64)};end`;
-  try { window.location.href = rawUrl; } catch(e){ window.location.href = intentUrl; }
-}
+const isAndroid = () => /Android/i.test(navigator.userAgent);
 
-/* ========================= STATE (SLOTS + GUARD) ========================= */
+/* ========================= STATE ========================= */
 let CLIENTES=[], PRODUCTOS=[], PRECIOS={};
 let slotActive='A';
 let notaA=null, notaB=null;
 let chA=null, chB=null;
 const slotState = { A:{cliente_id:null, telefono:null}, B:{cliente_id:null, telefono:null} };
 
-// Protector de salida
+/* ===== Protector de salida ===== */
 let exitGuardEnabled = JSON.parse(localStorage.getItem('exitGuardEnabled') || 'true');
 let isDirty = false;
 function markDirty(){ if(exitGuardEnabled) isDirty = true; }
@@ -316,7 +287,6 @@ function clearDirty(){ isDirty = false; }
 const exitGuardToggle=$('#exitGuardToggle');
 const slotABtn=$('#slotA'), slotBBtn=$('#slotB');
 const slotALabel=$('#slotALabel'), slotBLabel=$('#slotBLabel');
-
 const cliSelect=$('#cliSelect');
 const cliTelefono=$('#cliTelefono');
 const notaFolio=$('#notaFolio');
@@ -324,18 +294,15 @@ const notaFecha=$('#notaFecha');
 const notaDias=$('#notaDias');
 const notaVence=$('#notaVence');
 const notaInfo=$('#notaInfo');
-
 const pProducto=$('#pProducto');
 const pKg=$('#pKg');
 const pPrecio=$('#pPrecio');
 const subtotalBox=$('#subtotalBox');
-
 const vFolio=$('#vFolio');
 const vEstado=$('#vEstado');
 const vSaldo=$('#vSaldo');
 const vistaBody=$('#vistaBody');
 const vistaTotal=$('#vistaTotal');
-
 const bandejaFecha=$('#bandejaFecha');
 const bandejaBody=$('#bandejaBody');
 const diaFecha=$('#diaFecha');
@@ -376,8 +343,8 @@ $('#btnContinuar').addEventListener('click', continuarNota);
 $('#btnAgregar').addEventListener('click', addPartida);
 $('#btnWA').addEventListener('click', ()=> activeNota() && waNota(activeNota().id));
 $('#btnImprimir').addEventListener('click', ()=> activeNota() && imprimirNotaA4(activeNota().id));
-$('#btnImprimir80').addEventListener('click', ()=> activeNota() && imprimirNota80mm(activeNota().id)); // HTML->Print
-$('#btnImprimir80RawBT').addEventListener('click', ()=> activeNota() && imprimirNota80mmRawBT(activeNota().id)); // ESC/POS directo
+$('#btnImprimir80').addEventListener('click', ()=> activeNota() && imprimirNota80mm(activeNota().id));
+$('#btnImprimir80Rawbt').addEventListener('click', ()=> activeNota() && imprimirNota80mmRawBT(activeNota().id));
 $('#btnCSV').addEventListener('click', ()=> activeNota() && exportNotaCSV(activeNota().id));
 $('#btnCerrar').addEventListener('click', cerrarNota);
 $('#btnNuevoCliente').addEventListener('click', addCliente);
@@ -537,7 +504,7 @@ async function recalcNota(nota_id){
   await loadBandeja();
 }
 
-/* ========================= VISTA (EDITAR/BORRAR) ========================= */
+/* ========================= VISTA (SLOT ACTIVO) ========================= */
 async function renderVista(){
   const n = activeNota();
   if(!n){
@@ -579,6 +546,8 @@ async function renderVista(){
 
   refreshNotaInfo();
 }
+
+/* ===== Editar en línea ===== */
 function makeCellEditable(td, nota_id){
   if(td.classList.contains('cell-editing')) return;
   const field = td.dataset.field;
@@ -614,6 +583,8 @@ function makeCellEditable(td, nota_id){
   input.addEventListener('keydown', e=>{ if(e.key==='Enter') commit(true); if(e.key==='Escape') commit(false); });
   input.addEventListener('blur', ()=> commit(true));
 }
+
+/* ===== Borrar partida ===== */
 async function deleteDetalle(detId){
   if(!confirm('¿Borrar esta partida?')) return;
   const n = activeNota(); if(!n) return;
@@ -697,7 +668,10 @@ async function waNota(nota_id){
   if(!phone || (activeNota()?.cliente_id!==nota.cliente_id)){
     const c = getClient(nota.cliente_id); phone = c ? (c.telefono||'') : '';
   }
-  openWA(plantillaWA(nota, det||[], nombre), phone);
+  const msg = plantillaWA(nota, det||[], nombre);
+  const u=`https://wa.me/?text=${encodeURIComponent(msg)}`;
+  const u2=`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+  const w=window.open(u,"_blank"); setTimeout(()=>{ if(!w||w.closed) window.open(u2,"_blank"); }, 600);
 }
 async function imprimirNotaA4(nota_id){
   const { data: nota } = await supabase.from('notas_credito').select('*, clientes(nombre)').eq('id', nota_id).single();
@@ -716,7 +690,7 @@ async function imprimirNotaA4(nota_id){
   window.print(); setTimeout(()=>{ el.style.display='none'; el.innerHTML=''; }, 500);
 }
 
-/* ====== Ticket 80mm (HTML -> print) ====== */
+/* ====== Ticket 80mm por DIÁLOGO DEL SISTEMA ====== */
 async function imprimirNota80mm(nota_id){
   await saveNotaObs();
   const { data: nota } = await supabase.from('notas_credito').select('*, clientes(nombre)').eq('id', nota_id).single();
@@ -725,11 +699,11 @@ async function imprimirNota80mm(nota_id){
   const el = $('#printArea'); el.style.display='block'; el.classList.add('ticket80');
 
   const lines = (det||[]).map(d=>`
-      <tr><td colspan="2">${d.producto}</td></tr>
-      <tr class="mono">
-        <td>${to2(d.cantidad)}kg × $${to2(d.precio)}</td>
-        <td style="text-align:right">$${to2(d.importe)}</td>
-      </tr>`).join('');
+    <tr><td colspan="2">${d.producto}</td></tr>
+    <tr class="mono">
+      <td>${to2(d.cantidad)}kg × $${to2(d.precio)}</td>
+      <td style="text-align:right">$${to2(d.importe)}</td>
+    </tr>`).join('');
 
   el.innerHTML = `
     <div class="tk-header">
@@ -750,74 +724,78 @@ async function imprimirNota80mm(nota_id){
     <div class="tk-line"></div>
     <div class="thanks">¡Gracias por su preferencia!</div>
   `;
+
+  /* Inyecta @page 80mm roll SÓLO para esta impresión */
+  const pageStyle = document.createElement('style');
+  pageStyle.id = 'pageStyle80';
+  pageStyle.textContent = '@page { size: 80mm auto; margin: 0 }';
+  document.head.appendChild(pageStyle);
+
   window.print();
-  setTimeout(()=>{ el.style.display='none'; el.classList.remove('ticket80'); el.innerHTML=''; }, 500);
+  setTimeout(()=>{ 
+    el.style.display='none'; el.classList.remove('ticket80'); el.innerHTML='';
+    const st = document.getElementById('pageStyle80'); if(st) st.remove();
+  }, 500);
 }
 
-/* ====== Ticket 80mm (ESC/POS directo con RawBT) ====== */
+/* ====== Ticket 80mm por RAWBT (Android, sin diálogo) ====== */
+function left(s, n){ return (s||'').toString().slice(0,n).padEnd(n,' '); }
+function right(num, n){ const s=(num||'').toString(); return s.length>=n? s.slice(-n) : ' '.repeat(n-s.length)+s; }
+function monoLine(){ return '--------------------------------\n'; } // 32 col aprox 80mm
+
+function buildRawbtText(nota, det, clienteNombre){
+  // 32 columnas aprox (fuente por defecto RawBT)
+  let out='';
+  out += `${STORE_NAME}\n`;
+  out += `Nota a Crédito\n`;
+  out += monoLine();
+  out += `Cliente: ${clienteNombre}\n`;
+  out += `Folio: ${nota.folio}\n`;
+  out += `Fecha: ${nota.fecha}  Vence: ${nota.vence||''}\n`;
+  out += monoLine();
+  (det||[]).forEach(d=>{
+    out += `${left(d.producto,32)}\n`;
+    const izq = `${to2(d.cantidad)}kg x $${to2(d.precio)}`;
+    const der = `$${to2(d.importe)}`;
+    out += `${left(izq,20)}${right(der,12)}\n`;
+  });
+  out += monoLine();
+  out += `Total: $${to2(nota.total)}\n`;
+  out += `Saldo: $${to2(nota.saldo)}\n`;
+  if(nota.observaciones){ out += monoLine(); out += `Notas:\n${nota.observaciones}\n`; }
+  out += '\n¡Gracias por su preferencia!\n\n\n';
+  return out;
+}
+
 async function imprimirNota80mmRawBT(nota_id){
   await saveNotaObs();
+  const { data: nota } = await supabase.from('notas_credito').select('*, clientes(nombre)').eq('id', nota_id).single();
+  const { data: det }  = await supabase.from('notas_detalle').select('*').eq('nota_id', nota_id).order('created_at');
+  const clienteNombre = nota.clientes?.nombre || '';
 
-  const { data: nota } = await supabase.from('notas_credito')
-    .select('*, clientes(nombre)').eq('id', nota_id).single();
-  const { data: det }  = await supabase.from('notas_detalle')
-    .select('*').eq('nota_id', nota_id).order('created_at');
+  const text = buildRawbtText(nota, det||[], clienteNombre);
 
-  const INIT     = esc(0x1B,0x40);      // Initialize
-  const ALIGN_L  = esc(0x1B,0x61,0x00);
-  const ALIGN_C  = esc(0x1B,0x61,0x01);
-  const BOLD_ON  = esc(0x1B,0x45,0x01);
-  const BOLD_OFF = esc(0x1B,0x45,0x00);
-  const LF       = esc(0x0A);
-  const CUT      = esc(0x1D,0x56,0x00); // Si no corta: usa esc(0x1D,0x56,0x01) ó esc(0x1D,0x56,0x42,0x00)
-
-  const line = (s="") => cat(text(s), LF);
-
-  let parts = [
-    INIT,
-    ALIGN_C, BOLD_ON, text(STORE_NAME), LF, BOLD_OFF,
-    line('Nota a Crédito'),
-    ALIGN_L,
-    line(`Cliente: ${nota.clientes?.nombre||''}`),
-    line(`Folio  : ${nota.folio}`),
-    line(`Fecha  : ${nota.fecha}${nota.vence?`   Vence: ${nota.vence}`:''}`),
-    line('--------------------------------')
-  ];
-
-  (det||[]).forEach(d=>{
-    const imp = Number(d.cantidad)*Number(d.precio);
-    parts.push(line(String(d.producto)));
-    parts.push(line(`${to2(d.cantidad)}kg x $${to2(d.precio)}   $${to2(imp)}`));
-  });
-
-  parts.push(
-    line('--------------------------------'),
-    BOLD_ON, line(`Total: $${to2(nota.total)}`), BOLD_OFF,
-    line(`Saldo: $${to2(nota.saldo)}`)
-  );
-
-  if (nota.observaciones){
-    parts.push(line('Notas del cliente:'));
-    String(nota.observaciones).split('\n').forEach(l => parts.push(line(l)));
+  if(!isAndroid()){
+    alert('RawBT es solo para Android. Usa "Imprimir 80mm".');
+    return;
   }
 
-  parts.push(LF, ALIGN_C, line('¡Gracias por su preferencia!'), LF, CUT, LF);
-
-  const bytes = cat(...parts);
-  openRawBT(bytes);
+  try{
+    // Esquema simple soportado por RawBT: "rawbt:" + data URI (text/plain)
+    const uri = 'rawbt:' + encodeURIComponent(text);
+    // Intento abrir RawBT
+    window.location.href = uri;
+    // Por si el navegador bloquea, abrimos en nueva pestaña
+    setTimeout(()=>{ window.open(uri, '_blank'); }, 400);
+  }catch(e){
+    console.error(e);
+    alert('No se pudo abrir RawBT. Verifica que la app esté instalada.');
+    // Enlace a Play Store:
+    window.open('https://play.google.com/store/apps/details?id=ru.a402d.rawbtprinter','_blank');
+  }
 }
 
-async function exportNotaCSV(nota_id){
-  const { data: nota } = await supabase.from('notas_credito').select('*').eq('id', nota_id).single();
-  const { data: det }  = await supabase.from('notas_detalle').select('*').eq('nota_id', nota_id).order('created_at');
-  const head=['Folio','Fecha','Hora','Producto','Kg','Precio','Importe'];
-  const rows=(det||[]).map(d=>[nota.folio, nota.fecha, new Date(d.created_at).toLocaleTimeString(), d.producto, to2(d.cantidad), to2(d.precio), to2(d.importe)]);
-  const csv=[head,...rows].map(r=>r.map(csvEscape).join(',')).join('\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const url=URL.createObjectURL(blob);
-  const a=document.createElement('a'); a.href=url; a.download=`nota_${nota.folio}.csv`; a.click(); URL.revokeObjectURL(url);
-}
-
-/* ========================= REPORTE DIARIO ========================= */
+/* ========================= REPORTE DIARIO GENERAL ========================= */
 async function imprimirDiaA4(){
   const f = diaFecha.value || todayISO();
   const { data: notas } = await supabase
