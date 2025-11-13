@@ -33,45 +33,69 @@ export async function imprimirNota80mm(nota_id) {
 
   const el = $("#printArea");
   el.style.display = "block";
+  el.classList.add("ticket80");
 
-  const items = (det || [])
+  const lines = (det || [])
     .map(
-      (d) =>
-        `<tr><td>${d.producto}</td><td class="right">${to2(d.cantidad)}</td><td>kg</td><td>$${to2(d.precio)}</td><td>$${to2(d.importe)}</td></tr>`
+      (d) => `
+    <tr><td colspan="2">${d.producto}</td></tr>
+    <tr class="mono">
+      <td>${to2(d.cantidad)}kg × $${to2(d.precio)}</td>
+      <td style="text-align:right">$${to2(d.importe)}</td>
+    </tr>`
     )
     .join("");
 
-  let totalKg = 0;
-  (det || []).forEach((d) => {
-    totalKg += parseFloat(d.cantidad || 0);
-  });
-
   el.innerHTML = `
-    <div class="center">${STORE_NAME}</div>
-    <div class="center">Nota a Crédito</div>
-    <div style="font-size:11px;margin:4px 0;">Folio: ${nota.folio}</div>
-    <div style="font-size:11px;margin-bottom:6px;">
-      Cliente: ${nota.clientes?.nombre || ""}<br>
-      Fecha: ${nota.fecha} • Vence: ${nota.vence || "—"}<br>
-      ${nota.observaciones ? `Obs: ${nota.observaciones}<br>` : ""}
+    <div class="tk-header">
+      <div class="store">${STORE_NAME}</div>
+      <div>Nota a Crédito</div>
     </div>
-    <table>
-      <thead><tr><th>Prod</th><th class="right">Cant</th><th>U</th><th>P.Unit</th><th>Importe</th></tr></thead>
-      <tbody>${items}</tbody>
-      <tfoot>
-        <tr><td>Total kg</td><td class="right" colspan="4">${to2(totalKg)}</td></tr>
-        <tr><td>Total $</td><td class="right" colspan="4">$${to2(nota.total)}</td></tr>
-        <tr><td>Saldo</td><td class="right" colspan="4">$${to2(nota.saldo)}</td></tr>
-      </tfoot>
-    </table>
-    <div style="height:18px"></div>
-    <div style="border-top:1px solid #000; padding-top:6px; text-align:center; font-size:11px;">Firma de recibido</div>
+    <div class="tk-meta">
+      <div><b>Cliente:</b> ${nota.clientes?.nombre || ""}</div>
+      <div><b>Folio:</b> ${nota.folio}</div>
+      <div><b>Fecha:</b> ${nota.fecha} &nbsp; <b>Vence:</b> ${nota.vence || ""}</div>
+    </div>
+    <div class="tk-line"></div>
+    <table class="tk-items"><tbody>${lines}</tbody></table>
+    <div class="tk-line"></div>
+    <div class="totals">Total: $${to2(nota.total)}<span class="right"></span></div>
+    <div class="mono">Saldo: $${to2(nota.saldo)}</div>
+    ${nota.observaciones ? `<div class="obs-title">Notas del cliente:</div><div class="obs">${nota.observaciones || ""}</div>` : ""}
+    <div class="tk-line"></div>
+    <div class="thanks">¡Gracias por su preferencia!</div>
   `;
+
+  const pageStyle = document.createElement("style");
+  pageStyle.id = "pageStyle80";
+  pageStyle.textContent = `
+    @page { 
+      size: 80mm auto; 
+      margin: 0; 
+    }
+    @media print {
+      html, body {
+        height: auto;
+        overflow: visible;
+      }
+      #printArea.ticket80 {
+        page-break-before: avoid;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        orphans: 4;
+        widows: 4;
+      }
+    }
+  `;
+  document.head.appendChild(pageStyle);
 
   window.print();
   setTimeout(() => {
     el.style.display = "none";
+    el.classList.remove("ticket80");
     el.innerHTML = "";
+    const st = document.getElementById("pageStyle80");
+    if (st) st.remove();
   }, 500);
 }
 
