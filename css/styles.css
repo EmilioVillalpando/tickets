@@ -220,45 +220,37 @@ th {
     font-size: 12px;
   }
 
-  /* Ticket 80mm - 203 DPI (1mm = 8 dots) */
+  /* Ticket 80mm (el tamaño real del papel lo inyecto en JS con @page dinámico) */
   #printArea.ticket80 {
     width: 80mm;
-    max-width: 80mm;
-    padding: 2mm 3mm;
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
-  #printArea.ticket80 * {
-    page-break-inside: avoid;
+    padding: 2mm;
   }
   #printArea.ticket80 .tk-header {
     text-align: center;
-    font-size: 10px;
-    line-height: 1.3;
-    margin-bottom: 3px;
+    font-size: 12px;
+    line-height: 1.2;
+    margin-bottom: 6px;
   }
   #printArea.ticket80 .tk-header .store {
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
   }
   #printArea.ticket80 .tk-meta {
-    font-size: 9px;
-    margin-bottom: 3px;
-    line-height: 1.3;
+    font-size: 11px;
+    margin-bottom: 6px;
   }
   #printArea.ticket80 .tk-line {
     border-top: 1px dashed #000;
-    margin: 3px 0;
+    margin: 6px 0;
   }
   #printArea.ticket80 .tk-items {
     width: 100%;
-    font-size: 9px;
+    font-size: 11px;
     border-collapse: collapse;
   }
   #printArea.ticket80 .tk-items th,
   #printArea.ticket80 .tk-items td {
-    padding: 1px 0;
-    line-height: 1.2;
+    padding: 2px 0;
   }
   #printArea.ticket80 .right {
     float: right;
@@ -266,27 +258,24 @@ th {
   #printArea.ticket80 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New",
       monospace;
-    font-size: 9px;
   }
   #printArea.ticket80 .totals {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
-    margin-top: 2px;
-    line-height: 1.3;
+    margin-top: 4px;
   }
   #printArea.ticket80 .obs-title {
     font-weight: 700;
-    font-size: 9px;
-    margin-top: 3px;
+    font-size: 11px;
+    margin-top: 6px;
   }
   #printArea.ticket80 .obs {
     white-space: pre-wrap;
-    font-size: 9px;
-    line-height: 1.3;
+    font-size: 11px;
   }
   #printArea.ticket80 .thanks {
     text-align: center;
-    margin-top: 4px;
-    font-size: 9px;
+    margin-top: 8px;
+    font-size: 11px;
   }
 }

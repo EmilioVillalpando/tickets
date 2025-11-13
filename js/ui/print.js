@@ -68,25 +68,7 @@ export async function imprimirNota80mm(nota_id) {
 
   const pageStyle = document.createElement("style");
   pageStyle.id = "pageStyle80";
-  pageStyle.textContent = `
-    @page { 
-      size: 80mm auto; 
-      margin: 0; 
-    }
-    @media print {
-      html, body {
-        height: auto;
-        overflow: visible;
-      }
-      #printArea.ticket80 {
-        page-break-before: avoid;
-        page-break-after: avoid;
-        page-break-inside: avoid;
-        orphans: 4;
-        widows: 4;
-      }
-    }
-  `;
+  pageStyle.textContent = "@page { size: 80mm auto; margin: 0 }";
   document.head.appendChild(pageStyle);
 
   window.print();
