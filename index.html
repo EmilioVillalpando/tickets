@@ -8,7 +8,7 @@
 </head>
 <body>
 <header>
-  <h1>VDC360° · Notas a Crédito (Slots A/B + Reporte Diario) v1.2</h1>
+  <h1>VDC360° · Notas a Crédito (Slots A/B + Reporte Diario) v1.3</h1>
 </header>
 
 <main>
@@ -188,9 +188,15 @@
       <button class="btn btn-ghost danger right" id="btnCerrar">Cerrar Nota</button>
     </div>
   </section>
+
+  <!-- ÁREA DE IMPRESIÓN -->
+  <section class="card" id="printCard">
+    <h2 class="no-print">Vista previa de impresión</h2>
+    <div id="printArea" style="display:none"></div>
+    <div class="cut-hint">SIEMPRE CON TODA LA ACTITUD.</div>
+  </section>
 </main>
 
-<div id="printArea" style="display:none"></div>
 <datalist id="catProductos"></datalist>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
