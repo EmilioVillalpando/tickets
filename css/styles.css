@@ -1,0 +1,281 @@
+:root {
+  --ink: #111;
+  --brand: #0a7a3b;
+  --muted: #6b7280;
+  --bg: #f6f7f8;
+  --card: #fff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto;
+}
+
+header {
+  background: var(--brand);
+  color: #fff;
+  padding: 14px 18px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+main {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 16px;
+}
+
+h2 {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+}
+
+label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  color: #111;
+}
+
+input,
+select,
+button,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  padding: 8px;
+  border-bottom: 1px solid #eef0f2;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background: #fafafa;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.row-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 16px;
+}
+
+.flex {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.right {
+  margin-left: auto;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+  border: none;
+}
+
+.btn-ghost {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  color: #111;
+}
+
+.btn-muted {
+  background: #111;
+  color: #fff;
+  border: none;
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef7f0;
+  color: #0a7a3b;
+  font-size: 12px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.danger {
+  color: #b91c1c;
+}
+
+.slotbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.slotbtn {
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.slotbtn.active {
+  background: #0a7a3b;
+  color: #fff;
+  border-color: #0a7a3b;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.cell-editing input {
+  width: 100%;
+  padding: 6px;
+  font-size: 14px;
+}
+
+/* ====== IMPRESIÓN ====== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printArea,
+  #printArea * {
+    visibility: visible;
+  }
+  #printArea {
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+  /* A4 por defecto */
+  #printArea:not(.ticket80) {
+    width: 210mm;
+    padding: 12mm;
+  }
+  #printArea:not(.ticket80) h3 {
+    margin: 0 0 6mm 0;
+  }
+  #printArea:not(.ticket80) table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #printArea:not(.ticket80) th,
+  #printArea:not(.ticket80) td {
+    border: 1px solid #aaa;
+    padding: 4px;
+    font-size: 12px;
+  }
+
+  /* Ticket 80mm (el tamaño real del papel lo inyecto en JS con @page dinámico) */
+  #printArea.ticket80 {
+    width: 80mm;
+    padding: 2mm;
+  }
+  #printArea.ticket80 .tk-header {
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  #printArea.ticket80 .tk-header .store {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  #printArea.ticket80 .tk-meta {
+    font-size: 11px;
+    margin-bottom: 6px;
+  }
+  #printArea.ticket80 .tk-line {
+    border-top: 1px dashed #000;
+    margin: 6px 0;
+  }
+  #printArea.ticket80 .tk-items {
+    width: 100%;
+    font-size: 11px;
+    border-collapse: collapse;
+  }
+  #printArea.ticket80 .tk-items th,
+  #printArea.ticket80 .tk-items td {
+    padding: 2px 0;
+  }
+  #printArea.ticket80 .right {
+    float: right;
+  }
+  #printArea.ticket80 .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Courier New",
+      monospace;
+  }
+  #printArea.ticket80 .totals {
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 4px;
+  }
+  #printArea.ticket80 .obs-title {
+    font-weight: 700;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+  #printArea.ticket80 .obs {
+    white-space: pre-wrap;
+    font-size: 11px;
+  }
+  #printArea.ticket80 .thanks {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 11px;
+  }
+}
