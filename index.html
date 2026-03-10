@@ -1,1 +1,1346 @@
 
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Comandas — Taquería Guadalupe Victoria</title>
+
+  <style>
+    :root{
+      --bg:#f3e7d4;
+      --paper:#fbf2e2;
+      --card:#fff7ea;
+      --ink:#3b2a1f;
+      --muted:#6e5646;
+      --line:rgba(59,42,31,.15);
+
+      --brand:#3b2a1f;
+      --gold1:#c98a1e;
+      --gold2:#b77712;
+      --green:#1f6b2a;
+      --red:#9f2d22;
+
+      --shadow: 0 18px 50px rgba(32,24,16,.18);
+      --r:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:
+        radial-gradient(1200px 520px at 10% -10%, rgba(201,138,30,.20), transparent 60%),
+        radial-gradient(1200px 520px at 90% 0%, rgba(59,42,31,.12), transparent 55%),
+        var(--bg);
+      color:var(--ink);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    header{
+      position: sticky; top: 0; z-index: 50;
+      background: linear-gradient(180deg, rgba(59,42,31,.95), rgba(59,42,31,.88));
+      color:#fff;
+      padding:12px 14px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    header .row{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      max-width:1400px; margin:0 auto;
+    }
+    header .brand{display:flex; flex-direction:column; line-height:1.05; min-width:0;}
+    header h1{
+      margin:0;
+      font-size:16px;
+      letter-spacing:.2px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    header .sub{
+      font-size:12px; opacity:.92; margin-top:3px;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      background: rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .pill b{font-size:13px}
+
+    .wrap{
+      max-width:1400px;
+      margin:0 auto;
+      padding:14px;
+      display:grid;
+      gap:14px;
+    }
+
+    .hero{
+      border-radius: 22px;
+      border:1px solid rgba(59,42,31,.15);
+      overflow:hidden;
+      box-shadow: 0 25px 70px rgba(32,24,16,.18);
+      background:#0b1220;
+    }
+    .hero img{width:100%; height: 210px; object-fit: cover; display:block;}
+    @media (max-width: 520px){ .hero img{height:150px} }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.35fr .95fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 1180px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card h2{
+      margin:0;
+      padding:14px 14px 10px;
+      font-size:15px;
+      border-bottom:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .content{padding:14px}
+
+    .searchRow{display:flex; gap:10px; align-items:center; margin-top:12px;}
+    .searchRow input{
+      flex:1;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(59,42,31,.20);
+      background: rgba(255,255,255,.65);
+      outline:none;
+      font-size:14px;
+      color: var(--ink);
+    }
+
+    .tabs{display:flex; flex-wrap:wrap; gap:10px; margin: 12px 0 10px;}
+    .tab{
+      border:1px solid rgba(59,42,31,.22);
+      background: rgba(255,255,255,.55);
+      padding:10px 14px;
+      border-radius: 12px;
+      font-weight:900;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      letter-spacing:.2px;
+      box-shadow: 0 10px 22px rgba(32,24,16,.10);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .tab.active{
+      background: rgba(255,255,255,.80);
+      border-color: rgba(201,138,30,.55);
+      box-shadow: 0 0 0 3px rgba(201,138,30,.18);
+    }
+
+    .sectionTitle{
+      margin: 12px 0 10px;
+      font-size: 40px;
+      letter-spacing: .8px;
+      font-weight: 1000;
+      color: rgba(59,42,31,.96);
+      line-height:1;
+    }
+    .divider{
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(59,42,31,.20);
+      margin: 8px 0 18px;
+    }
+
+    .items{display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:14px;}
+    @media (max-width: 620px){ .items{grid-template-columns:1fr} }
+
+    .prod{
+      background: rgba(255,255,255,.35);
+      border:1px solid rgba(59,42,31,.18);
+      border-radius: 18px;
+      overflow:hidden;
+      display:grid;
+      grid-template-columns: 1fr 1.1fr;
+      min-height: 170px;
+      box-shadow: 0 18px 50px rgba(32,24,16,.10);
+    }
+    .prodLeft{
+      padding:14px 14px 12px;
+      display:flex; flex-direction:column; gap:8px;
+      background: rgba(255,255,255,.35);
+      min-width:0;
+    }
+    .prodName{
+      font-weight:1000;
+      font-size: 22px;
+      margin:0;
+      line-height:1.15;
+      word-break: break-word;
+    }
+    .prodDesc{
+      margin:0;
+      color: var(--muted);
+      font-weight:700;
+      line-height:1.25;
+      font-size:13px;
+    }
+    .price{
+      margin-top:auto;
+      font-weight:1000;
+      color: var(--green);
+      font-size: 16px;
+    }
+    .price b{
+      display:block;
+      font-size: 32px;
+      letter-spacing:.3px;
+    }
+
+    .prodRight{
+      position:relative;
+      padding:14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.30));
+      display:flex; flex-direction:column; justify-content:center; align-items:center; gap:10px;
+    }
+    .prodImg{
+      width: 100%;
+      height: 92px;
+      border-radius: 18px;
+      overflow:hidden;
+      background: #0b1220;
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .prodImg img{width:100%; height:100%; object-fit: cover; display:block;}
+
+    .btnAdd, .stickyBtn, .btnDark, .btnWarn, .btnRed{
+      border:none; cursor:pointer;
+      padding: 11px 16px;
+      border-radius: 12px;
+      font-weight: 1000;
+      color:#fff;
+      font-size: 14px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btnAdd, .stickyBtn{
+      border-radius:999px;
+      padding:10px 24px;
+      background: linear-gradient(180deg, var(--gold1), var(--gold2));
+      box-shadow: 0 12px 26px rgba(201,138,30,.38);
+      font-size: 16px;
+    }
+    .btnDark{
+      background: linear-gradient(180deg, rgba(59,42,31,.94), rgba(59,42,31,.88));
+      box-shadow: 0 12px 26px rgba(0,0,0,.22);
+    }
+    .btnWarn{
+      background: linear-gradient(180deg, #2b8a3e, #1f6b2a);
+      box-shadow: 0 12px 26px rgba(31,107,42,.26);
+    }
+    .btnRed{
+      background: linear-gradient(180deg, #b43b2e, #8f281d);
+      box-shadow: 0 12px 26px rgba(143,40,29,.26);
+    }
+
+    .btnLight, .mini{
+      border:1px solid rgba(59,42,31,.18);
+      background: rgba(255,255,255,.65);
+      color: var(--ink);
+      cursor:pointer;
+      font-weight:1000;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btnLight{
+      padding:12px 14px;
+      border-radius: 12px;
+    }
+
+    .mini{
+      width:30px; height:30px;
+      border-radius:10px;
+    }
+
+    .formGrid{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+    @media (max-width:620px){ .formGrid{grid-template-columns:1fr} }
+
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:1000;
+      margin:10px 0 6px;
+      color: rgba(59,42,31,.90)
+    }
+    input, textarea, select{
+      width:100%;
+      padding:12px 12px;
+      border:1px solid rgba(59,42,31,.18);
+      border-radius:14px;
+      font-size:14px;
+      outline:none;
+      background: rgba(255,255,255,.65);
+      color: var(--ink);
+    }
+    textarea{min-height:88px; resize:vertical}
+
+    .cartLine{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+      border-bottom:1px dashed rgba(59,42,31,.18);
+      padding:10px 0;
+    }
+    .cartLine:last-child{border-bottom:none}
+
+    .muted{color: var(--muted)}
+    .qtyRow{display:flex; gap:6px; align-items:center}
+
+    .totalRow{
+      display:flex; justify-content:space-between; align-items:center;
+      padding-top:12px; margin-top:12px;
+      border-top:1px solid rgba(59,42,31,.18);
+      font-size:14px;
+      font-weight:900;
+    }
+    .totalRow strong{font-size:18px}
+
+    .stickyBar{
+      position: sticky;
+      bottom: 12px;
+      z-index: 25;
+      margin-top: 12px;
+      background: linear-gradient(180deg, rgba(59,42,31,.94), rgba(59,42,31,.90));
+      color:#fff;
+      border-radius: 14px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 10px 10px 10px 12px;
+      flex-wrap:wrap;
+    }
+    .stickyBar .left{display:flex; align-items:center; gap:10px; font-weight:1000;}
+    .stickyBar .amount{font-size:18px; letter-spacing:.2px;}
+
+    .note{
+      font-size:12px;
+      color: var(--muted);
+      font-weight:800;
+      line-height:1.35;
+      background: rgba(255,255,255,.35);
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(59,42,31,.16);
+      margin-top:12px;
+    }
+
+    .openList{
+      display:grid; gap:10px;
+    }
+    .openCard{
+      border:1px solid rgba(59,42,31,.16);
+      background: rgba(255,255,255,.45);
+      border-radius:16px;
+      padding:12px;
+      box-shadow: 0 10px 24px rgba(32,24,16,.08);
+    }
+    .openCardTop{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+      margin-bottom:8px;
+    }
+    .openMesa{
+      font-weight:1000;
+      font-size:18px;
+      line-height:1.1;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:1000;
+      border:1px solid rgba(59,42,31,.16);
+      background: rgba(255,255,255,.65);
+    }
+    .openMini{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      line-height:1.35;
+    }
+    .openActions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.58);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index:60;
+      touch-action:none;
+    }
+    .modal{
+      width:min(820px, 100%);
+      background: var(--paper);
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(59,42,31,.18);
+      box-shadow: 0 40px 100px rgba(0,0,0,.35);
+      pointer-events:auto;
+    }
+    .modalHead{
+      padding:14px 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));
+      border-bottom:1px solid rgba(59,42,31,.16);
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .modalHead h3{margin:0; font-size:15px}
+    .closeX{
+      border:1px solid rgba(59,42,31,.18);
+      background: rgba(255,255,255,.65);
+      border-radius:12px;
+      width:40px; height:40px;
+      cursor:pointer;
+      font-weight:1000;
+      color: var(--ink);
+    }
+    .optGroup{
+      border:1px solid rgba(59,42,31,.16);
+      border-radius:16px;
+      padding:12px 12px;
+      margin-top:10px;
+      background: rgba(255,255,255,.35);
+    }
+    .optTitle{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+    .optTitle b{font-size:13px}
+    .optTitle span{font-size:12px; color:var(--muted); font-weight:800}
+    .optList{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+    .optBtn{
+      border:1px solid rgba(59,42,31,.18);
+      background: rgba(255,255,255,.65);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+      font-weight:900;
+      color: var(--ink);
+    }
+    .optBtn.active{
+      border-color: rgba(201,138,30,.60);
+      box-shadow:0 0 0 3px rgba(201,138,30,.18);
+    }
+    .footerBtns{
+      display:flex;
+      gap:10px;
+      padding:14px 16px;
+      border-top:1px solid rgba(59,42,31,.16);
+      background: rgba(255,255,255,.25);
+    }
+    .footerBtns button{flex:1}
+
+    .print-area{display:none}
+
+    @media print{
+      body *{visibility:hidden !important}
+      .print-area, .print-area *{visibility:visible !important}
+      .print-area{
+        display:block !important;
+        position:absolute;
+        inset:0;
+        background:#fff;
+        color:#000;
+        padding:0;
+        margin:0;
+      }
+      @page{
+        size:80mm auto;
+        margin:2mm;
+      }
+    }
+
+    .ticket{
+      width:76mm;
+      margin:0 auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color:#000;
+      background:#fff;
+      padding:4mm 2mm;
+      font-size:12px;
+      line-height:1.25;
+    }
+    .ticket .center{text-align:center}
+    .ticket .b{font-weight:900}
+    .ticket .lg{font-size:16px}
+    .ticket .sm{font-size:11px}
+    .ticket .hr{
+      border-top:1px dashed #000;
+      margin:6px 0;
+    }
+    .ticket .row{
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .ticket .item{
+      margin:5px 0;
+    }
+    .ticket .item-name{
+      font-weight:900;
+      font-size:12px;
+    }
+    .ticket .item-sub{
+      padding-left:8px;
+      font-size:11px;
+      white-space:pre-wrap;
+    }
+    .ticket .tot{
+      font-size:14px;
+      font-weight:900;
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="row">
+    <div class="brand">
+      <h1>🍽️ Comandas — Taquería Guadalupe Victoria</h1>
+      <div class="sub">Sistema para meseros y mesas • Diseño Picapiedra</div>
+    </div>
+    <div class="pill" id="cartPill">🧾 <b>0</b> • <span id="pillTotal">$0.00</span></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <img src="portadagdp.png" alt="Taquería Guadalupe Victoria">
+  </div>
+
+  <div class="grid">
+    <!-- MENÚ -->
+    <section class="card">
+      <h2>Menú</h2>
+      <div class="content">
+        <div class="searchRow">
+          <input id="q" placeholder="Buscar un producto (ej. taco, quesadilla, charola)..."/>
+        </div>
+
+        <div class="tabs" id="tabs"></div>
+
+        <div id="sectionHdr">
+          <div class="sectionTitle" id="sectionTitle">TACOS</div>
+          <div class="divider"></div>
+        </div>
+
+        <div class="items" id="items"></div>
+
+        <div class="note">
+          Tip: puedes usar este sistema para levantar pedido por mesa, guardar la comanda y mandarla directo a impresión.
+        </div>
+      </div>
+    </section>
+
+    <!-- COMANDA ACTUAL -->
+    <aside class="card">
+      <h2>Comanda actual</h2>
+      <div class="content">
+        <div class="formGrid">
+          <div>
+            <label>Mesa *</label>
+            <select id="mesaSelect"></select>
+          </div>
+          <div>
+            <label>Mesero *</label>
+            <input id="meseroInput" placeholder="Ej. Marco">
+          </div>
+        </div>
+
+        <label>Nombre del cliente / referencia</label>
+        <input id="clienteInput" placeholder="Ej. Familia Pérez / Mesa cumpleaños">
+
+        <label>Notas generales de la mesa</label>
+        <textarea id="notaMesaInput" placeholder="Ej. una orden sale primero, sin cebolla en toda la mesa, etc."></textarea>
+
+        <div id="cart"></div>
+
+        <div class="totalRow">
+          <span>Total</span>
+          <strong id="total">$0.00</strong>
+        </div>
+
+        <div class="stickyBar">
+          <div class="left">
+            <span>🍽️</span>
+            <span class="amount" id="barTotal">$0.00</span>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <button class="btnLight" id="btnClear">Vaciar</button>
+            <button class="btnWarn" id="btnGuardar">Guardar comanda</button>
+            <button class="stickyBtn" id="btnImprimir">Imprimir</button>
+          </div>
+        </div>
+
+        <div class="note">
+          Al guardar, la comanda se queda registrada como abierta. Puedes volver a cargarla, editarla o cerrarla después.
+        </div>
+      </div>
+    </aside>
+
+    <!-- COMANDAS ABIERTAS -->
+    <aside class="card">
+      <h2>Comandas abiertas <span id="openCount" class="badge">0</span></h2>
+      <div class="content">
+        <div id="openList" class="openList"></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="backdrop" id="backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modalHead">
+      <div>
+        <h3 id="mTitle">Producto</h3>
+        <div class="muted" id="mSub" style="font-size:12px;font-weight:900">Configura como lo quieres</div>
+      </div>
+      <button class="closeX" id="mClose" type="button">✕</button>
+    </div>
+
+    <div class="content" id="mBody"></div>
+
+    <div class="footerBtns">
+      <button class="btnLight" id="mCancel" type="button">Cancelar</button>
+      <button class="btnDark" id="mAdd" type="button">Agregar a comanda</button>
+    </div>
+  </div>
+</div>
+
+<!-- ÁREA DE IMPRESIÓN -->
+<div class="print-area" id="printArea"></div>
+
+<script>
+/** =========================
+ *  CONFIG
+ *  ========================= */
+const NEGOCIO = "Taquería Guadalupe Victoria";
+const IMG_BASE = "";
+const LS_KEY = "gdp_comandas_abiertas_v1";
+
+/** =========================
+ *  CATÁLOGO
+ *  ========================= */
+const catalogo = [
+  {id:"taco_tripa",    cat:"TACOS", name:"Taco de Tripa",    price:38, desc:"Tripa doradita.", mods:true,  img:"tacogdp.png"},
+  {id:"taco_pastor",   cat:"TACOS", name:"Taco de Pastor",   price:28, desc:"Pastor clásico.", mods:false, img:"tacogdp.png"},
+  {id:"taco_bistec",   cat:"TACOS", name:"Taco de Bistec",   price:28, desc:"Bistec bien servido.", mods:false, img:"tacogdp.png"},
+  {id:"taco_chorizo",  cat:"TACOS", name:"Taco de Chorizo",  price:28, desc:"Chorizo doradito.", mods:false, img:"tacogdp.png"},
+  {id:"taco_alambre",  cat:"TACOS", name:"Taco de Alambre",  price:28, desc:"Alambre en taco.", mods:false, img:"tacogdp.png"},
+  {id:"taco_costilla", cat:"TACOS", name:"Taco de Costilla", price:28, desc:"Costilla jugosa.", mods:false, img:"tacogdp.png"},
+  {id:"taco_barbacoa", cat:"TACOS", name:"Taco de Barbacoa", price:28, desc:"Barbacoa suave.", mods:false, img:"tacogdp.png"},
+  {id:"taco_higado",   cat:"TACOS", name:"Taco de Hígado",   price:28, desc:"Hígado bien sazonado.", mods:false, img:"tacogdp.png"},
+  {id:"taco_combinado",cat:"TACOS", name:"Taco Combinado",   price:38, desc:"Pon en nota tus carnes.", mods:true, img:"tacogdp.png"},
+
+  {id:"quesa_tripa",   cat:"QUESADILLAS", name:"Quesadilla de Tripa",   price:100, desc:"Queso + tripa.", mods:false, img:"quesadillagdp.png"},
+  {id:"quesa_pastor",  cat:"QUESADILLAS", name:"Quesadilla de Pastor",  price:90,  desc:"Queso + pastor.", mods:false, img:"quesadillagdp.png"},
+  {id:"quesa_bistec",  cat:"QUESADILLAS", name:"Quesadilla de Bistec",  price:90,  desc:"Queso + bistec.", mods:false, img:"quesadillagdp.png"},
+  {id:"quesa_chorizo", cat:"QUESADILLAS", name:"Quesadilla de Chorizo", price:90,  desc:"Queso + chorizo.", mods:false, img:"quesadillagdp.png"},
+  {id:"quesa_higado",  cat:"QUESADILLAS", name:"Quesadilla de Hígado",  price:90,  desc:"Queso + hígado.", mods:false, img:"quesadillagdp.png"},
+
+  {id:"charola_combinada", cat:"CHAROLAS", name:"Charola Combinada", price:100, desc:"Pon en nota qué combinación quieres.", mods:true, img:"charolagdp.png"},
+  {id:"charola_alambre",   cat:"CHAROLAS", name:"Charola de Alambre", price:90,  desc:"Alambre para compartir.", mods:false, img:"charolagdp.png"},
+
+  {id:"volcan_tripa",   cat:"VOLCANES", name:"Volcán de Tripa",   price:90, desc:"Volcán bien servido.", mods:true,  img:"volcangdp.png"},
+  {id:"volcan_pastor",  cat:"VOLCANES", name:"Volcán de Pastor",  price:85, desc:"Volcán de pastor.",    mods:true,  img:"volcangdp.png"},
+  {id:"volcan_bistec",  cat:"VOLCANES", name:"Volcán de Bistec",  price:85, desc:"Volcán de bistec.",    mods:true,  img:"volcangdp.png"},
+  {id:"volcan_chorizo", cat:"VOLCANES", name:"Volcán de Chorizo", price:85, desc:"Volcán de chorizo.",   mods:true,  img:"volcangdp.png"},
+  {id:"volcan_higado",  cat:"VOLCANES", name:"Volcán de Hígado",  price:85, desc:"Volcán de hígado.",    mods:true,  img:"volcangdp.png"},
+
+  {id:"beb_coca_light",  cat:"BEBIDAS", name:"Coca Light",       price:35, desc:"", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_coca",        cat:"BEBIDAS", name:"Coca",             price:35, desc:"", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_fresca",      cat:"BEBIDAS", name:"Fresca",           price:35, desc:"", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_sprite",      cat:"BEBIDAS", name:"Sprite",           price:35, desc:"", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_agua_fresca", cat:"BEBIDAS", name:"Agua fresca",      price:30, desc:"Vaso", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_agua_lt",     cat:"BEBIDAS", name:"Agua fresca 1 Lt", price:60, desc:"1 litro", mods:false, img:"bebidasgpd.png"},
+
+  {id:"pos_pay_queso",   cat:"POSTRES", name:"Pay de queso",                    price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_gel_rompope", cat:"POSTRES", name:"Gelatina de vainilla con rompope",price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_arroz",       cat:"POSTRES", name:"Arroz con leche",                 price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_flan",        cat:"POSTRES", name:"Flan",                            price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_gel_fresa",   cat:"POSTRES", name:"Gelatina de fresa con yoghurt",   price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_napolitano",  cat:"POSTRES", name:"Napolitano",                      price:60, desc:"", mods:false, img:"postresgdp.png"},
+];
+
+const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
+
+/** =========================
+ *  MODIFICADORES
+ *  ========================= */
+const MODS = {
+  conSin: {
+    title:"Con todo / Sin…",
+    type:"multi",
+    required:false,
+    options:["Con todo","Sin cebolla","Sin cilantro","Sin piña","Sin salsa"]
+  }
+};
+
+function modsPara(item){
+  if(!item.mods) return [];
+  return ["conSin"];
+}
+
+/** =========================
+ *  HELPERS
+ *  ========================= */
+function money(n){ return "$" + Number(n||0).toFixed(2); }
+function escapeHtml(s){
+  return String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+function modsToText(mods){
+  const parts = [];
+  for(const k of Object.keys(mods||{})){
+    const g = MODS[k];
+    if(!g) continue;
+    const val = mods[k];
+    if(Array.isArray(val) && val.length) parts.push(`${g.title}: ${val.join(", ")}`);
+    if(typeof val==="string" && val) parts.push(`${g.title}: ${val}`);
+  }
+  return parts.join(" • ");
+}
+function buildKey(item, mods, note){
+  return item.id + "|" + JSON.stringify(mods || {}) + "|" + (note || "");
+}
+function validateRequired(item, mods){
+  const keys = modsPara(item);
+  for(const k of keys){
+    const g = MODS[k];
+    if(!g || !g.required) continue;
+    const v = mods[k];
+    if(g.type==="single" && !v) return `${g.title} es obligatorio.`;
+    if(g.type==="multi" && (!v || !v.length)) return `${g.title} es obligatorio.`;
+  }
+  return null;
+}
+function nowString(){
+  const d = new Date();
+  return d.toLocaleString("es-MX", {
+    year:"numeric", month:"2-digit", day:"2-digit",
+    hour:"2-digit", minute:"2-digit"
+  });
+}
+function shortTime(){
+  const d = new Date();
+  return d.toLocaleTimeString("es-MX", {hour:"2-digit", minute:"2-digit"});
+}
+function uid(){
+  return "CMD-" + Date.now().toString().slice(-8);
+}
+
+/** =========================
+ *  UI MENÚ
+ *  ========================= */
+const tabs = document.getElementById("tabs");
+const itemsBox = document.getElementById("items");
+const sectionTitle = document.getElementById("sectionTitle");
+const q = document.getElementById("q");
+let activeCat = CATS[0];
+
+function renderTabs(){
+  tabs.innerHTML = "";
+  CATS.forEach(c=>{
+    const el = document.createElement("div");
+    el.className = "tab" + (c===activeCat ? " active":"");
+    el.textContent = c;
+    el.addEventListener("click", ()=>{
+      activeCat = c;
+      renderTabs();
+      renderItems();
+    });
+    tabs.appendChild(el);
+  });
+}
+function renderItems(){
+  sectionTitle.textContent = activeCat;
+  const term = (q.value || "").trim().toLowerCase();
+  const list = catalogo.filter(x=>{
+    const inCat = x.cat === activeCat;
+    const inSearch = !term || x.name.toLowerCase().includes(term) || (x.desc || "").toLowerCase().includes(term);
+    return inCat && inSearch;
+  });
+
+  itemsBox.innerHTML = "";
+  list.forEach(it=>{
+    const card = document.createElement("div");
+    card.className = "prod";
+    card.innerHTML = `
+      <div class="prodLeft">
+        <h3 class="prodName">${escapeHtml(it.name)}</h3>
+        <p class="prodDesc">${escapeHtml(it.desc || "")}</p>
+        <div class="price">MXN <b>${money(it.price)}</b></div>
+      </div>
+      <div class="prodRight">
+        <div class="prodImg"><img src="${IMG_BASE + it.img}" alt="${escapeHtml(it.name)}"></div>
+        <button class="btnAdd" type="button">Agregar</button>
+      </div>
+    `;
+    card.querySelector("button").addEventListener("click", ()=> onAddClicked(it));
+    itemsBox.appendChild(card);
+  });
+
+  if(!list.length){
+    itemsBox.innerHTML = `<div class="muted" style="font-weight:900">No hay resultados.</div>`;
+  }
+}
+q.addEventListener("input", renderItems);
+
+/** =========================
+ *  COMANDA ACTUAL
+ *  ========================= */
+let cart = [];
+let editandoId = null;
+
+const cartBox = document.getElementById("cart");
+const totalEl = document.getElementById("total");
+const cartPill = document.getElementById("cartPill");
+const barTotal = document.getElementById("barTotal");
+
+const mesaSelect = document.getElementById("mesaSelect");
+const meseroInput = document.getElementById("meseroInput");
+const clienteInput = document.getElementById("clienteInput");
+const notaMesaInput = document.getElementById("notaMesaInput");
+
+for(let i=1; i<=20; i++){
+  const op = document.createElement("option");
+  op.value = "Mesa " + i;
+  op.textContent = "Mesa " + i;
+  mesaSelect.appendChild(op);
+}
+
+function cartCount(){ return cart.reduce((a,x)=> a + x.qty, 0); }
+function cartTotal(){ return cart.reduce((a,x)=> a + (x.qty * x.basePrice), 0); }
+
+function clearFormForNew(){
+  editandoId = null;
+  cart = [];
+  mesaSelect.value = "Mesa 1";
+  meseroInput.value = "";
+  clienteInput.value = "";
+  notaMesaInput.value = "";
+  renderCart();
+  renderOpenComandas();
+}
+
+function renderCart(){
+  const count = cartCount();
+  cartPill.innerHTML = `🧾 <b>${count}</b> • <span id="pillTotal">${money(cartTotal())}</span>`;
+  totalEl.textContent = money(cartTotal());
+  barTotal.textContent = money(cartTotal());
+
+  if(cart.length===0){
+    cartBox.innerHTML = `<div class="muted" style="font-weight:900; padding-top:8px;">Aún no agregas productos 😄</div>`;
+    return;
+  }
+
+  cartBox.innerHTML = "";
+  cart.forEach((line, idx)=>{
+    const wrap = document.createElement("div");
+    wrap.className = "cartLine";
+    const lineTotal = line.qty * line.basePrice;
+    wrap.innerHTML = `
+      <div style="min-width:0">
+        <div style="font-weight:1000;font-size:14px">${escapeHtml(line.name)}
+          <span class="muted" style="font-weight:1000">(${money(line.basePrice)})</span>
+        </div>
+        <div class="muted" style="font-size:12px; margin-top:4px; line-height:1.25; font-weight:900">
+          ${escapeHtml(modsToText(line.mods) || "")}
+        </div>
+        ${line.note ? `<div class="muted" style="font-size:12px; margin-top:4px; font-weight:900">Nota: ${escapeHtml(line.note)}</div>` : ``}
+      </div>
+      <div style="text-align:right">
+        <div class="qtyRow">
+          <button class="mini" type="button" data-act="dec">−</button>
+          <div style="min-width:24px; text-align:center; font-weight:1000">${line.qty}</div>
+          <button class="mini" type="button" data-act="inc">+</button>
+        </div>
+        <div style="margin-top:6px; font-weight:1000">${money(lineTotal)}</div>
+        <button class="mini" type="button" data-act="del" style="margin-top:8px;width:100%;height:34px;border-radius:12px;">✕</button>
+      </div>
+    `;
+
+    wrap.querySelector('[data-act="dec"]').addEventListener("click", ()=>{
+      line.qty = Math.max(1, line.qty - 1);
+      renderCart();
+    });
+    wrap.querySelector('[data-act="inc"]').addEventListener("click", ()=>{
+      line.qty += 1;
+      renderCart();
+    });
+    wrap.querySelector('[data-act="del"]').addEventListener("click", ()=>{
+      cart.splice(idx, 1);
+      renderCart();
+    });
+
+    cartBox.appendChild(wrap);
+  });
+}
+
+function addLine(item, mods, note, qty = 1){
+  const key = buildKey(item, mods, note);
+  const existing = cart.find(x=> x.key === key);
+
+  if(existing){
+    existing.qty += qty;
+  }else{
+    cart.push({
+      key,
+      id:item.id,
+      name:item.name,
+      basePrice:item.price,
+      qty:Number(qty || 1),
+      mods:mods || {},
+      note:note || ""
+    });
+  }
+  renderCart();
+}
+
+/** =========================
+ *  MODAL PRODUCTO
+ *  ========================= */
+const backdrop = document.getElementById("backdrop");
+const mTitle = document.getElementById("mTitle");
+const mBody  = document.getElementById("mBody");
+const mClose = document.getElementById("mClose");
+const mCancel= document.getElementById("mCancel");
+const mAdd   = document.getElementById("mAdd");
+
+let currentItem = null;
+let draft = null;
+
+function onAddClicked(item){
+  openModal(item);
+}
+
+function openModal(item){
+  currentItem = item;
+  draft = {mods:{}, note:"", qty:1};
+
+  mTitle.textContent = `${item.name} — ${money(item.price)}`;
+  mBody.innerHTML = "";
+
+  const qtyBox = document.createElement("div");
+  qtyBox.className = "optGroup";
+  qtyBox.innerHTML = `
+    <div class="optTitle">
+      <b>Cantidad</b>
+      <span>elige cuántos vas a agregar</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:12px; margin-top:12px;">
+      <button type="button" class="mini" id="qtyMinus" style="width:42px;height:42px;font-size:22px;">−</button>
+      <div id="qtyValue" style="min-width:42px;text-align:center;font-size:22px;font-weight:1000;">1</div>
+      <button type="button" class="mini" id="qtyPlus" style="width:42px;height:42px;font-size:22px;">+</button>
+    </div>
+  `;
+  mBody.appendChild(qtyBox);
+
+  const keys = modsPara(item);
+  if(keys.length){
+    keys.forEach(k=>{
+      const g = MODS[k];
+      const box = document.createElement("div");
+      box.className = "optGroup";
+      box.innerHTML = `
+        <div class="optTitle">
+          <b>${g.title}${g.required ? " *":""}</b>
+          <span>${g.type==="single" ? "elige 1" : "elige las que quieras"}</span>
+        </div>
+        <div class="optList" data-k="${k}"></div>
+      `;
+      const list = box.querySelector(".optList");
+
+      g.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "optBtn";
+        btn.textContent = opt;
+        btn.addEventListener("click", ()=> toggleOpt(k, opt, btn));
+        list.appendChild(btn);
+      });
+
+      mBody.appendChild(box);
+    });
+  }
+
+  const n = document.createElement("div");
+  n.className = "optGroup";
+  n.innerHTML = `
+    <div class="optTitle">
+      <b>Nota (opcional)</b>
+      <span>ej. “bien dorado” / “sin hielo” / “sale primero”</span>
+    </div>
+    <div style="margin-top:10px">
+      <input id="noteProd" placeholder="Escribe una nota para este producto..."/>
+    </div>
+  `;
+  mBody.appendChild(n);
+
+  backdrop.style.display = "flex";
+  backdrop.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+
+  setTimeout(()=>{
+    const inp = document.getElementById("noteProd");
+    if(inp) inp.oninput = ()=> draft.note = inp.value;
+
+    const qtyValue = document.getElementById("qtyValue");
+    const qtyMinus = document.getElementById("qtyMinus");
+    const qtyPlus = document.getElementById("qtyPlus");
+
+    function refreshQty(){
+      if(qtyValue) qtyValue.textContent = draft.qty;
+    }
+
+    if(qtyMinus){
+      qtyMinus.addEventListener("click", ()=>{
+        draft.qty = Math.max(1, draft.qty - 1);
+        refreshQty();
+      });
+    }
+    if(qtyPlus){
+      qtyPlus.addEventListener("click", ()=>{
+        draft.qty += 1;
+        refreshQty();
+      });
+    }
+    refreshQty();
+  }, 0);
+}
+
+function closeModal(){
+  backdrop.style.display = "none";
+  backdrop.setAttribute("aria-hidden","true");
+  currentItem = null;
+  draft = null;
+  document.body.style.overflow = "";
+}
+function toggleOpt(k, opt, el){
+  const g = MODS[k];
+  if(g.type==="single"){
+    draft.mods[k] = opt;
+    el.parentElement.querySelectorAll(".optBtn").forEach(x=>x.classList.remove("active"));
+    el.classList.add("active");
+  }else{
+    draft.mods[k] = draft.mods[k] || [];
+    const arr = draft.mods[k];
+    const i = arr.indexOf(opt);
+    if(i >= 0){
+      arr.splice(i,1);
+      el.classList.remove("active");
+    }else{
+      arr.push(opt);
+      el.classList.add("active");
+    }
+  }
+}
+
+mClose.addEventListener("click", closeModal);
+mCancel.addEventListener("click", closeModal);
+backdrop.addEventListener("click", (e)=>{
+  if(e.target === backdrop) closeModal();
+});
+mAdd.addEventListener("click", ()=>{
+  if(!currentItem || !draft) return;
+
+  const err = validateRequired(currentItem, draft.mods);
+  if(err){
+    alert(err);
+    return;
+  }
+
+  addLine(currentItem, draft.mods, draft.note, Number(draft.qty || 1));
+  closeModal();
+});
+
+/** =========================
+ *  COMANDAS ABIERTAS
+ *  ========================= */
+function loadOpenComandas(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  }catch(err){
+    return [];
+  }
+}
+function saveOpenComandas(list){
+  localStorage.setItem(LS_KEY, JSON.stringify(list || []));
+}
+function getCurrentPayload(){
+  return {
+    id: editandoId || uid(),
+    mesa: mesaSelect.value,
+    mesero: meseroInput.value.trim(),
+    cliente: clienteInput.value.trim(),
+    notaMesa: notaMesaInput.value.trim(),
+    items: cart,
+    total: cartTotal(),
+    updatedAt: new Date().toISOString(),
+    updatedLabel: nowString()
+  };
+}
+function validateComanda(){
+  if(!mesaSelect.value.trim()) return "Selecciona una mesa.";
+  if(!meseroInput.value.trim()) return "Escribe el nombre del mesero.";
+  if(!cart.length) return "Agrega al menos un producto.";
+  return null;
+}
+function saveCurrentComanda(){
+  const err = validateComanda();
+  if(err){
+    alert(err);
+    return false;
+  }
+
+  const payload = getCurrentPayload();
+  const abiertas = loadOpenComandas();
+  const idx = abiertas.findIndex(x=> x.id === payload.id);
+
+  if(idx >= 0){
+    abiertas[idx] = payload;
+  }else{
+    abiertas.unshift(payload);
+  }
+
+  saveOpenComandas(abiertas);
+  editandoId = payload.id;
+  renderOpenComandas();
+  return true;
+}
+function renderOpenComandas(){
+  const abiertas = loadOpenComandas();
+  const openList = document.getElementById("openList");
+  const openCount = document.getElementById("openCount");
+  openCount.textContent = abiertas.length;
+
+  if(!abiertas.length){
+    openList.innerHTML = `<div class="muted" style="font-weight:900">No hay comandas abiertas.</div>`;
+    return;
+  }
+
+  openList.innerHTML = "";
+  abiertas.forEach(cmd=>{
+    const div = document.createElement("div");
+    div.className = "openCard";
+
+    const totalItems = (cmd.items || []).reduce((a,x)=> a + Number(x.qty || 0), 0);
+    const preview = (cmd.items || []).slice(0,3).map(x=> `• ${x.qty} x ${x.name}`).join("<br>");
+
+    div.innerHTML = `
+      <div class="openCardTop">
+        <div>
+          <div class="openMesa">${escapeHtml(cmd.mesa)}</div>
+          <div class="openMini">
+            Mesero: <b>${escapeHtml(cmd.mesero || "—")}</b><br>
+            Cliente: <b>${escapeHtml(cmd.cliente || "—")}</b><br>
+            Actualizada: <b>${escapeHtml(cmd.updatedLabel || "—")}</b>
+          </div>
+        </div>
+        <div class="badge">${totalItems} prod.</div>
+      </div>
+
+      <div class="openMini">
+        ${preview || "Sin productos"}
+        ${(cmd.items || []).length > 3 ? "<br>..." : ""}
+      </div>
+
+      <div style="margin-top:8px; font-weight:1000">Total: ${money(cmd.total || 0)}</div>
+
+      <div class="openActions">
+        <button class="btnDark" data-act="cargar">Cargar</button>
+        <button class="btnWarn" data-act="imprimir">Imprimir</button>
+        <button class="btnLight" data-act="duplicar">Duplicar</button>
+        <button class="btnRed" data-act="cerrar">Cerrar</button>
+      </div>
+    `;
+
+    div.querySelector('[data-act="cargar"]').addEventListener("click", ()=> loadComandaIntoForm(cmd.id));
+    div.querySelector('[data-act="imprimir"]').addEventListener("click", ()=> printComandaById(cmd.id));
+    div.querySelector('[data-act="duplicar"]').addEventListener("click", ()=> duplicateComanda(cmd.id));
+    div.querySelector('[data-act="cerrar"]').addEventListener("click", ()=> closeComanda(cmd.id));
+
+    openList.appendChild(div);
+  });
+}
+function loadComandaIntoForm(id){
+  const abiertas = loadOpenComandas();
+  const cmd = abiertas.find(x=> x.id === id);
+  if(!cmd) return alert("No se encontró la comanda.");
+
+  editandoId = cmd.id;
+  mesaSelect.value = cmd.mesa || "Mesa 1";
+  meseroInput.value = cmd.mesero || "";
+  clienteInput.value = cmd.cliente || "";
+  notaMesaInput.value = cmd.notaMesa || "";
+  cart = Array.isArray(cmd.items) ? cmd.items : [];
+  renderCart();
+}
+function duplicateComanda(id){
+  const abiertas = loadOpenComandas();
+  const cmd = abiertas.find(x=> x.id === id);
+  if(!cmd) return;
+
+  const copy = {
+    ...cmd,
+    id: uid(),
+    mesa: cmd.mesa + " (copia)",
+    updatedAt: new Date().toISOString(),
+    updatedLabel: nowString()
+  };
+  abiertas.unshift(copy);
+  saveOpenComandas(abiertas);
+  renderOpenComandas();
+}
+function closeComanda(id){
+  if(!confirm("¿Cerrar y quitar esta comanda de abiertas?")) return;
+  let abiertas = loadOpenComandas();
+  abiertas = abiertas.filter(x=> x.id !== id);
+  saveOpenComandas(abiertas);
+
+  if(editandoId === id){
+    clearFormForNew();
+  }else{
+    renderOpenComandas();
+  }
+}
+
+/** =========================
+ *  IMPRESIÓN
+ *  ========================= */
+function buildTicketHTML(cmd){
+  const itemsHtml = (cmd.items || []).map(x=>{
+    const mods = modsToText(x.mods);
+    return `
+      <div class="item">
+        <div class="row">
+          <div class="item-name">${escapeHtml(x.qty)} x ${escapeHtml(x.name)}</div>
+          <div class="item-name">${money(x.qty * x.basePrice)}</div>
+        </div>
+        ${mods ? `<div class="item-sub">• ${escapeHtml(mods)}</div>` : ""}
+        ${x.note ? `<div class="item-sub">• Nota: ${escapeHtml(x.note)}</div>` : ""}
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="ticket">
+      <div class="center b lg">${escapeHtml(NEGOCIO)}</div>
+      <div class="center b">COMANDA</div>
+      <div class="center sm">${escapeHtml(cmd.id || "")}</div>
+
+      <div class="hr"></div>
+
+      <div class="row"><div class="b">Mesa:</div><div class="b">${escapeHtml(cmd.mesa || "")}</div></div>
+      <div class="row"><div class="b">Mesero:</div><div>${escapeHtml(cmd.mesero || "")}</div></div>
+      <div class="row"><div class="b">Cliente:</div><div>${escapeHtml(cmd.cliente || "—")}</div></div>
+      <div class="row"><div class="b">Hora:</div><div>${escapeHtml(cmd.updatedLabel || shortTime())}</div></div>
+
+      ${cmd.notaMesa ? `
+        <div class="hr"></div>
+        <div class="b">Notas mesa:</div>
+        <div>${escapeHtml(cmd.notaMesa)}</div>
+      ` : ""}
+
+      <div class="hr"></div>
+      ${itemsHtml}
+      <div class="hr"></div>
+
+      <div class="row tot"><div>TOTAL</div><div>${money(cmd.total || 0)}</div></div>
+
+      <div class="hr"></div>
+      <div class="center b">Gracias</div>
+    </div>
+  `;
+}
+function printCommand(cmd){
+  const area = document.getElementById("printArea");
+  area.innerHTML = buildTicketHTML(cmd);
+  setTimeout(()=>{
+    window.print();
+  }, 120);
+}
+function printCurrentComanda(){
+  const err = validateComanda();
+  if(err){
+    alert(err);
+    return;
+  }
+  const payload = getCurrentPayload();
+  printCommand(payload);
+}
+function printComandaById(id){
+  const abiertas = loadOpenComandas();
+  const cmd = abiertas.find(x=> x.id === id);
+  if(!cmd) return alert("No se encontró la comanda.");
+  printCommand(cmd);
+}
+
+/** =========================
+ *  BOTONES
+ *  ========================= */
+document.getElementById("btnClear").addEventListener("click", ()=>{
+  if(confirm("¿Vaciar la comanda actual?")){
+    cart = [];
+    renderCart();
+  }
+});
+
+document.getElementById("btnGuardar").addEventListener("click", ()=>{
+  const ok = saveCurrentComanda();
+  if(ok) alert("Comanda guardada correctamente.");
+});
+
+document.getElementById("btnImprimir").addEventListener("click", ()=>{
+  const ok = saveCurrentComanda();
+  if(ok) printCurrentComanda();
+});
+
+/** =========================
+ *  INIT
+ *  ========================= */
+renderTabs();
+renderItems();
+renderCart();
+renderOpenComandas();
+</script>
+</body>
+</html>
