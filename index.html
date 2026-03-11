@@ -146,7 +146,7 @@ label{
   text-transform:uppercase;
   letter-spacing:.3px;
 }
-input{
+input, select{
   width:100%;
   padding:15px 14px;
   border-radius:16px;
@@ -156,7 +156,7 @@ input{
   color:var(--ink);
   outline:none;
 }
-input:focus{
+input:focus, select:focus{
   border-color:var(--blue);
   box-shadow:0 0 0 4px rgba(21,101,192,.10);
 }
@@ -517,7 +517,7 @@ input:focus{
   z-index:50;
 }
 .modal{
-  width:min(520px,100%);
+  width:min(560px,100%);
   background:#fff;
   border-radius:20px;
   overflow:hidden;
@@ -551,6 +551,31 @@ input:focus{
 }
 .modalBody{
   padding:14px;
+}
+.quickMods{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+@media (max-width:520px){
+  .quickMods{grid-template-columns:1fr}
+}
+.modBtn{
+  border:none;
+  cursor:pointer;
+  padding:12px 12px;
+  border-radius:14px;
+  background:#fff;
+  color:#0b4f93;
+  border:2px solid rgba(21,101,192,.16);
+  font-weight:1000;
+  text-align:center;
+}
+.modBtn.active{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+  border-color:#d39a00;
 }
 .modalFoot{
   padding:14px;
@@ -643,14 +668,18 @@ input:focus{
 
   <div class="card">
     <div class="cardHead">
-      <h2 id="screenTitle">Paso 1 — Nombre del mesero</h2>
-      <p id="screenSub">Primero identifica quién está tomando el pedido.</p>
+      <h2 id="screenTitle">Paso 1 — Mesero</h2>
+      <p id="screenSub">Primero selecciona quién está tomando el pedido.</p>
     </div>
 
     <div class="cardBody">
       <section class="step active" id="step1">
-        <label>Nombre del mesero</label>
-        <input id="mesero" placeholder="Ej. Marco">
+        <label>Mesero</label>
+        <select id="mesero">
+          <option value="">Selecciona un mesero</option>
+          <option value="Mesero 1">Mesero 1</option>
+          <option value="Mesero 2">Mesero 2</option>
+        </select>
       </section>
 
       <section class="step" id="step2">
@@ -674,7 +703,7 @@ input:focus{
             </div>
           </div>
 
-          <label style="margin-top:12px">Persona</label>
+          <label style="margin-top:12px">Plato</label>
           <div class="personasGrid" id="personas"></div>
 
           <div class="cats" id="cats"></div>
@@ -683,7 +712,7 @@ input:focus{
         <div class="items" id="items"></div>
 
         <div class="noteBox">
-          Aquí solo eliges persona y productos. No necesitas bajar hasta la comanda mientras capturas.
+          Aquí solo eliges plato y productos. No necesitas bajar hasta la comanda mientras capturas.
         </div>
       </section>
 
@@ -732,8 +761,11 @@ input:focus{
       <button class="closeX" id="btnCerrarModal" type="button">✕</button>
     </div>
     <div class="modalBody">
-      <label id="modalPersonaLabel">Nota</label>
-      <input id="notaRapida" placeholder="Ej. sin cebolla / combinado / bien dorado">
+      <label id="modalPersonaLabel">Indicaciones rápidas</label>
+      <div class="quickMods" id="quickMods"></div>
+
+      <label style="margin-top:12px">Nota libre</label>
+      <input id="notaRapida" placeholder="Opcional: ej. bien dorado">
     </div>
     <div class="modalFoot">
       <button class="btn btnRed" id="btnCancelarModal" type="button">Cancelar</button>
@@ -788,13 +820,13 @@ const catalogo = [
 ];
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
-const PERSONAS = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","General"];
+const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
 const MESAS = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"];
 
 let currentStep = 1;
 let meseroNombre = "";
 let mesaActiva = "";
-let personaActiva = "Persona 1";
+let personaActiva = "Plato 1";
 let activeCat = "TACOS";
 let cart = [];
 let draftItem = null;
@@ -809,9 +841,9 @@ const steps = {
 };
 
 const titles = {
-  1: ["Paso 1 — Nombre del mesero","Primero identifica quién está tomando el pedido."],
+  1: ["Paso 1 — Mesero","Primero selecciona quién está tomando el pedido."],
   2: ["Paso 2 — Elegir mesa","Toca la mesa donde se está levantando la orden."],
-  3: ["Paso 3 — Capturar pedido","Elige persona y agrega productos sin bajar hasta la comanda."],
+  3: ["Paso 3 — Capturar pedido","Elige plato y agrega productos sin bajar hasta la comanda."],
   4: ["Paso 4 — Revisar e imprimir","Confirma la comanda y manda a imprimir cocina."],
 };
 
@@ -834,6 +866,7 @@ const backdrop = document.getElementById("backdrop");
 const modalTitle = document.getElementById("modalTitle");
 const modalPersonaLabel = document.getElementById("modalPersonaLabel");
 const notaRapida = document.getElementById("notaRapida");
+const quickMods = document.getElementById("quickMods");
 const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const btnGuardarModal = document.getElementById("btnGuardarModal");
@@ -936,7 +969,7 @@ function renderMesas(){
 
 function renderPersonas(){
   personasBox.innerHTML = "";
-  PERSONAS.forEach(p=>{
+  PLATOS.forEach(p=>{
     const b = document.createElement("button");
     b.type = "button";
     b.className = "personaBtn" + (p===personaActiva ? " active":"");
@@ -981,6 +1014,20 @@ function showToast(text){
   }, 1200);
 }
 
+function getQuickMods(item){
+  const mods = [];
+  if(["TACOS","VOLCANES"].includes(item.cat)){
+    mods.push("Sin verdura", "Solo cebolla", "Solo cilantro");
+  }
+  if(item.cat === "QUESADILLAS"){
+    mods.push("Sin frijoles", "Sin verdura", "Solo cebolla", "Solo cilantro");
+  }
+  if(item.cat === "CHAROLAS"){
+    mods.push("Sin verdura", "Solo cebolla", "Solo cilantro");
+  }
+  return mods;
+}
+
 function renderItems(){
   itemsBox.innerHTML = "";
   catalogo.filter(x=>x.cat===activeCat).forEach(item=>{
@@ -996,8 +1043,12 @@ function renderItems(){
   });
 }
 
+function shouldOpenModal(item){
+  return item.requiereNota || getQuickMods(item).length > 0;
+}
+
 function agregarDesdeClick(item, buttonEl){
-  if(item.requiereNota){
+  if(shouldOpenModal(item)){
     abrirModal(item, buttonEl);
     return;
   }
@@ -1005,7 +1056,8 @@ function agregarDesdeClick(item, buttonEl){
 }
 
 function agregarLinea(item, persona, note, buttonEl=null){
-  const key = makeKey(item, persona, note);
+  const cleanNote = (note || "").trim();
+  const key = makeKey(item, persona, cleanNote);
   const existing = cart.find(x=>x.key===key);
 
   if(existing){
@@ -1016,7 +1068,7 @@ function agregarLinea(item, persona, note, buttonEl=null){
       id:item.id,
       name:item.name,
       persona,
-      note:note || "",
+      note:cleanNote,
       qty:1,
       cat:item.cat,
       cocina:!!item.cocina
@@ -1027,7 +1079,14 @@ function agregarLinea(item, persona, note, buttonEl=null){
   updateHeaderPill();
   renderCart();
   flashAddedButton(buttonEl);
-  showToast("Producto añadido");
+
+  const nombreSimple = item.cat === "TACOS" ? "Taco" :
+                       item.cat === "QUESADILLAS" ? "Quesadilla" :
+                       item.cat === "VOLCANES" ? "Volcán" :
+                       item.cat === "CHAROLAS" ? "Charola" :
+                       "Producto";
+
+  showToast(`${nombreSimple} añadido a ${persona}`);
 }
 
 function agruparCart(){
@@ -1037,7 +1096,7 @@ function agruparCart(){
     grupos[line.persona].push(line);
   });
 
-  return PERSONAS
+  return PLATOS
     .filter(p => grupos[p] && grupos[p].length)
     .map(p => ({ persona:p, lines:grupos[p] }));
 }
@@ -1134,10 +1193,31 @@ function renderCart(){
 }
 
 function abrirModal(item, buttonEl){
-  draftItem = { item, buttonEl };
+  draftItem = { item, buttonEl, selectedMods: new Set() };
   modalTitle.textContent = item.name;
-  modalPersonaLabel.textContent = `Nota para ${personaActiva}`;
+  modalPersonaLabel.textContent = `Indicaciones para ${personaActiva}`;
   notaRapida.value = "";
+
+  quickMods.innerHTML = "";
+  const mods = getQuickMods(item);
+
+  mods.forEach(mod=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "modBtn";
+    btn.textContent = mod;
+    btn.onclick = ()=>{
+      if(draftItem.selectedMods.has(mod)){
+        draftItem.selectedMods.delete(mod);
+        btn.classList.remove("active");
+      }else{
+        draftItem.selectedMods.add(mod);
+        btn.classList.add("active");
+      }
+    };
+    quickMods.appendChild(btn);
+  });
+
   backdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
   setTimeout(()=>notaRapida.focus(), 50);
@@ -1146,6 +1226,7 @@ function abrirModal(item, buttonEl){
 function cerrarModal(){
   draftItem = null;
   notaRapida.value = "";
+  quickMods.innerHTML = "";
   backdrop.style.display = "none";
   document.body.style.overflow = "";
 }
@@ -1157,7 +1238,12 @@ backdrop.addEventListener("click", (e)=>{
 });
 btnGuardarModal.onclick = ()=>{
   if(!draftItem) return;
-  agregarLinea(draftItem.item, personaActiva, notaRapida.value.trim(), draftItem.buttonEl);
+
+  const modsText = Array.from(draftItem.selectedMods).join(" • ");
+  const freeText = notaRapida.value.trim();
+  const finalNote = [modsText, freeText].filter(Boolean).join(" • ");
+
+  agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.buttonEl);
   cerrarModal();
 };
 
@@ -1168,7 +1254,7 @@ function buildTicketCocina(){
       <div class="c b">${escapeHtml(mesaActiva)}</div>
       <div class="hr"></div>
   `;
-  PERSONAS.forEach(persona=>{
+  PLATOS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona && x.cocina);
     if(!lines.length) return;
     html += `<div class="g">${escapeHtml(persona)}</div>`;
@@ -1182,8 +1268,7 @@ function buildTicketCocina(){
     });
     html += `<div class="hr"></div>`;
   });
-  html += `</div>`;
-  return html;
+  return html + `</div>`;
 }
 
 function buildResumenComanda(){
@@ -1194,7 +1279,7 @@ function buildResumenComanda(){
       <div class="small c">Mesero: ${escapeHtml(meseroNombre || "—")}</div>
       <div class="hr"></div>
   `;
-  PERSONAS.forEach(persona=>{
+  PLATOS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona);
     if(!lines.length) return;
     html += `<div class="g">${escapeHtml(persona)}</div>`;
@@ -1209,8 +1294,7 @@ function buildResumenComanda(){
     });
     html += `<div class="hr"></div>`;
   });
-  html += `</div>`;
-  return html;
+  return html + `</div>`;
 }
 
 function imprimirCocina(){
@@ -1231,7 +1315,7 @@ function verResumen(){
 function handleMainContinue(){
   if(currentStep === 1){
     const nombre = meseroInput.value.trim();
-    if(!nombre) return alert("Escribe el nombre del mesero.");
+    if(!nombre) return alert("Selecciona un mesero.");
     meseroNombre = nombre;
     updateResumeViews();
     goToStep(2);
@@ -1262,7 +1346,7 @@ mainContinueBtn.onclick = handleMainContinue;
 document.getElementById("backTo3").onclick = ()=> goToStep(3);
 
 document.getElementById("expandAll").onclick = ()=>{
-  PERSONAS.forEach(p=>openGroups.add(p));
+  PLATOS.forEach(p=>openGroups.add(p));
   renderCart();
 };
 
