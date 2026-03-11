@@ -7,400 +7,478 @@
 
 <style>
 :root{
-  --bg:#f7f9fc;
+  --bg:#f6f8fc;
   --paper:#ffffff;
-  --card:#ffffff;
-  --ink:#0f172a;
-  --muted:#475569;
-  --line:rgba(15,23,42,.12);
+  --ink:#102033;
+  --muted:#5f7187;
+  --line:rgba(16,32,51,.12);
 
-  --brand:#c62828;     /* rojo principal */
-  --brand-dark:#8e1d1d;
-  --blue:#1565c0;      /* azul fuerte */
-  --blue-soft:#e3f2fd;
-  --yellow:#fbc02d;    /* amarillo */
-  --yellow-soft:#fff8d6;
-  --danger:#d32f2f;
-  --success:#2e7d32;
+  --red:#c62828;
+  --red-dark:#8e1d1d;
+  --blue:#1565c0;
+  --blue-dark:#0f4f98;
+  --yellow:#fbc02d;
+  --yellow-dark:#e0a800;
+  --green:#2e7d32;
 
-  --shadow:0 14px 34px rgba(2,6,23,.10);
-  --r:18px;
+  --shadow:0 16px 40px rgba(2,6,23,.10);
+  --r:20px;
 }
 
 *{box-sizing:border-box}
 html,body{height:100%}
-
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   background:
-    radial-gradient(1200px 520px at 0% 0%, rgba(251,192,45,.18), transparent 55%),
-    radial-gradient(1000px 500px at 100% 0%, rgba(21,101,192,.14), transparent 55%),
-    linear-gradient(180deg,#f7f9fc 0%, #eef3f9 100%);
+    radial-gradient(1000px 420px at 0% 0%, rgba(251,192,45,.18), transparent 60%),
+    radial-gradient(1000px 420px at 100% 0%, rgba(21,101,192,.14), transparent 60%),
+    linear-gradient(180deg,#f6f8fc 0%, #eef4fb 100%);
   color:var(--ink);
 }
 
 header{
-  background:linear-gradient(135deg,var(--brand) 0%, var(--brand-dark) 100%);
-  color:#fff;
-  padding:12px;
-  box-shadow:0 10px 24px rgba(198,40,40,.28);
   position:sticky;
   top:0;
-  z-index:20;
+  z-index:30;
+  padding:12px;
+  background:linear-gradient(135deg,var(--red) 0%, var(--red-dark) 100%);
+  color:#fff;
+  box-shadow:0 12px 30px rgba(198,40,40,.25);
 }
-
 .head{
-  max-width:1100px;
+  max-width:980px;
   margin:auto;
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:10px;
 }
-
-.title h1{
+.brand h1{
   margin:0;
   font-size:18px;
   line-height:1.1;
 }
-.title .sub{
+.brand .sub{
+  margin-top:4px;
   font-size:12px;
   opacity:.95;
-  margin-top:3px;
 }
-
 .pill{
-  background:rgba(255,255,255,.18);
+  background:rgba(255,255,255,.16);
   border:1px solid rgba(255,255,255,.18);
-  padding:8px 14px;
+  padding:8px 12px;
   border-radius:999px;
   font-weight:900;
   white-space:nowrap;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
 }
 
 .wrap{
-  max-width:1100px;
+  max-width:980px;
   margin:auto;
   padding:14px;
+}
+
+.stepDots{
   display:grid;
-  gap:14px;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:minmax(0,1.2fr) minmax(320px,.9fr);
-  gap:14px;
-  align-items:start;
-}
-@media(max-width:900px){
-  .grid{grid-template-columns:1fr}
-}
-
-.card{
-  background:linear-gradient(180deg,#ffffff 0%, #fbfdff 100%);
-  border-radius:var(--r);
-  border:1px solid rgba(21,101,192,.12);
-  box-shadow:var(--shadow);
-  overflow:hidden;
-}
-
-.card h2{
-  margin:0;
-  padding:12px 14px;
-  border-bottom:1px solid rgba(21,101,192,.14);
-  font-size:16px;
-  background:linear-gradient(180deg, rgba(21,101,192,.08), rgba(251,192,45,.08));
-  color:#0b3d6e;
-}
-
-.content{padding:14px}
-
-label{
-  display:block;
-  font-size:12px;
-  font-weight:900;
-  color:#355070;
-  margin-bottom:6px;
-  text-transform:uppercase;
-  letter-spacing:.3px;
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:2px solid rgba(21,101,192,.14);
-  margin-top:4px;
-  background:#fff;
-  font-size:16px;
-  color:var(--ink);
-  outline:none;
-}
-input:focus,select:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 4px rgba(21,101,192,.12);
-}
-
-.topForm{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:14px;
-}
-@media(max-width:620px){
-  .topForm{grid-template-columns:1fr}
-}
-
-.personas{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(4,1fr);
   gap:8px;
   margin-bottom:14px;
 }
-@media(max-width:620px){
-  .personas{grid-template-columns:repeat(2,1fr)}
+.stepDot{
+  border-radius:16px;
+  padding:10px 8px;
+  text-align:center;
+  font-size:12px;
+  font-weight:900;
+  border:2px solid rgba(21,101,192,.12);
+  background:#fff;
+  color:var(--muted);
+}
+.stepDot.active{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+  border-color:#d39a00;
+}
+.stepDot.done{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
+  border-color:var(--blue-dark);
 }
 
-.personaBtn{
+.card{
+  background:var(--paper);
+  border:1px solid rgba(21,101,192,.12);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.cardHead{
+  padding:14px 16px;
+  border-bottom:1px solid rgba(21,101,192,.12);
+  background:linear-gradient(180deg, rgba(21,101,192,.05), rgba(251,192,45,.08));
+}
+.cardHead h2{
+  margin:0;
+  font-size:18px;
+  color:#0b3d6e;
+}
+.cardHead p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:700;
+}
+.cardBody{
   padding:14px;
-  border-radius:14px;
-  border:2px solid rgba(251,192,45,.55);
-  background:linear-gradient(180deg,#fffef7,#fff6cc);
-  color:#7a5100;
+}
+
+.step{
+  display:none;
+}
+.step.active{
+  display:block;
+}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  font-size:12px;
   font-weight:900;
+  color:#355070;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+}
+input{
+  width:100%;
+  padding:15px 14px;
+  border-radius:16px;
+  border:2px solid rgba(21,101,192,.14);
+  background:#fff;
+  font-size:18px;
+  color:var(--ink);
+  outline:none;
+}
+input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(21,101,192,.10);
+}
+
+.btnRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.btn{
+  border:none;
+  border-radius:16px;
+  padding:14px 18px;
+  font-weight:1000;
+  font-size:15px;
   cursor:pointer;
-  min-height:62px;
+}
+.btnBlue{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(21,101,192,.22);
+}
+.btnRed{
+  background:linear-gradient(180deg,var(--red),var(--red-dark));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(198,40,40,.22);
+}
+.btnYellow{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+  box-shadow:0 10px 24px rgba(251,192,45,.24);
+}
+.btnLight{
+  background:#fff;
+  color:#0b4f93;
+  border:2px solid rgba(21,101,192,.16);
+}
+
+.mesasGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+@media (max-width:640px){
+  .mesasGrid{grid-template-columns:repeat(2,1fr)}
+}
+.mesaBtn{
+  border:none;
+  cursor:pointer;
+  background:transparent;
+  padding:0;
+}
+.mesaCard{
+  position:relative;
+  min-height:116px;
+  border-radius:22px;
+  border:2px solid rgba(21,101,192,.16);
+  background:linear-gradient(180deg,#ffffff,#eef6ff);
+  box-shadow:0 10px 24px rgba(21,101,192,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:8px;
+}
+.mesaTop{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  border:3px solid rgba(90,59,0,.12);
+  box-shadow:inset 0 2px 8px rgba(255,255,255,.35);
+}
+.mesaLegs{
+  display:flex;
+  gap:18px;
+  margin-top:-4px;
+}
+.mesaLegs span{
+  width:6px;
+  height:18px;
+  border-radius:99px;
+  background:#8d6e63;
+}
+.mesaText{
+  font-weight:1000;
+  color:#0b3d6e;
   font-size:16px;
-  box-shadow:0 6px 14px rgba(251,192,45,.14);
+}
+.mesaBtn.active .mesaCard{
+  border-color:var(--red);
+  background:linear-gradient(180deg,#fff1f1,#ffe2e2);
+  box-shadow:0 14px 30px rgba(198,40,40,.18);
+}
+.mesaBtn.active .mesaText{
+  color:var(--red-dark);
+}
+
+.stickyTop{
+  position:sticky;
+  top:78px;
+  z-index:15;
+  background:linear-gradient(180deg, rgba(246,248,252,.95), rgba(246,248,252,.88));
+  backdrop-filter:blur(6px);
+  padding-bottom:10px;
+  margin-bottom:10px;
+}
+
+.resumeBar{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+@media (max-width:640px){
+  .resumeBar{grid-template-columns:1fr}
+}
+.resumeBox{
+  border-radius:16px;
+  padding:12px 14px;
+  background:#fff;
+  border:2px solid rgba(21,101,192,.12);
+  box-shadow:0 8px 18px rgba(2,6,23,.05);
+}
+.resumeBox b{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:5px;
+  text-transform:uppercase;
+}
+.resumeBox span{
+  font-size:22px;
+  font-weight:1000;
+  line-height:1;
+}
+
+.personasGrid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+@media (max-width:640px){
+  .personasGrid{grid-template-columns:repeat(2,1fr)}
+}
+.personaBtn{
+  border:none;
+  border-radius:16px;
+  min-height:64px;
+  font-size:16px;
+  font-weight:1000;
+  cursor:pointer;
+  background:linear-gradient(180deg,#fffef7,#fff5cc);
+  border:2px solid rgba(251,192,45,.55);
+  color:#7a5100;
 }
 .personaBtn.active{
-  background:linear-gradient(180deg,var(--yellow) 0%, #f2b705 100%);
-  color:#5a3700;
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
   border-color:#d69b00;
-  box-shadow:0 10px 24px rgba(251,192,45,.30);
 }
 
 .cats{
   display:flex;
   flex-wrap:wrap;
-  gap:6px;
-  margin-bottom:12px;
+  gap:8px;
+  margin-top:12px;
 }
-
 .catBtn{
-  padding:10px 12px;
+  border:none;
   border-radius:999px;
-  border:2px solid rgba(21,101,192,.20);
-  background:#fff;
-  color:#124a8a;
-  font-weight:900;
+  padding:11px 14px;
+  font-size:14px;
+  font-weight:1000;
   cursor:pointer;
+  background:#fff;
+  color:#0b4f93;
+  border:2px solid rgba(21,101,192,.18);
 }
 .catBtn.active{
-  background:linear-gradient(180deg,var(--blue) 0%, #0f4f98 100%);
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
   color:#fff;
-  border-color:#0f4f98;
-  box-shadow:0 10px 24px rgba(21,101,192,.24);
 }
 
 .items{
+  margin-top:12px;
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:8px;
+  gap:10px;
 }
-@media(max-width:620px){
+@media (max-width:640px){
   .items{grid-template-columns:1fr}
 }
-
 .itemBtn{
-  padding:14px;
-  border-radius:14px;
-  border:2px solid rgba(198,40,40,.14);
-  background:linear-gradient(180deg,#ffffff,#fff5f5);
-  text-align:left;
+  border:none;
   cursor:pointer;
-  min-height:76px;
+  text-align:left;
+  padding:14px;
+  border-radius:18px;
+  background:linear-gradient(180deg,#ffffff,#fff5f5);
+  border:2px solid rgba(198,40,40,.14);
   box-shadow:0 6px 16px rgba(198,40,40,.06);
 }
-.itemBtn:hover{
-  border-color:rgba(198,40,40,.35);
-}
 .itemBtn .name{
-  font-weight:900;
-  font-size:18px;
-  line-height:1.1;
+  font-size:20px;
+  font-weight:1000;
   color:#8e1d1d;
+  line-height:1.1;
 }
 .itemBtn .desc{
+  margin-top:5px;
   font-size:12px;
   color:var(--muted);
-  margin-top:4px;
   font-weight:700;
 }
 
+.comandaCompacta{
+  margin-top:12px;
+  display:grid;
+  gap:10px;
+}
 .group{
-  border:2px solid rgba(21,101,192,.14);
-  border-radius:14px;
-  margin-bottom:10px;
+  border-radius:16px;
   overflow:hidden;
+  border:2px solid rgba(21,101,192,.14);
   background:#fff;
 }
-
 .groupHead{
-  padding:10px;
-  background:linear-gradient(90deg, rgba(251,192,45,.22), rgba(21,101,192,.12));
-  font-weight:900;
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:8px;
+  padding:10px 12px;
+  background:linear-gradient(90deg, rgba(251,192,45,.22), rgba(21,101,192,.12));
 }
-
-.groupHeadLeft{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  min-width:0;
+.groupTitle{
+  font-weight:1000;
   color:#0b3d6e;
 }
-
-.groupHeadRight{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
 .groupTag{
   font-size:11px;
-  padding:4px 8px;
-  border-radius:999px;
   background:#fff;
   border:1px solid rgba(21,101,192,.18);
   color:#33597f;
-  font-weight:900;
-}
-
-.toggleBtn{
-  border:1px solid rgba(21,101,192,.20);
-  background:linear-gradient(180deg,#ffffff,#eef6ff);
-  color:#0b4f93;
   border-radius:999px;
-  padding:7px 10px;
-  font-size:12px;
+  padding:4px 8px;
   font-weight:900;
-  cursor:pointer;
 }
-
 .groupBody{
   display:none;
 }
-
 .group.open .groupBody{
   display:block;
 }
-
+.toggleBtn{
+  border:none;
+  cursor:pointer;
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:1000;
+  background:#fff;
+  color:#0b4f93;
+  border:1px solid rgba(21,101,192,.16);
+}
 .line{
   display:flex;
   justify-content:space-between;
   gap:8px;
-  padding:10px;
-  border-bottom:1px dashed rgba(15,23,42,.12);
-  align-items:flex-start;
-  background:#fff;
-}
-.line:last-child{border-bottom:none}
-
-.lineLeft{
-  min-width:0;
+  padding:10px 12px;
+  border-top:1px dashed rgba(16,32,51,.12);
 }
 .lineTitle{
-  font-weight:900;
+  font-weight:1000;
   line-height:1.2;
-  color:#1f2937;
 }
 .lineMeta{
+  margin-top:4px;
   font-size:12px;
   color:var(--muted);
-  margin-top:4px;
   white-space:pre-wrap;
-  font-weight:800;
+  font-weight:700;
 }
 .lineCat{
-  display:inline-block;
   margin-top:6px;
+  display:inline-block;
   font-size:11px;
-  padding:4px 8px;
   border-radius:999px;
-  border:1px solid rgba(251,192,45,.45);
+  padding:4px 8px;
+  background:#fff8d6;
   color:#7a5100;
-  background:var(--yellow-soft);
+  border:1px solid rgba(251,192,45,.45);
   font-weight:900;
 }
-
 .rightBtns{
   display:flex;
   flex-direction:column;
   gap:6px;
   min-width:92px;
 }
-
-.mini, .btnDark, .btnDanger, .btnSoft{
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:900;
-}
-
 .mini{
+  border:none;
+  cursor:pointer;
   height:36px;
+  border-radius:12px;
+  font-weight:1000;
   background:#fff;
-  border:2px solid rgba(21,101,192,.16);
   color:#0b4f93;
-  font-size:18px;
+  border:2px solid rgba(21,101,192,.16);
 }
-
-.btnRow{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-  flex-wrap:wrap;
-}
-.btnDanger{
-  background:linear-gradient(180deg,var(--danger),#b71c1c);
-  color:#fff;
-  padding:12px 14px;
-  font-size:14px;
-  box-shadow:0 10px 24px rgba(211,47,47,.22);
-}
-.btnDark{
-  background:linear-gradient(180deg,var(--blue),#0f4f98);
-  color:#fff;
-  padding:12px 14px;
-  font-size:14px;
-  box-shadow:0 10px 24px rgba(21,101,192,.22);
-}
-.btnSoft{
-  background:linear-gradient(180deg,#fff8d6,#ffe082);
-  color:#7a5100;
-  padding:12px 14px;
-  font-size:14px;
-  border:1px solid rgba(251,192,45,.55);
-}
-
-.empty{
-  color:var(--muted);
-  font-weight:900;
-  padding:4px 0;
+.mini.qty{
+  cursor:default;
 }
 
 .noteBox{
   margin-top:12px;
   padding:10px 12px;
-  border-radius:12px;
+  border-radius:14px;
   background:linear-gradient(180deg, rgba(21,101,192,.06), rgba(251,192,45,.10));
   border:1px solid rgba(21,101,192,.14);
   color:#355070;
@@ -412,7 +490,7 @@ input:focus,select:focus{
 .backdrop{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.50);
+  background:rgba(15,23,42,.52);
   display:none;
   align-items:center;
   justify-content:center;
@@ -420,20 +498,20 @@ input:focus,select:focus{
   z-index:50;
 }
 .modal{
-  width:min(520px, 100%);
-  background:var(--paper);
-  border-radius:18px;
-  box-shadow:0 30px 80px rgba(2,6,23,.24);
-  border:1px solid rgba(21,101,192,.14);
+  width:min(520px,100%);
+  background:#fff;
+  border-radius:20px;
   overflow:hidden;
+  border:1px solid rgba(21,101,192,.14);
+  box-shadow:0 30px 80px rgba(2,6,23,.24);
 }
 .modalHead{
   padding:14px 16px;
-  border-bottom:1px solid rgba(21,101,192,.14);
+  border-bottom:1px solid rgba(21,101,192,.12);
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:10px;
+  gap:8px;
   background:linear-gradient(180deg, rgba(21,101,192,.06), rgba(251,192,45,.08));
 }
 .modalHead h3{
@@ -445,80 +523,25 @@ input:focus,select:focus{
   width:40px;
   height:40px;
   border-radius:12px;
-  border:1px solid rgba(21,101,192,.14);
+  border:1px solid rgba(21,101,192,.12);
   background:#fff;
+  color:#0b4f93;
   font-size:18px;
   font-weight:1000;
   cursor:pointer;
-  color:#0b4f93;
 }
 .modalBody{
   padding:14px;
-  display:grid;
-  gap:10px;
 }
 .modalFoot{
   padding:14px;
-  border-top:1px solid rgba(21,101,192,.14);
+  border-top:1px solid rgba(21,101,192,.12);
   display:flex;
   gap:10px;
-  background:rgba(255,255,255,.7);
-}
-.modalFoot button{flex:1}
-
-.stickyAside{
-  position:sticky;
-  top:78px;
-}
-
-.cartTools{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-
-.toolBtn{
-  padding:10px 12px;
-  border-radius:999px;
-  border:2px solid rgba(21,101,192,.18);
-  background:#fff;
-  color:#0b4f93;
-  font-weight:900;
-  cursor:pointer;
-  font-size:13px;
-}
-
-.toolBtn.active{
-  background:linear-gradient(180deg,var(--yellow),#f2b705);
-  color:#5a3700;
-  border-color:#d69b00;
-  box-shadow:0 10px 24px rgba(251,192,45,.24);
-}
-
-.cartScroll{
-  max-height:58vh;
-  overflow:auto;
-  padding-right:4px;
-  scroll-behavior:smooth;
-  border-radius:12px;
-}
-
-.cartScroll::-webkit-scrollbar{
-  width:10px;
-}
-.cartScroll::-webkit-scrollbar-thumb{
-  background:linear-gradient(180deg, rgba(198,40,40,.55), rgba(21,101,192,.55));
-  border-radius:999px;
-}
-
-.group.flash{
-  outline:3px solid rgba(251,192,45,.60);
-  transition:outline .25s ease;
+  background:rgba(255,255,255,.8);
 }
 
 .print-area{display:none}
-
 @media print{
   body *{visibility:hidden!important}
   .print-area,.print-area *{visibility:visible!important}
@@ -533,7 +556,6 @@ input:focus,select:focus{
     margin:2mm;
   }
 }
-
 .ticket{
   width:76mm;
   font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
@@ -546,106 +568,128 @@ input:focus,select:focus{
 .ticket .c{text-align:center}
 .ticket .b{font-weight:900}
 .ticket .lg{font-size:18px}
-.ticket .hr{
-  border-top:1px dashed #000;
-  margin:6px 0;
-}
-.ticket .g{
-  font-weight:900;
-  margin-top:7px;
-  font-size:13px;
-  text-transform:uppercase;
-}
-.ticket .it{
-  margin:5px 0;
-}
-.ticket .itn{
-  font-weight:900;
-  font-size:15px;
-  line-height:1.15;
-}
-.ticket .sub{
-  padding-left:8px;
-  font-size:11px;
-  white-space:pre-wrap;
-}
-.ticket .small{
-  font-size:11px;
-}
+.ticket .hr{border-top:1px dashed #000;margin:6px 0}
+.ticket .g{font-weight:900;margin-top:7px;font-size:13px;text-transform:uppercase}
+.ticket .it{margin:5px 0}
+.ticket .itn{font-weight:900;font-size:15px;line-height:1.15}
+.ticket .sub{padding-left:8px;font-size:11px;white-space:pre-wrap}
+.ticket .small{font-size:11px}
 </style>
 </head>
-
 <body>
 
 <header>
   <div class="head">
-    <div class="title">
+    <div class="brand">
       <h1>🍽️ Comandas Cocina</h1>
-      <div class="sub">Modo taquero • comanda colapsable para no scrollear de más</div>
+      <div class="sub">Flujo por pasos para celular y tablet</div>
     </div>
     <div class="pill" id="pill">0 productos</div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="grid">
+  <div class="stepDots">
+    <div class="stepDot active" id="dot1">1. Mesero</div>
+    <div class="stepDot" id="dot2">2. Mesa</div>
+    <div class="stepDot" id="dot3">3. Pedido</div>
+    <div class="stepDot" id="dot4">4. Comanda</div>
+  </div>
 
-    <section class="card">
-      <h2>Tomar pedido</h2>
-      <div class="content">
+  <div class="card">
+    <div class="cardHead">
+      <h2 id="screenTitle">Paso 1 — Nombre del mesero</h2>
+      <p id="screenSub">Primero identifica quién está tomando el pedido.</p>
+    </div>
 
-        <div class="topForm">
-          <div>
-            <label>Mesa</label>
-            <select id="mesa"></select>
-          </div>
-          <div>
-            <label>Mesero</label>
-            <input id="mesero" placeholder="Ej. Marco">
-          </div>
+    <div class="cardBody">
+      <!-- PASO 1 -->
+      <section class="step active" id="step1">
+        <label>Nombre del mesero</label>
+        <input id="mesero" placeholder="Ej. Marco">
+        <div class="btnRow">
+          <button class="btn btnBlue" id="goStep2">Continuar a mesas</button>
+        </div>
+      </section>
+
+      <!-- PASO 2 -->
+      <section class="step" id="step2">
+        <div class="noteBox" style="margin-top:0">
+          Elige la mesa tocando un botón grande. Pensado para usar rápido en celular o tablet.
         </div>
 
-        <label>Persona</label>
-        <div class="personas" id="personas"></div>
+        <div class="mesasGrid" id="mesasGrid" style="margin-top:12px"></div>
 
-        <div class="cats" id="cats"></div>
+        <div class="btnRow">
+          <button class="btn btnLight" id="backTo1">Volver</button>
+          <button class="btn btnBlue" id="goStep3">Continuar al pedido</button>
+        </div>
+      </section>
+
+      <!-- PASO 3 -->
+      <section class="step" id="step3">
+        <div class="stickyTop">
+          <div class="resumeBar">
+            <div class="resumeBox">
+              <b>Mesero</b>
+              <span id="meseroView">—</span>
+            </div>
+            <div class="resumeBox">
+              <b>Mesa</b>
+              <span id="mesaView">—</span>
+            </div>
+          </div>
+
+          <label style="margin-top:12px">Persona</label>
+          <div class="personasGrid" id="personas"></div>
+
+          <div class="cats" id="cats"></div>
+        </div>
 
         <div class="items" id="items"></div>
 
+        <div class="btnRow">
+          <button class="btn btnLight" id="backTo2">Volver a mesas</button>
+          <button class="btn btnYellow" id="goStep4">Revisar comanda</button>
+        </div>
+
         <div class="noteBox">
-          El mesero registra todo aquí. El ticket de cocina solo imprime comida importante para el taquero.
+          Aquí solo eliges persona y productos. No necesitas bajar hasta la impresión mientras capturas.
         </div>
+      </section>
 
-      </div>
-    </section>
-
-    <aside class="card stickyAside">
-      <h2>Comanda</h2>
-      <div class="content">
-
-        <div class="cartTools">
-          <button class="toolBtn active" id="btnFiltroTodo" type="button">Ver todo</button>
-          <button class="toolBtn" id="btnFiltroPersona" type="button">Solo persona activa</button>
-          <button class="toolBtn" id="btnIrPersona" type="button">Ir a persona activa</button>
-        </div>
-
-        <div class="cartScroll" id="cartScroll">
-          <div id="cart"></div>
+      <!-- PASO 4 -->
+      <section class="step" id="step4">
+        <div class="resumeBar">
+          <div class="resumeBox">
+            <b>Mesero</b>
+            <span id="meseroView4">—</span>
+          </div>
+          <div class="resumeBox">
+            <b>Mesa</b>
+            <span id="mesaView4">—</span>
+          </div>
         </div>
 
         <div class="btnRow">
-          <button class="btnDanger" id="btnVaciar">Vaciar</button>
-          <button class="btnSoft" id="btnResumen">Ver resumen</button>
-          <button class="btnDark" id="btnImprimir">Imprimir cocina</button>
+          <button class="btn btnLight" id="backTo3">Seguir capturando</button>
+          <button class="btn btnLight" id="expandAll">Abrir todo</button>
+          <button class="btn btnLight" id="collapseAll">Cerrar todo</button>
+        </div>
+
+        <div class="comandaCompacta" id="cart"></div>
+
+        <div class="btnRow">
+          <button class="btn btnRed" id="btnVaciar">Vaciar comanda</button>
+          <button class="btn btnYellow" id="btnResumen">Resumen</button>
+          <button class="btn btnBlue" id="btnImprimir">Imprimir cocina</button>
         </div>
 
         <div class="noteBox">
-          Los pedidos salen escondidos por defecto. Abre solo la persona que quieras revisar.
+          Aquí revisas e imprimes. Las bebidas y postres se ven en la comanda, pero no salen en el ticket de cocina.
         </div>
-
-      </div>
-    </aside>
-
+      </section>
+    </div>
   </div>
 </div>
 
@@ -656,14 +700,12 @@ input:focus,select:focus{
       <button class="closeX" id="btnCerrarModal" type="button">✕</button>
     </div>
     <div class="modalBody">
-      <div>
-        <label id="modalPersonaLabel">Persona</label>
-        <input id="notaRapida" placeholder="Ej. sin cebolla / bien dorado / combinado">
-      </div>
+      <label id="modalPersonaLabel">Nota</label>
+      <input id="notaRapida" placeholder="Ej. sin cebolla / combinado / bien dorado">
     </div>
     <div class="modalFoot">
-      <button class="btnDanger" id="btnCancelarModal" type="button">Cancelar</button>
-      <button class="btnDark" id="btnGuardarModal" type="button">Agregar</button>
+      <button class="btn btnRed" id="btnCancelarModal" type="button">Cancelar</button>
+      <button class="btn btnBlue" id="btnGuardarModal" type="button">Agregar</button>
     </div>
   </div>
 </div>
@@ -712,20 +754,43 @@ const catalogo = [
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PERSONAS = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","General"];
 
+let currentStep = 1;
+let meseroNombre = "";
+let mesaActiva = "";
 let personaActiva = "Persona 1";
 let activeCat = "TACOS";
 let cart = [];
 let draftItem = null;
-let filtroCart = "todo";
 const openGroups = new Set();
 
-const mesa = document.getElementById("mesa");
-const mesero = document.getElementById("mesero");
+const steps = {
+  1: document.getElementById("step1"),
+  2: document.getElementById("step2"),
+  3: document.getElementById("step3"),
+  4: document.getElementById("step4"),
+};
+
+const titles = {
+  1: ["Paso 1 — Nombre del mesero","Primero identifica quién está tomando el pedido."],
+  2: ["Paso 2 — Elegir mesa","Toca la mesa donde se está levantando la orden."],
+  3: ["Paso 3 — Capturar pedido","Elige persona y agrega productos sin bajar hasta la comanda."],
+  4: ["Paso 4 — Revisar e imprimir","Confirma la comanda y manda a imprimir cocina."],
+};
+
+const meseroInput = document.getElementById("mesero");
+const mesasGrid = document.getElementById("mesasGrid");
 const personasBox = document.getElementById("personas");
 const catsBox = document.getElementById("cats");
 const itemsBox = document.getElementById("items");
 const cartBox = document.getElementById("cart");
 const pill = document.getElementById("pill");
+const screenTitle = document.getElementById("screenTitle");
+const screenSub = document.getElementById("screenSub");
+
+const meseroView = document.getElementById("meseroView");
+const mesaView = document.getElementById("mesaView");
+const meseroView4 = document.getElementById("meseroView4");
+const mesaView4 = document.getElementById("mesaView4");
 
 const backdrop = document.getElementById("backdrop");
 const modalTitle = document.getElementById("modalTitle");
@@ -734,18 +799,6 @@ const notaRapida = document.getElementById("notaRapida");
 const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const btnGuardarModal = document.getElementById("btnGuardarModal");
-
-const cartScroll = document.getElementById("cartScroll");
-const btnFiltroTodo = document.getElementById("btnFiltroTodo");
-const btnFiltroPersona = document.getElementById("btnFiltroPersona");
-const btnIrPersona = document.getElementById("btnIrPersona");
-
-for(let i=1;i<=20;i++){
-  const o = document.createElement("option");
-  o.value = "Mesa " + i;
-  o.textContent = "Mesa " + i;
-  mesa.appendChild(o);
-}
 
 function escapeHtml(s){
   return String(s || "")
@@ -762,20 +815,69 @@ function makeKey(item, persona, note){
   return [item.id, persona, note || ""].join("|");
 }
 
+function updateHeaderPill(){
+  pill.textContent = `${totalProductos()} productos`;
+}
+
+function updateResumeViews(){
+  meseroView.textContent = meseroNombre || "—";
+  mesaView.textContent = mesaActiva || "—";
+  meseroView4.textContent = meseroNombre || "—";
+  mesaView4.textContent = mesaActiva || "—";
+}
+
+function goToStep(n){
+  currentStep = n;
+  Object.keys(steps).forEach(k=>{
+    steps[k].classList.toggle("active", Number(k) === n);
+  });
+
+  [1,2,3,4].forEach(i=>{
+    const dot = document.getElementById("dot"+i);
+    dot.classList.remove("active","done");
+    if(i < n) dot.classList.add("done");
+    if(i === n) dot.classList.add("active");
+  });
+
+  screenTitle.textContent = titles[n][0];
+  screenSub.textContent = titles[n][1];
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function renderMesas(){
+  mesasGrid.innerHTML = "";
+  for(let i=1;i<=20;i++){
+    const mesa = "Mesa " + i;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "mesaBtn" + (mesaActiva===mesa ? " active":"");
+    btn.innerHTML = `
+      <div class="mesaCard">
+        <div class="mesaTop"></div>
+        <div class="mesaLegs"><span></span><span></span></div>
+        <div class="mesaText">${mesa}</div>
+      </div>
+    `;
+    btn.onclick = ()=>{
+      mesaActiva = mesa;
+      renderMesas();
+      updateResumeViews();
+    };
+    mesasGrid.appendChild(btn);
+  }
+}
+
 function renderPersonas(){
   personasBox.innerHTML = "";
   PERSONAS.forEach(p=>{
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "personaBtn" + (p===personaActiva ? " active" : "");
+    b.className = "personaBtn" + (p===personaActiva ? " active":"");
     b.textContent = p;
     b.onclick = ()=>{
       personaActiva = p;
       openGroups.add(p);
       renderPersonas();
-      if(filtroCart === "persona"){
-        renderCart();
-      }
     };
     personasBox.appendChild(b);
   });
@@ -786,7 +888,7 @@ function renderCats(){
   CATS.forEach(c=>{
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "catBtn" + (c===activeCat ? " active" : "");
+    b.className = "catBtn" + (c===activeCat ? " active":"");
     b.textContent = c;
     b.onclick = ()=>{
       activeCat = c;
@@ -799,8 +901,7 @@ function renderCats(){
 
 function renderItems(){
   itemsBox.innerHTML = "";
-  const list = catalogo.filter(x=>x.cat===activeCat);
-  list.forEach(item=>{
+  catalogo.filter(x=>x.cat===activeCat).forEach(item=>{
     const b = document.createElement("button");
     b.type = "button";
     b.className = "itemBtn";
@@ -841,11 +942,8 @@ function agregarLinea(item, persona, note){
   }
 
   openGroups.add(persona);
+  updateHeaderPill();
   renderCart();
-
-  if(filtroCart === "todo"){
-    setTimeout(irAPersonaActiva, 50);
-  }
 }
 
 function agruparCart(){
@@ -861,55 +959,40 @@ function agruparCart(){
 }
 
 function toggleGroup(persona){
-  if(openGroups.has(persona)){
-    openGroups.delete(persona);
-  }else{
-    openGroups.add(persona);
-  }
+  if(openGroups.has(persona)) openGroups.delete(persona);
+  else openGroups.add(persona);
   renderCart();
 }
 
 function renderCart(){
-  pill.textContent = `${totalProductos()} productos`;
-
   if(!cart.length){
-    cartBox.innerHTML = `<div class="empty">Aún no agregas productos.</div>`;
+    cartBox.innerHTML = `<div class="noteBox" style="margin-top:0">Aún no agregas productos a la comanda.</div>`;
     return;
   }
 
   cartBox.innerHTML = "";
-
-  const grupos = agruparCart()
-    .filter(group => filtroCart === "todo" ? true : group.persona === personaActiva);
-
-  if(!grupos.length){
-    cartBox.innerHTML = `<div class="empty">No hay productos para este filtro.</div>`;
-    return;
-  }
-
-  grupos.forEach(group=>{
+  agruparCart().forEach(group=>{
     const g = document.createElement("div");
-    g.className = "group" + (openGroups.has(group.persona) ? " open" : "");
-    g.dataset.persona = group.persona;
+    const isOpen = openGroups.has(group.persona);
+    g.className = "group" + (isOpen ? " open":"");
 
     const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+x.qty,0);
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
-    const isOpen = openGroups.has(group.persona);
 
     const bodyRows = group.lines.map((line)=>{
       const idx = cart.indexOf(line);
       return `
-        <div class="line" data-idx="${idx}">
-          <div class="lineLeft">
+        <div class="line">
+          <div>
             <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
             ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
             <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
           </div>
           <div class="rightBtns">
-            <button class="mini" type="button" data-a="dec" data-idx="${idx}">−</button>
-            <button class="mini" type="button" disabled style="font-size:15px;font-weight:1000">${line.qty}</button>
-            <button class="mini" type="button" data-a="inc" data-idx="${idx}">+</button>
-            <button class="mini" type="button" data-a="del" data-idx="${idx}">✕</button>
+            <button class="mini" data-a="dec" data-idx="${idx}">−</button>
+            <button class="mini qty">${line.qty}</button>
+            <button class="mini" data-a="inc" data-idx="${idx}">+</button>
+            <button class="mini" data-a="del" data-idx="${idx}">✕</button>
           </div>
         </div>
       `;
@@ -917,82 +1000,53 @@ function renderCart(){
 
     g.innerHTML = `
       <div class="groupHead">
-        <div class="groupHeadLeft">
-          <span>${escapeHtml(group.persona)}</span>
-        </div>
-        <div class="groupHeadRight">
+        <div class="groupTitle">${escapeHtml(group.persona)}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
-          <button class="toggleBtn" type="button" data-toggle="${escapeHtml(group.persona)}">
+          <button class="toggleBtn" data-toggle="${escapeHtml(group.persona)}">
             ${isOpen ? "▼ Ocultar pedidos" : "▶ Ver pedidos"}
           </button>
         </div>
       </div>
-      <div class="groupBody">
-        ${bodyRows}
-      </div>
+      <div class="groupBody">${bodyRows}</div>
     `;
 
     cartBox.appendChild(g);
   });
 
   cartBox.querySelectorAll("[data-toggle]").forEach(btn=>{
-    btn.onclick = ()=>{
-      toggleGroup(btn.getAttribute("data-toggle"));
-    };
+    btn.onclick = ()=> toggleGroup(btn.getAttribute("data-toggle"));
   });
 
   cartBox.querySelectorAll('[data-a="dec"]').forEach(btn=>{
     btn.onclick = ()=>{
-      const idx = Number(btn.getAttribute("data-idx"));
-      const line = cart[idx];
-      if(!line) return;
-      line.qty = Math.max(1, line.qty - 1);
+      const idx = Number(btn.dataset.idx);
+      if(!cart[idx]) return;
+      cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+      updateHeaderPill();
       renderCart();
     };
   });
 
   cartBox.querySelectorAll('[data-a="inc"]').forEach(btn=>{
     btn.onclick = ()=>{
-      const idx = Number(btn.getAttribute("data-idx"));
-      const line = cart[idx];
-      if(!line) return;
-      line.qty += 1;
+      const idx = Number(btn.dataset.idx);
+      if(!cart[idx]) return;
+      cart[idx].qty += 1;
+      updateHeaderPill();
       renderCart();
     };
   });
 
   cartBox.querySelectorAll('[data-a="del"]').forEach(btn=>{
     btn.onclick = ()=>{
-      const idx = Number(btn.getAttribute("data-idx"));
+      const idx = Number(btn.dataset.idx);
       if(Number.isNaN(idx) || !cart[idx]) return;
-      cart.splice(idx, 1);
+      cart.splice(idx,1);
+      updateHeaderPill();
       renderCart();
     };
   });
-}
-
-function syncCartTools(){
-  btnFiltroTodo.classList.toggle("active", filtroCart === "todo");
-  btnFiltroPersona.classList.toggle("active", filtroCart === "persona");
-}
-
-function irAPersonaActiva(){
-  openGroups.add(personaActiva);
-  renderCart();
-
-  let selectorPersona = personaActiva;
-  if (window.CSS && typeof CSS.escape === "function") {
-    selectorPersona = CSS.escape(personaActiva);
-  } else {
-    selectorPersona = personaActiva.replace(/"/g, '\\"');
-  }
-
-  const grupo = cartBox.querySelector(`[data-persona="${selectorPersona}"]`);
-  if(!grupo) return;
-
-  grupo.scrollIntoView({behavior:"smooth", block:"start"});
-  grupo.classList.add("flash");
-  setTimeout(()=>grupo.classList.remove("flash"), 700);
 }
 
 function abrirModal(item){
@@ -1017,34 +1071,22 @@ btnCancelarModal.onclick = cerrarModal;
 backdrop.addEventListener("click", (e)=>{
   if(e.target === backdrop) cerrarModal();
 });
-
 btnGuardarModal.onclick = ()=>{
   if(!draftItem) return;
   agregarLinea(draftItem, personaActiva, notaRapida.value.trim());
   cerrarModal();
 };
 
-function validarAntesImprimir(){
-  if(!mesa.value.trim()) return "Selecciona una mesa.";
-  if(!mesero.value.trim()) return "Escribe el nombre del mesero.";
-  if(!cart.length) return "Agrega productos a la comanda.";
-  const cocinaLines = cart.filter(x=>x.cocina);
-  if(!cocinaLines.length) return "No hay productos de cocina para imprimir.";
-  return null;
-}
-
 function buildTicketCocina(){
   let html = `
     <div class="ticket">
       <div class="c b lg">COMANDA COCINA</div>
-      <div class="c b">${escapeHtml(mesa.value)}</div>
+      <div class="c b">${escapeHtml(mesaActiva)}</div>
       <div class="hr"></div>
   `;
-
   PERSONAS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona && x.cocina);
     if(!lines.length) return;
-
     html += `<div class="g">${escapeHtml(persona)}</div>`;
     lines.forEach(l=>{
       html += `
@@ -1056,7 +1098,6 @@ function buildTicketCocina(){
     });
     html += `<div class="hr"></div>`;
   });
-
   html += `</div>`;
   return html;
 }
@@ -1065,15 +1106,13 @@ function buildResumenComanda(){
   let html = `
     <div class="ticket">
       <div class="c b lg">RESUMEN COMANDA</div>
-      <div class="c b">${escapeHtml(mesa.value)}</div>
-      <div class="small c">Mesero: ${escapeHtml(mesero.value || "—")}</div>
+      <div class="c b">${escapeHtml(mesaActiva)}</div>
+      <div class="small c">Mesero: ${escapeHtml(meseroNombre || "—")}</div>
       <div class="hr"></div>
   `;
-
   PERSONAS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona);
     if(!lines.length) return;
-
     html += `<div class="g">${escapeHtml(persona)}</div>`;
     lines.forEach(l=>{
       html += `
@@ -1086,73 +1125,83 @@ function buildResumenComanda(){
     });
     html += `<div class="hr"></div>`;
   });
-
   html += `</div>`;
   return html;
 }
 
 function imprimirCocina(){
-  const err = validarAntesImprimir();
-  if(err){
-    alert(err);
-    return;
-  }
+  if(!cart.length) return alert("No hay productos en la comanda.");
+  if(!cart.some(x=>x.cocina)) return alert("No hay productos de cocina para imprimir.");
   const area = document.getElementById("printArea");
   area.innerHTML = buildTicketCocina();
   setTimeout(()=>window.print(),100);
 }
 
 function verResumen(){
-  if(!cart.length){
-    alert("Sin productos en la comanda.");
-    return;
-  }
+  if(!cart.length) return alert("No hay productos en la comanda.");
   const area = document.getElementById("printArea");
   area.innerHTML = buildResumenComanda();
   setTimeout(()=>window.print(),100);
 }
 
-btnFiltroTodo.onclick = ()=>{
-  filtroCart = "todo";
-  syncCartTools();
+// Navegación pasos
+document.getElementById("goStep2").onclick = ()=>{
+  const nombre = meseroInput.value.trim();
+  if(!nombre) return alert("Escribe el nombre del mesero.");
+  meseroNombre = nombre;
+  updateResumeViews();
+  goToStep(2);
+};
+
+document.getElementById("backTo1").onclick = ()=> goToStep(1);
+
+document.getElementById("goStep3").onclick = ()=>{
+  if(!mesaActiva) return alert("Selecciona una mesa.");
+  updateResumeViews();
+  goToStep(3);
+};
+
+document.getElementById("backTo2").onclick = ()=> goToStep(2);
+
+document.getElementById("goStep4").onclick = ()=>{
+  if(!cart.length) return alert("Agrega al menos un producto.");
+  renderCart();
+  goToStep(4);
+};
+
+document.getElementById("backTo3").onclick = ()=> goToStep(3);
+
+document.getElementById("expandAll").onclick = ()=>{
+  PERSONAS.forEach(p=>openGroups.add(p));
   renderCart();
 };
 
-btnFiltroPersona.onclick = ()=>{
-  filtroCart = "persona";
-  openGroups.add(personaActiva);
-  syncCartTools();
+document.getElementById("collapseAll").onclick = ()=>{
+  openGroups.clear();
   renderCart();
 };
-
-btnIrPersona.onclick = ()=>{
-  if(filtroCart !== "todo"){
-    filtroCart = "todo";
-    syncCartTools();
-    renderCart();
-    setTimeout(irAPersonaActiva, 60);
-    return;
-  }
-  irAPersonaActiva();
-};
-
-document.getElementById("btnImprimir").onclick = imprimirCocina;
-document.getElementById("btnResumen").onclick = verResumen;
 
 document.getElementById("btnVaciar").onclick = ()=>{
   if(confirm("¿Vaciar comanda?")){
     cart = [];
     openGroups.clear();
+    updateHeaderPill();
     renderCart();
+    goToStep(3);
   }
 };
 
+document.getElementById("btnResumen").onclick = verResumen;
+document.getElementById("btnImprimir").onclick = imprimirCocina;
+
+// Inicial
+renderMesas();
 renderPersonas();
 renderCats();
 renderItems();
 renderCart();
-syncCartTools();
+updateHeaderPill();
+updateResumeViews();
 </script>
-
 </body>
 </html>
