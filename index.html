@@ -343,10 +343,24 @@
       color:var(--ink);
     }
 
+    .cartGroup{
+      margin-top:12px;
+      border:1px solid rgba(59,42,31,.16);
+      border-radius:18px;
+      overflow:hidden;
+      background:rgba(255,255,255,.30);
+    }
+    .cartGroupHead{
+      padding:10px 12px;
+      font-weight:1000;
+      font-size:13px;
+      background:linear-gradient(180deg, rgba(201,138,30,.18), rgba(201,138,30,.05));
+      border-bottom:1px solid rgba(59,42,31,.14);
+    }
     .cartLine{
       display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
       border-bottom:1px dashed rgba(59,42,31,.18);
-      padding:12px 0;
+      padding:12px;
     }
     .cartLine:last-child{border-bottom:none}
     .muted{color:var(--muted)}
@@ -356,6 +370,19 @@
       font-weight:1000;
       font-size:15px;
       line-height:1.2;
+    }
+
+    .badgePersona{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:rgba(201,138,30,.14);
+      border:1px solid rgba(201,138,30,.25);
+      font-size:11px;
+      font-weight:1000;
+      margin-top:6px;
     }
 
     .totalRow{
@@ -420,6 +447,9 @@
       overflow:hidden;
       border:1px solid rgba(59,42,31,.18);
       box-shadow:0 40px 100px rgba(0,0,0,.35);
+      max-height:min(92vh, 900px);
+      display:flex;
+      flex-direction:column;
     }
     .modalHead{
       padding:14px 16px;
@@ -477,6 +507,11 @@
     }
     .footerBtns button{flex:1}
 
+    .modalScroll{
+      overflow:auto;
+      padding:14px;
+    }
+
     .print-area{display:none}
 
     @media print{
@@ -514,6 +549,12 @@
       border-top:1px dashed #000;
       margin:6px 0;
     }
+    .ticket .person-head{
+      font-weight:900;
+      font-size:13px;
+      margin:8px 0 4px;
+      text-transform:uppercase;
+    }
     .ticket .item{
       margin:7px 0;
     }
@@ -535,7 +576,7 @@
   <div class="row">
     <div class="brand">
       <h1>🍽️ Comandas Cocina — Taquería Guadalupe Victoria</h1>
-      <div class="sub">Versión tablet para meseros • ticket limpio para taquero</div>
+      <div class="sub">Versión tablet para meseros • ticket por persona/plato</div>
     </div>
     <div class="pill" id="cartPill">🧾 <b>0</b> • <span id="pillTotal">$0.00</span></div>
   </div>
@@ -565,7 +606,7 @@
         <div class="items" id="items"></div>
 
         <div class="note">
-          Diseñado para que el mesero levante la orden rápido desde la tablet.
+          Ahora el mesero puede asignar tacos por persona para que cocina sepa qué va en cada plato.
         </div>
       </div>
     </section>
@@ -615,7 +656,7 @@
         </div>
 
         <div class="note">
-          El ticket impreso sale solo con producto, cantidad y notas útiles para cocina.
+          El ticket impreso sale agrupado por persona/plato. Ideal para que el taquero monte cada plato correctamente.
         </div>
       </div>
     </aside>
@@ -633,7 +674,7 @@
       <button class="closeX" id="mClose" type="button">✕</button>
     </div>
 
-    <div class="content" id="mBody"></div>
+    <div class="modalScroll" id="mBody"></div>
 
     <div class="footerBtns">
       <button class="btnLight" id="mCancel" type="button">Cancelar</button>
@@ -705,6 +746,10 @@ function modsPara(item){
   return ["conSin"];
 }
 
+function requierePersona(item){
+  return ["TACOS","QUESADILLAS","VOLCANES"].includes(item.cat);
+}
+
 function money(n){ return "$" + Number(n||0).toFixed(2); }
 function escapeHtml(s){
   return String(s || "")
@@ -723,8 +768,12 @@ function modsToText(mods){
   }
   return parts.join(" • ");
 }
-function buildKey(item, mods, note){
-  return item.id + "|" + JSON.stringify(mods || {}) + "|" + (note || "");
+function normalizaPersona(v){
+  const txt = String(v || "").trim();
+  return txt || "General";
+}
+function buildKey(item, mods, note, persona){
+  return item.id + "|" + JSON.stringify(mods || {}) + "|" + (note || "") + "|" + normalizaPersona(persona);
 }
 function validateRequired(item, mods){
   const keys = modsPara(item);
@@ -821,6 +870,26 @@ q.addEventListener("input", renderItems);
 function cartCount(){ return cart.reduce((a,x)=> a + x.qty, 0); }
 function cartTotal(){ return cart.reduce((a,x)=> a + x.qty * x.basePrice, 0); }
 
+function agruparCartPorPersona(){
+  const groups = {};
+  cart.forEach(line=>{
+    const persona = normalizaPersona(line.persona);
+    if(!groups[persona]) groups[persona] = [];
+    groups[persona].push(line);
+  });
+
+  const orden = Object.keys(groups).sort((a,b)=>{
+    if(a === "General") return 1;
+    if(b === "General") return -1;
+    const na = parseInt(a.replace(/\D/g,''),10);
+    const nb = parseInt(b.replace(/\D/g,''),10);
+    if(!isNaN(na) && !isNaN(nb)) return na - nb;
+    return a.localeCompare(b, 'es');
+  });
+
+  return orden.map(persona=>({persona, lines:groups[persona]}));
+}
+
 function renderCart(){
   const count = cartCount();
   cartPill.innerHTML = `🧾 <b>${count}</b> • <span id="pillTotal">${money(cartTotal())}</span>`;
@@ -833,49 +902,66 @@ function renderCart(){
   }
 
   cartBox.innerHTML = "";
-  cart.forEach((line, idx)=>{
-    const wrap = document.createElement("div");
-    wrap.className = "cartLine";
-    const lineTotal = line.qty * line.basePrice;
+  const grupos = agruparCartPorPersona();
 
-    wrap.innerHTML = `
-      <div style="min-width:0">
-        <div class="cartItemTitle">${escapeHtml(line.name)}</div>
-        <div class="muted" style="font-size:12px; margin-top:4px; line-height:1.25; font-weight:900">
-          ${escapeHtml(modsToText(line.mods) || "")}
+  grupos.forEach(group=>{
+    const g = document.createElement("div");
+    g.className = "cartGroup";
+
+    const head = document.createElement("div");
+    head.className = "cartGroupHead";
+    head.textContent = `🍽️ ${group.persona}`;
+    g.appendChild(head);
+
+    group.lines.forEach((line)=>{
+      const idx = cart.indexOf(line);
+      const wrap = document.createElement("div");
+      wrap.className = "cartLine";
+      const lineTotal = line.qty * line.basePrice;
+
+      wrap.innerHTML = `
+        <div style="min-width:0">
+          <div class="cartItemTitle">${escapeHtml(line.name)}</div>
+          <div class="badgePersona">${escapeHtml(normalizaPersona(line.persona))}</div>
+          <div class="muted" style="font-size:12px; margin-top:6px; line-height:1.25; font-weight:900">
+            ${escapeHtml(modsToText(line.mods) || "")}
+          </div>
+          ${line.note ? `<div class="muted" style="font-size:12px; margin-top:4px; font-weight:900">Nota: ${escapeHtml(line.note)}</div>` : ``}
         </div>
-        ${line.note ? `<div class="muted" style="font-size:12px; margin-top:4px; font-weight:900">Nota: ${escapeHtml(line.note)}</div>` : ``}
-      </div>
-      <div style="text-align:right">
-        <div class="qtyRow">
-          <button class="mini" type="button" data-act="dec">−</button>
-          <div style="min-width:26px; text-align:center; font-weight:1000; font-size:16px">${line.qty}</div>
-          <button class="mini" type="button" data-act="inc">+</button>
+        <div style="text-align:right">
+          <div class="qtyRow">
+            <button class="mini" type="button" data-act="dec">−</button>
+            <div style="min-width:26px; text-align:center; font-weight:1000; font-size:16px">${line.qty}</div>
+            <button class="mini" type="button" data-act="inc">+</button>
+          </div>
+          <div style="margin-top:6px; font-weight:1000">${money(lineTotal)}</div>
+          <button class="mini" type="button" data-act="del" style="margin-top:8px;width:100%;height:36px;border-radius:12px;">✕</button>
         </div>
-        <div style="margin-top:6px; font-weight:1000">${money(lineTotal)}</div>
-        <button class="mini" type="button" data-act="del" style="margin-top:8px;width:100%;height:36px;border-radius:12px;">✕</button>
-      </div>
-    `;
+      `;
 
-    wrap.querySelector('[data-act="dec"]').addEventListener("click", ()=>{
-      line.qty = Math.max(1, line.qty - 1);
-      renderCart();
-    });
-    wrap.querySelector('[data-act="inc"]').addEventListener("click", ()=>{
-      line.qty += 1;
-      renderCart();
-    });
-    wrap.querySelector('[data-act="del"]').addEventListener("click", ()=>{
-      cart.splice(idx, 1);
-      renderCart();
+      wrap.querySelector('[data-act="dec"]').addEventListener("click", ()=>{
+        line.qty = Math.max(1, line.qty - 1);
+        renderCart();
+      });
+      wrap.querySelector('[data-act="inc"]').addEventListener("click", ()=>{
+        line.qty += 1;
+        renderCart();
+      });
+      wrap.querySelector('[data-act="del"]').addEventListener("click", ()=>{
+        cart.splice(idx, 1);
+        renderCart();
+      });
+
+      g.appendChild(wrap);
     });
 
-    cartBox.appendChild(wrap);
+    cartBox.appendChild(g);
   });
 }
 
-function addLine(item, mods, note, qty=1){
-  const key = buildKey(item, mods, note);
+function addLine(item, mods, note, qty=1, persona="General"){
+  const personaFinal = normalizaPersona(persona);
+  const key = buildKey(item, mods, note, personaFinal);
   const existing = cart.find(x=>x.key===key);
 
   if(existing){
@@ -885,10 +971,12 @@ function addLine(item, mods, note, qty=1){
       key,
       id:item.id,
       name:item.name,
+      cat:item.cat,
       basePrice:item.price,
       qty:Number(qty || 1),
       mods:mods || {},
-      note:note || ""
+      note:note || "",
+      persona:personaFinal
     });
   }
   renderCart();
@@ -904,9 +992,21 @@ const mAdd   = document.getElementById("mAdd");
 let currentItem = null;
 let draft = null;
 
+function sugerenciasPersona(){
+  const usadas = new Set(
+    cart
+      .map(x => normalizaPersona(x.persona))
+      .filter(x => x !== "General")
+  );
+
+  const base = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","Persona 6"];
+  base.forEach(x => usadas.add(x));
+  return Array.from(usadas);
+}
+
 function openModal(item){
   currentItem = item;
-  draft = {mods:{}, note:"", qty:1};
+  draft = {mods:{}, note:"", qty:1, persona: requierePersona(item) ? "Persona 1" : "General"};
 
   mTitle.textContent = `${item.name} — ${money(item.price)}`;
   mBody.innerHTML = "";
@@ -925,6 +1025,28 @@ function openModal(item){
     </div>
   `;
   mBody.appendChild(qtyBox);
+
+  if(requierePersona(item)){
+    const personaBox = document.createElement("div");
+    personaBox.className = "optGroup";
+
+    const sugeridas = sugerenciasPersona();
+    const chips = sugeridas.map(p => `
+      <button type="button" class="optBtn personaBtn ${draft.persona===p ? 'active':''}" data-persona="${escapeHtml(p)}">${escapeHtml(p)}</button>
+    `).join("");
+
+    personaBox.innerHTML = `
+      <div class="optTitle">
+        <b>Persona / Plato</b>
+        <span>para saber qué va en cada plato</span>
+      </div>
+      <div class="optList" id="personaQuick">${chips}</div>
+      <div style="margin-top:10px">
+        <input id="personaInput" placeholder="Ej. Persona 1 / Niño / Señora de azul" value="${escapeHtml(draft.persona)}">
+      </div>
+    `;
+    mBody.appendChild(personaBox);
+  }
 
   const keys = modsPara(item);
   if(keys.length){
@@ -974,6 +1096,14 @@ function openModal(item){
     const inp = document.getElementById("noteProd");
     if(inp) inp.oninput = ()=> draft.note = inp.value;
 
+    const personaInput = document.getElementById("personaInput");
+    if(personaInput){
+      personaInput.oninput = ()=>{
+        draft.persona = personaInput.value;
+        syncPersonaButtons();
+      };
+    }
+
     const qtyValue = document.getElementById("qtyValue");
     const qtyMinus = document.getElementById("qtyMinus");
     const qtyPlus = document.getElementById("qtyPlus");
@@ -990,6 +1120,24 @@ function openModal(item){
       draft.qty += 1;
       refreshQty();
     });
+
+    document.querySelectorAll(".personaBtn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const val = btn.getAttribute("data-persona") || "General";
+        draft.persona = val;
+        if(personaInput) personaInput.value = val;
+        syncPersonaButtons();
+      });
+    });
+
+    function syncPersonaButtons(){
+      document.querySelectorAll(".personaBtn").forEach(btn=>{
+        const val = btn.getAttribute("data-persona") || "";
+        btn.classList.toggle("active", normalizaPersona(draft.persona) === normalizaPersona(val));
+      });
+    }
+
+    syncPersonaButtons();
   }, 0);
 }
 function closeModal(){
@@ -1029,7 +1177,13 @@ mAdd.addEventListener("click", ()=>{
     alert(err);
     return;
   }
-  addLine(currentItem, draft.mods, draft.note, Number(draft.qty || 1));
+  addLine(
+    currentItem,
+    draft.mods,
+    draft.note,
+    Number(draft.qty || 1),
+    requierePersona(currentItem) ? draft.persona : "General"
+  );
   closeModal();
 });
 
@@ -1041,27 +1195,38 @@ function validateComanda(){
 }
 
 function buildKitchenTicketHTML(){
-  const itemsHtml = cart.map(x=>{
-    const mods = modsToText(x.mods);
-    const note = (x.note || "").trim();
+  const grupos = agruparCartPorPersona();
+
+  const gruposHtml = grupos.map(group=>{
+    const itemsHtml = group.lines.map(x=>{
+      const mods = modsToText(x.mods);
+      const note = (x.note || "").trim();
+      return `
+        <div class="item">
+          <div class="item-name">${escapeHtml(x.qty)} x ${escapeHtml(x.name)}</div>
+          ${mods ? `<div class="item-sub">• ${escapeHtml(mods)}</div>` : ""}
+          ${note ? `<div class="item-sub">• ${escapeHtml(note)}</div>` : ""}
+        </div>
+      `;
+    }).join("");
+
     return `
-      <div class="item">
-        <div class="item-name">${escapeHtml(x.qty)} x ${escapeHtml(x.name)}</div>
-        ${mods ? `<div class="item-sub">• ${escapeHtml(mods)}</div>` : ""}
-        ${note ? `<div class="item-sub">• ${escapeHtml(note)}</div>` : ""}
-      </div>
+      <div class="person-head">${escapeHtml(group.persona)}</div>
+      ${itemsHtml}
+      <div class="hr"></div>
     `;
   }).join("");
 
   return `
     <div class="ticket">
       <div class="center b lg">COMANDA</div>
+      <div class="center b">${escapeHtml(mesaSelect.value)}</div>
       <div class="hr"></div>
-      ${itemsHtml}
-      <div class="hr"></div>
+      ${gruposHtml}
     </div>
   `;
 }
+
 function printCurrentComanda(){
   const err = validateComanda();
   if(err){
