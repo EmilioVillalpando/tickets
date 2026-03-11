@@ -3,24 +3,22 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Comandas Cocina — Taquería Guadalupe Victoria</title>
+  <title>Comandas Cocina — Guadalupe Victoria</title>
 
   <style>
     :root{
-      --bg:#f3e7d4;
-      --paper:#fbf2e2;
-      --card:#fff7ea;
-      --ink:#3b2a1f;
-      --muted:#6e5646;
-      --line:rgba(59,42,31,.15);
-
+      --bg:#f4ead9;
+      --paper:#fbf4e8;
+      --card:#fffaf2;
+      --ink:#2f241c;
+      --muted:#7a6554;
+      --line:rgba(47,36,28,.14);
       --brand:#3b2a1f;
-      --gold1:#c98a1e;
-      --gold2:#b77712;
-      --green:#1f6b2a;
-
-      --shadow:0 18px 50px rgba(32,24,16,.18);
-      --r:20px;
+      --gold:#b9842a;
+      --green:#245a2a;
+      --danger:#b42318;
+      --shadow:0 14px 34px rgba(32,24,16,.12);
+      --r:18px;
     }
 
     *{box-sizing:border-box}
@@ -29,54 +27,54 @@
     body{
       margin:0;
       font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:
-        radial-gradient(1200px 520px at 10% -10%, rgba(201,138,30,.20), transparent 60%),
-        radial-gradient(1200px 520px at 90% 0%, rgba(59,42,31,.12), transparent 55%),
-        var(--bg);
+      background:var(--bg);
       color:var(--ink);
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
     }
 
     header{
-      position:sticky; top:0; z-index:50;
-      background:linear-gradient(180deg, rgba(59,42,31,.96), rgba(59,42,31,.90));
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:var(--brand);
       color:#fff;
-      padding:12px 14px;
-      box-shadow:0 12px 30px rgba(0,0,0,.25);
-      border-bottom:1px solid rgba(255,255,255,.10);
+      padding:12px;
+      box-shadow:0 10px 24px rgba(0,0,0,.18);
     }
-    header .row{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      max-width:1400px; margin:0 auto;
+
+    .head{
+      max-width:1200px;
+      margin:0 auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
     }
-    header .brand{
-      display:flex; flex-direction:column; line-height:1.05; min-width:0;
+
+    .title{
+      min-width:0;
     }
-    header h1{
+    .title h1{
       margin:0;
       font-size:18px;
-      letter-spacing:.2px;
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      line-height:1.1;
     }
-    header .sub{
-      font-size:12px; opacity:.92; margin-top:4px;
+    .title .sub{
+      margin-top:4px;
+      font-size:12px;
+      opacity:.9;
     }
 
     .pill{
-      display:inline-flex; align-items:center; gap:8px;
-      background:rgba(255,255,255,.12);
+      background:rgba(255,255,255,.14);
       border:1px solid rgba(255,255,255,.18);
-      padding:10px 12px;
       border-radius:999px;
-      font-size:13px;
+      padding:10px 14px;
       font-weight:900;
-      user-select:none;
       white-space:nowrap;
     }
 
     .wrap{
-      max-width:1400px;
+      max-width:1200px;
       margin:0 auto;
       padding:14px;
       display:grid;
@@ -84,26 +82,26 @@
     }
 
     .hero{
-      border-radius:24px;
-      border:1px solid rgba(59,42,31,.15);
+      border-radius:22px;
       overflow:hidden;
-      box-shadow:0 25px 70px rgba(32,24,16,.18);
-      background:#0b1220;
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      background:#111;
     }
     .hero img{
       width:100%;
-      height:180px;
+      height:150px;
       object-fit:cover;
       display:block;
     }
 
     .grid{
       display:grid;
-      grid-template-columns:1.3fr .95fr;
+      grid-template-columns:1.2fr .9fr;
       gap:14px;
       align-items:start;
     }
-    @media (max-width:1080px){
+    @media (max-width:980px){
       .grid{grid-template-columns:1fr}
     }
 
@@ -114,403 +112,298 @@
       box-shadow:var(--shadow);
       overflow:hidden;
     }
+
     .card h2{
       margin:0;
-      padding:14px 16px 12px;
-      font-size:16px;
+      padding:14px 16px;
       border-bottom:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      font-size:16px;
+      background:rgba(255,255,255,.35);
     }
+
     .content{padding:14px}
-
-    .searchRow{
-      display:flex; gap:10px; align-items:center; margin-top:12px;
-    }
-    .searchRow input{
-      flex:1;
-      padding:15px 14px;
-      border-radius:16px;
-      border:1px solid rgba(59,42,31,.20);
-      background:rgba(255,255,255,.72);
-      outline:none;
-      font-size:16px;
-      color:var(--ink);
-    }
-
-    .tabs{
-      display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 10px;
-    }
-    .tab{
-      border:1px solid rgba(59,42,31,.22);
-      background:rgba(255,255,255,.60);
-      padding:12px 16px;
-      border-radius:14px;
-      font-weight:1000;
-      font-size:14px;
-      cursor:pointer;
-      user-select:none;
-      letter-spacing:.2px;
-      box-shadow:0 10px 22px rgba(32,24,16,.10);
-      -webkit-tap-highlight-color:transparent;
-      touch-action:manipulation;
-    }
-    .tab.active{
-      background:rgba(255,255,255,.88);
-      border-color:rgba(201,138,30,.55);
-      box-shadow:0 0 0 3px rgba(201,138,30,.18);
-    }
-
-    .sectionTitle{
-      margin:12px 0 10px;
-      font-size:38px;
-      letter-spacing:.8px;
-      font-weight:1000;
-      color:rgba(59,42,31,.96);
-      line-height:1;
-    }
-    .divider{
-      height:4px;
-      border-radius:999px;
-      background:rgba(59,42,31,.20);
-      margin:8px 0 18px;
-    }
-
-    .items{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-    }
-    @media (max-width:620px){
-      .items{grid-template-columns:1fr}
-    }
-
-    .prod{
-      background:rgba(255,255,255,.35);
-      border:1px solid rgba(59,42,31,.18);
-      border-radius:20px;
-      overflow:hidden;
-      display:grid;
-      grid-template-columns:1fr 1.05fr;
-      min-height:185px;
-      box-shadow:0 18px 50px rgba(32,24,16,.10);
-    }
-    .prodLeft{
-      padding:16px 14px 14px;
-      display:flex; flex-direction:column; gap:8px;
-      background:rgba(255,255,255,.35);
-      min-width:0;
-    }
-    .prodName{
-      font-weight:1000;
-      font-size:24px;
-      margin:0;
-      line-height:1.1;
-      word-break:break-word;
-    }
-    .prodDesc{
-      margin:0;
-      color:var(--muted);
-      font-weight:800;
-      line-height:1.25;
-      font-size:14px;
-    }
-    .price{
-      margin-top:auto;
-      font-weight:1000;
-      color:var(--green);
-      font-size:16px;
-    }
-    .price b{
-      display:block;
-      font-size:34px;
-      letter-spacing:.3px;
-    }
-
-    .prodRight{
-      padding:14px;
-      background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.30));
-      display:flex; flex-direction:column; justify-content:center; align-items:center; gap:12px;
-    }
-    .prodImg{
-      width:100%;
-      height:96px;
-      border-radius:18px;
-      overflow:hidden;
-      background:#0b1220;
-      box-shadow:0 18px 40px rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
-    }
-    .prodImg img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
-
-    .btnAdd, .stickyBtn, .btnDark{
-      border:none; cursor:pointer;
-      padding:13px 18px;
-      border-radius:14px;
-      font-weight:1000;
-      color:#fff;
-      font-size:15px;
-      -webkit-tap-highlight-color:transparent;
-      touch-action:manipulation;
-    }
-    .btnAdd, .stickyBtn{
-      border-radius:999px;
-      padding:12px 24px;
-      background:linear-gradient(180deg, var(--gold1), var(--gold2));
-      box-shadow:0 12px 26px rgba(201,138,30,.38);
-      font-size:17px;
-    }
-    .btnDark{
-      background:linear-gradient(180deg, rgba(59,42,31,.94), rgba(59,42,31,.88));
-      box-shadow:0 12px 26px rgba(0,0,0,.22);
-    }
-
-    .btnLight, .mini{
-      border:1px solid rgba(59,42,31,.18);
-      background:rgba(255,255,255,.70);
-      color:var(--ink);
-      cursor:pointer;
-      font-weight:1000;
-      -webkit-tap-highlight-color:transparent;
-      touch-action:manipulation;
-    }
-    .btnLight{
-      padding:12px 14px;
-      border-radius:14px;
-      font-size:14px;
-    }
-    .mini{
-      width:36px; height:36px;
-      border-radius:12px;
-      font-size:18px;
-    }
-
-    .mesaBanner{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:12px;
-    }
-    @media (max-width:620px){
-      .mesaBanner{grid-template-columns:1fr}
-    }
-    .mesaBox{
-      background:linear-gradient(180deg, rgba(201,138,30,.18), rgba(201,138,30,.06));
-      border:1px solid rgba(201,138,30,.35);
-      border-radius:18px;
-      padding:14px;
-      box-shadow:0 12px 30px rgba(201,138,30,.12);
-    }
-    .mesaBox b{
-      display:block;
-      font-size:12px;
-      margin-bottom:6px;
-      color:var(--muted);
-    }
-    .mesaBig{
-      font-size:26px;
-      font-weight:1000;
-      line-height:1;
-    }
-
-    .formGrid{
-      display:grid; gap:10px; grid-template-columns:1fr 1fr;
-    }
-    @media (max-width:620px){
-      .formGrid{grid-template-columns:1fr}
-    }
 
     label{
       display:block;
       font-size:12px;
       font-weight:1000;
-      margin:10px 0 6px;
-      color:rgba(59,42,31,.90);
+      margin:0 0 6px;
+      color:var(--muted);
     }
+
     input, select{
       width:100%;
       padding:14px 12px;
-      border:1px solid rgba(59,42,31,.18);
-      border-radius:15px;
+      border:1px solid var(--line);
+      border-radius:14px;
       font-size:16px;
-      outline:none;
-      background:rgba(255,255,255,.70);
+      background:#fff;
       color:var(--ink);
+      outline:none;
     }
 
-    .cartGroup{
-      margin-top:12px;
-      border:1px solid rgba(59,42,31,.16);
-      border-radius:18px;
-      overflow:hidden;
-      background:rgba(255,255,255,.30);
+    .topForm{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:14px;
     }
-    .cartGroupHead{
-      padding:10px 12px;
+    @media (max-width:620px){
+      .topForm{grid-template-columns:1fr}
+    }
+
+    .personas{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+      margin-bottom:14px;
+    }
+    @media (max-width:620px){
+      .personas{grid-template-columns:repeat(2, 1fr)}
+    }
+
+    .personaBtn{
+      border:1px solid rgba(185,132,42,.35);
+      background:#fff;
+      color:var(--ink);
+      border-radius:16px;
+      padding:16px 10px;
+      font-size:18px;
       font-weight:1000;
-      font-size:13px;
-      background:linear-gradient(180deg, rgba(201,138,30,.18), rgba(201,138,30,.05));
-      border-bottom:1px solid rgba(59,42,31,.14);
+      cursor:pointer;
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+      min-height:70px;
     }
-    .cartLine{
-      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
-      border-bottom:1px dashed rgba(59,42,31,.18);
-      padding:12px;
+    .personaBtn.active{
+      background:var(--gold);
+      color:#fff;
+      box-shadow:0 0 0 3px rgba(185,132,42,.18);
     }
-    .cartLine:last-child{border-bottom:none}
-    .muted{color:var(--muted)}
-    .qtyRow{display:flex; gap:6px; align-items:center}
 
-    .cartItemTitle{
+    .cats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:14px;
+    }
+    .catBtn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:999px;
+      padding:11px 14px;
+      font-size:14px;
+      font-weight:1000;
+      cursor:pointer;
+    }
+    .catBtn.active{
+      background:var(--brand);
+      color:#fff;
+      border-color:var(--brand);
+    }
+
+    .items{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+    @media (max-width:620px){
+      .items{grid-template-columns:1fr}
+    }
+
+    .itemBtn{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:18px;
+      padding:16px 14px;
+      text-align:left;
+      cursor:pointer;
+      min-height:84px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:4px;
+      box-shadow:0 8px 22px rgba(0,0,0,.05);
+    }
+    .itemBtn .name{
+      font-size:20px;
+      font-weight:1000;
+      line-height:1.1;
+    }
+    .itemBtn .desc{
+      font-size:13px;
+      color:var(--muted);
+      font-weight:800;
+      line-height:1.2;
+    }
+
+    .miniNote{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,255,255,.45);
+      border:1px solid var(--line);
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .group{
+      margin-bottom:12px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fffdf9;
+    }
+    .groupHead{
+      padding:10px 12px;
+      background:rgba(185,132,42,.12);
+      border-bottom:1px solid var(--line);
+      font-weight:1000;
+      font-size:15px;
+    }
+
+    .line{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:flex-start;
+      padding:12px;
+      border-bottom:1px dashed var(--line);
+    }
+    .line:last-child{border-bottom:none}
+
+    .lineName{
       font-weight:1000;
       font-size:15px;
       line-height:1.2;
     }
-
-    .badgePersona{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:4px 8px;
-      border-radius:999px;
-      background:rgba(201,138,30,.14);
-      border:1px solid rgba(201,138,30,.25);
-      font-size:11px;
-      font-weight:1000;
-      margin-top:6px;
-    }
-
-    .totalRow{
-      display:flex; justify-content:space-between; align-items:center;
-      padding-top:12px; margin-top:12px;
-      border-top:1px solid rgba(59,42,31,.18);
-      font-size:15px;
-      font-weight:1000;
-    }
-    .totalRow strong{font-size:22px}
-
-    .stickyBar{
-      position:sticky;
-      bottom:12px;
-      z-index:25;
-      margin-top:12px;
-      background:linear-gradient(180deg, rgba(59,42,31,.94), rgba(59,42,31,.90));
-      color:#fff;
-      border-radius:16px;
-      box-shadow:0 18px 60px rgba(0,0,0,.28);
-      border:1px solid rgba(255,255,255,.12);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      padding:12px;
-      flex-wrap:wrap;
-    }
-    .stickyBar .left{
-      display:flex; align-items:center; gap:10px; font-weight:1000;
-    }
-    .stickyBar .amount{
-      font-size:20px; letter-spacing:.2px;
-    }
-
-    .note{
-      font-size:12px;
+    .lineNote{
+      margin-top:4px;
       color:var(--muted);
-      font-weight:800;
-      line-height:1.35;
-      background:rgba(255,255,255,.35);
-      padding:10px 12px;
+      font-size:12px;
+      font-weight:900;
+      line-height:1.25;
+      white-space:pre-wrap;
+    }
+
+    .rightBtns{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      align-items:stretch;
+      min-width:92px;
+    }
+
+    .mini, .btn, .btnDark, .btnDanger{
+      border:none;
       border-radius:12px;
-      border:1px solid rgba(59,42,31,.16);
+      cursor:pointer;
+      font-weight:1000;
+    }
+
+    .mini{
+      height:36px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:var(--ink);
+      font-size:18px;
+    }
+
+    .btnRow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
       margin-top:12px;
+    }
+
+    .btn{
+      background:var(--gold);
+      color:#fff;
+      padding:14px 16px;
+      font-size:15px;
+      border-radius:14px;
+      box-shadow:0 10px 24px rgba(185,132,42,.22);
+    }
+    .btnDark{
+      background:var(--brand);
+      color:#fff;
+      padding:14px 16px;
+      font-size:15px;
+      border-radius:14px;
+    }
+    .btnDanger{
+      background:var(--danger);
+      color:#fff;
+      padding:14px 16px;
+      font-size:15px;
+      border-radius:14px;
+    }
+
+    .empty{
+      color:var(--muted);
+      font-weight:1000;
+      padding:8px 0;
     }
 
     .backdrop{
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.58);
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.55);
       display:none;
       align-items:center;
       justify-content:center;
       padding:16px;
-      z-index:60;
-      touch-action:none;
+      z-index:50;
     }
+
     .modal{
-      width:min(820px, 100%);
+      width:min(520px, 100%);
       background:var(--paper);
       border-radius:18px;
+      box-shadow:0 30px 80px rgba(0,0,0,.32);
+      border:1px solid var(--line);
       overflow:hidden;
-      border:1px solid rgba(59,42,31,.18);
-      box-shadow:0 40px 100px rgba(0,0,0,.35);
-      max-height:min(92vh, 900px);
-      display:flex;
-      flex-direction:column;
     }
+
     .modalHead{
       padding:14px 16px;
-      background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0));
-      border-bottom:1px solid rgba(59,42,31,.16);
-      display:flex; justify-content:space-between; align-items:center; gap:10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      background:#fff;
     }
-    .modalHead h3{margin:0; font-size:16px}
+    .modalHead h3{
+      margin:0;
+      font-size:17px;
+    }
+
     .closeX{
-      border:1px solid rgba(59,42,31,.18);
-      background:rgba(255,255,255,.65);
+      width:40px;
+      height:40px;
       border-radius:12px;
-      width:42px; height:42px;
-      cursor:pointer;
-      font-weight:1000;
-      color:var(--ink);
+      border:1px solid var(--line);
+      background:#fff;
       font-size:18px;
-    }
-    .optGroup{
-      border:1px solid rgba(59,42,31,.16);
-      border-radius:16px;
-      padding:12px;
-      margin-top:10px;
-      background:rgba(255,255,255,.35);
-    }
-    .optTitle{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .optTitle b{font-size:13px}
-    .optTitle span{font-size:12px; color:var(--muted); font-weight:800}
-    .optList{
-      display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;
-    }
-    .optBtn{
-      border:1px solid rgba(59,42,31,.18);
-      background:rgba(255,255,255,.65);
-      padding:10px 12px;
-      border-radius:999px;
-      font-size:14px;
+      font-weight:1000;
       cursor:pointer;
-      user-select:none;
-      font-weight:900;
-      color:var(--ink);
     }
-    .optBtn.active{
-      border-color:rgba(201,138,30,.60);
-      box-shadow:0 0 0 3px rgba(201,138,30,.18);
+
+    .modalBody{
+      padding:14px;
+      display:grid;
+      gap:10px;
     }
-    .footerBtns{
+
+    .modalFoot{
+      padding:14px;
+      border-top:1px solid var(--line);
       display:flex;
       gap:10px;
-      padding:14px 16px;
-      border-top:1px solid rgba(59,42,31,.16);
-      background:rgba(255,255,255,.25);
+      background:rgba(255,255,255,.4);
     }
-    .footerBtns button{flex:1}
-
-    .modalScroll{
-      overflow:auto;
-      padding:14px;
-    }
+    .modalFoot button{flex:1}
 
     .print-area{display:none}
 
@@ -523,8 +416,6 @@
         inset:0;
         background:#fff;
         color:#000;
-        padding:0;
-        margin:0;
       }
       @page{
         size:80mm auto;
@@ -535,50 +426,49 @@
     .ticket{
       width:76mm;
       margin:0 auto;
+      padding:3mm 2mm;
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
       color:#000;
       background:#fff;
-      padding:3mm 2mm;
       font-size:12px;
-      line-height:1.24;
+      line-height:1.25;
     }
-    .ticket .center{text-align:center}
+    .ticket .c{text-align:center}
     .ticket .b{font-weight:900}
     .ticket .lg{font-size:18px}
     .ticket .hr{
       border-top:1px dashed #000;
       margin:6px 0;
     }
-    .ticket .person-head{
+    .ticket .g{
+      margin:8px 0 4px;
       font-weight:900;
       font-size:13px;
-      margin:8px 0 4px;
       text-transform:uppercase;
     }
-    .ticket .item{
-      margin:7px 0;
+    .ticket .it{
+      margin:6px 0;
     }
-    .ticket .item-name{
+    .ticket .itn{
       font-weight:900;
       font-size:15px;
       line-height:1.15;
     }
-    .ticket .item-sub{
+    .ticket .sub{
       padding-left:8px;
       font-size:11px;
       white-space:pre-wrap;
     }
   </style>
 </head>
-
 <body>
 <header>
-  <div class="row">
-    <div class="brand">
-      <h1>🍽️ Comandas Cocina — Taquería Guadalupe Victoria</h1>
-      <div class="sub">Versión tablet para meseros • ticket por persona/plato</div>
+  <div class="head">
+    <div class="title">
+      <h1>🍽️ Comandas Cocina</h1>
+      <div class="sub">Simple para mesero • limpio para cocina</div>
     </div>
-    <div class="pill" id="cartPill">🧾 <b>0</b> • <span id="pillTotal">$0.00</span></div>
+    <div class="pill" id="pill">0 productos</div>
   </div>
 </header>
 
@@ -588,630 +478,358 @@
   </div>
 
   <div class="grid">
-    <!-- MENÚ -->
+    <!-- IZQUIERDA -->
     <section class="card">
-      <h2>Menú</h2>
+      <h2>Tomar pedido</h2>
       <div class="content">
-        <div class="searchRow">
-          <input id="q" placeholder="Buscar producto...">
+        <div class="topForm">
+          <div>
+            <label>Mesa</label>
+            <select id="mesa"></select>
+          </div>
+          <div>
+            <label>Mesero</label>
+            <input id="mesero" placeholder="Ej. Marco">
+          </div>
         </div>
 
-        <div class="tabs" id="tabs"></div>
+        <label>¿Para quién es?</label>
+        <div class="personas" id="personas"></div>
 
-        <div>
-          <div class="sectionTitle" id="sectionTitle">TACOS</div>
-          <div class="divider"></div>
-        </div>
+        <div class="cats" id="cats"></div>
 
         <div class="items" id="items"></div>
 
-        <div class="note">
-          Ahora el mesero puede asignar tacos por persona para que cocina sepa qué va en cada plato.
+        <div class="miniNote">
+          Toca una persona y luego toca los productos. Así queda claro qué va en cada plato.
         </div>
       </div>
     </section>
 
-    <!-- COMANDA ACTUAL -->
+    <!-- DERECHA -->
     <aside class="card">
       <h2>Comanda actual</h2>
       <div class="content">
-        <div class="mesaBanner">
-          <div class="mesaBox">
-            <b>Mesa activa</b>
-            <div class="mesaBig" id="mesaPreview">Mesa 1</div>
-          </div>
-          <div class="mesaBox">
-            <b>Mesero</b>
-            <div class="mesaBig" id="meseroPreview">—</div>
-          </div>
-        </div>
-
-        <div class="formGrid">
-          <div>
-            <label>Mesa *</label>
-            <select id="mesaSelect"></select>
-          </div>
-          <div>
-            <label>Mesero *</label>
-            <input id="meseroInput" placeholder="Ej. Marco">
-          </div>
-        </div>
-
         <div id="cart"></div>
 
-        <div class="totalRow">
-          <span>Total visual</span>
-          <strong id="total">$0.00</strong>
+        <div class="btnRow">
+          <button class="btnDanger" id="btnVaciar">Vaciar</button>
+          <button class="btnDark" id="btnImprimir">Imprimir cocina</button>
         </div>
 
-        <div class="stickyBar">
-          <div class="left">
-            <span>🍽️</span>
-            <span class="amount" id="barTotal">$0.00</span>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap">
-            <button class="btnLight" id="btnClear">Vaciar</button>
-            <button class="stickyBtn" id="btnImprimir">Imprimir cocina</button>
-          </div>
-        </div>
-
-        <div class="note">
-          El ticket impreso sale agrupado por persona/plato. Ideal para que el taquero monte cada plato correctamente.
+        <div class="miniNote">
+          El ticket sale por persona y sin precios.
         </div>
       </div>
     </aside>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="backdrop" id="backdrop" aria-hidden="true">
-  <div class="modal" role="dialog" aria-modal="true">
+<!-- MODAL NOTA -->
+<div class="backdrop" id="backdrop">
+  <div class="modal">
     <div class="modalHead">
-      <div>
-        <h3 id="mTitle">Producto</h3>
-        <div class="muted" style="font-size:12px;font-weight:900">Configura como lo quieres</div>
-      </div>
-      <button class="closeX" id="mClose" type="button">✕</button>
+      <h3 id="modalTitle">Agregar detalle</h3>
+      <button class="closeX" id="btnCerrarModal" type="button">✕</button>
     </div>
-
-    <div class="modalScroll" id="mBody"></div>
-
-    <div class="footerBtns">
-      <button class="btnLight" id="mCancel" type="button">Cancelar</button>
-      <button class="btnDark" id="mAdd" type="button">Agregar</button>
+    <div class="modalBody">
+      <div>
+        <label id="modalPersonaLabel">Persona</label>
+        <input id="notaRapida" placeholder="Ej. sin cebolla / bien dorado / combinado">
+      </div>
+    </div>
+    <div class="modalFoot">
+      <button class="btnDanger" id="btnCancelarModal" type="button">Cancelar</button>
+      <button class="btnDark" id="btnGuardarModal" type="button">Agregar</button>
     </div>
   </div>
 </div>
 
-<!-- IMPRESIÓN -->
 <div class="print-area" id="printArea"></div>
 
 <script>
-const NEGOCIO = "Taquería Guadalupe Victoria";
-const IMG_BASE = "";
-
 const catalogo = [
-  {id:"taco_tripa",    cat:"TACOS", name:"Taco de Tripa",    price:38, desc:"Tripa doradita.", mods:true,  img:"tacogdp.png"},
-  {id:"taco_pastor",   cat:"TACOS", name:"Taco de Pastor",   price:28, desc:"Pastor clásico.", mods:false, img:"tacogdp.png"},
-  {id:"taco_bistec",   cat:"TACOS", name:"Taco de Bistec",   price:28, desc:"Bistec bien servido.", mods:false, img:"tacogdp.png"},
-  {id:"taco_chorizo",  cat:"TACOS", name:"Taco de Chorizo",  price:28, desc:"Chorizo doradito.", mods:false, img:"tacogdp.png"},
-  {id:"taco_alambre",  cat:"TACOS", name:"Taco de Alambre",  price:28, desc:"Alambre en taco.", mods:false, img:"tacogdp.png"},
-  {id:"taco_costilla", cat:"TACOS", name:"Taco de Costilla", price:28, desc:"Costilla jugosa.", mods:false, img:"tacogdp.png"},
-  {id:"taco_barbacoa", cat:"TACOS", name:"Taco de Barbacoa", price:28, desc:"Barbacoa suave.", mods:false, img:"tacogdp.png"},
-  {id:"taco_higado",   cat:"TACOS", name:"Taco de Hígado",   price:28, desc:"Hígado bien sazonado.", mods:false, img:"tacogdp.png"},
-  {id:"taco_combinado",cat:"TACOS", name:"Taco Combinado",   price:38, desc:"Pon en nota tus carnes.", mods:true, img:"tacogdp.png"},
+  {id:"taco_tripa",    cat:"TACOS",        name:"Taco de Tripa",    desc:"Tripa doradita", requiereNota:false},
+  {id:"taco_pastor",   cat:"TACOS",        name:"Taco de Pastor",   desc:"", requiereNota:false},
+  {id:"taco_bistec",   cat:"TACOS",        name:"Taco de Bistec",   desc:"", requiereNota:false},
+  {id:"taco_chorizo",  cat:"TACOS",        name:"Taco de Chorizo",  desc:"", requiereNota:false},
+  {id:"taco_alambre",  cat:"TACOS",        name:"Taco de Alambre",  desc:"", requiereNota:false},
+  {id:"taco_costilla", cat:"TACOS",        name:"Taco de Costilla", desc:"", requiereNota:false},
+  {id:"taco_barbacoa", cat:"TACOS",        name:"Taco de Barbacoa", desc:"", requiereNota:false},
+  {id:"taco_higado",   cat:"TACOS",        name:"Taco de Hígado",   desc:"", requiereNota:false},
+  {id:"taco_combi",    cat:"TACOS",        name:"Taco Combinado",   desc:"Escribe combinación", requiereNota:true},
 
-  {id:"quesa_tripa",   cat:"QUESADILLAS", name:"Quesadilla de Tripa",   price:100, desc:"Queso + tripa.", mods:false, img:"quesadillagdp.png"},
-  {id:"quesa_pastor",  cat:"QUESADILLAS", name:"Quesadilla de Pastor",  price:90,  desc:"Queso + pastor.", mods:false, img:"quesadillagdp.png"},
-  {id:"quesa_bistec",  cat:"QUESADILLAS", name:"Quesadilla de Bistec",  price:90,  desc:"Queso + bistec.", mods:false, img:"quesadillagdp.png"},
-  {id:"quesa_chorizo", cat:"QUESADILLAS", name:"Quesadilla de Chorizo", price:90,  desc:"Queso + chorizo.", mods:false, img:"quesadillagdp.png"},
-  {id:"quesa_higado",  cat:"QUESADILLAS", name:"Quesadilla de Hígado",  price:90,  desc:"Queso + hígado.", mods:false, img:"quesadillagdp.png"},
+  {id:"quesa_tripa",   cat:"QUESADILLAS",  name:"Quesadilla de Tripa",   desc:"", requiereNota:false},
+  {id:"quesa_pastor",  cat:"QUESADILLAS",  name:"Quesadilla de Pastor",  desc:"", requiereNota:false},
+  {id:"quesa_bistec",  cat:"QUESADILLAS",  name:"Quesadilla de Bistec",  desc:"", requiereNota:false},
+  {id:"quesa_chorizo", cat:"QUESADILLAS",  name:"Quesadilla de Chorizo", desc:"", requiereNota:false},
+  {id:"quesa_higado",  cat:"QUESADILLAS",  name:"Quesadilla de Hígado",  desc:"", requiereNota:false},
 
-  {id:"charola_combinada", cat:"CHAROLAS", name:"Charola Combinada", price:100, desc:"Pon en nota qué combinación quieres.", mods:true, img:"charolagdp.png"},
-  {id:"charola_alambre",   cat:"CHAROLAS", name:"Charola de Alambre", price:90,  desc:"Alambre para compartir.", mods:false, img:"charolagdp.png"},
+  {id:"charola_combi", cat:"CHAROLAS",     name:"Charola Combinada", desc:"Escribe combinación", requiereNota:true},
+  {id:"charola_alam",  cat:"CHAROLAS",     name:"Charola de Alambre", desc:"", requiereNota:false},
 
-  {id:"volcan_tripa",   cat:"VOLCANES", name:"Volcán de Tripa",   price:90, desc:"Volcán bien servido.", mods:true, img:"volcangdp.png"},
-  {id:"volcan_pastor",  cat:"VOLCANES", name:"Volcán de Pastor",  price:85, desc:"Volcán de pastor.", mods:true, img:"volcangdp.png"},
-  {id:"volcan_bistec",  cat:"VOLCANES", name:"Volcán de Bistec",  price:85, desc:"Volcán de bistec.", mods:true, img:"volcangdp.png"},
-  {id:"volcan_chorizo", cat:"VOLCANES", name:"Volcán de Chorizo", price:85, desc:"Volcán de chorizo.", mods:true, img:"volcangdp.png"},
-  {id:"volcan_higado",  cat:"VOLCANES", name:"Volcán de Hígado",  price:85, desc:"Volcán de hígado.", mods:true, img:"volcangdp.png"},
+  {id:"volcan_tripa",   cat:"VOLCANES",    name:"Volcán de Tripa",   desc:"", requiereNota:false},
+  {id:"volcan_pastor",  cat:"VOLCANES",    name:"Volcán de Pastor",  desc:"", requiereNota:false},
+  {id:"volcan_bistec",  cat:"VOLCANES",    name:"Volcán de Bistec",  desc:"", requiereNota:false},
+  {id:"volcan_chorizo", cat:"VOLCANES",    name:"Volcán de Chorizo", desc:"", requiereNota:false},
+  {id:"volcan_higado",  cat:"VOLCANES",    name:"Volcán de Hígado",  desc:"", requiereNota:false},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS", name:"Coca Light",       price:35, desc:"", mods:false, img:"bebidasgpd.png"},
-  {id:"beb_coca",        cat:"BEBIDAS", name:"Coca",             price:35, desc:"", mods:false, img:"bebidasgpd.png"},
-  {id:"beb_fresca",      cat:"BEBIDAS", name:"Fresca",           price:35, desc:"", mods:false, img:"bebidasgpd.png"},
-  {id:"beb_sprite",      cat:"BEBIDAS", name:"Sprite",           price:35, desc:"", mods:false, img:"bebidasgpd.png"},
-  {id:"beb_agua_fresca", cat:"BEBIDAS", name:"Agua fresca",      price:30, desc:"Vaso", mods:false, img:"bebidasgpd.png"},
-  {id:"beb_agua_lt",     cat:"BEBIDAS", name:"Agua fresca 1 Lt", price:60, desc:"1 litro", mods:false, img:"bebidasgpd.png"},
+  {id:"beb_coca_light",  cat:"BEBIDAS",    name:"Coca Light",       desc:"", requiereNota:false},
+  {id:"beb_coca",        cat:"BEBIDAS",    name:"Coca",             desc:"", requiereNota:false},
+  {id:"beb_fresca",      cat:"BEBIDAS",    name:"Fresca",           desc:"", requiereNota:false},
+  {id:"beb_sprite",      cat:"BEBIDAS",    name:"Sprite",           desc:"", requiereNota:false},
+  {id:"beb_agua",        cat:"BEBIDAS",    name:"Agua fresca",      desc:"", requiereNota:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",    name:"Agua fresca 1 Lt", desc:"", requiereNota:false},
 
-  {id:"pos_pay_queso",   cat:"POSTRES", name:"Pay de queso",                    price:60, desc:"", mods:false, img:"postresgdp.png"},
-  {id:"pos_gel_rompope", cat:"POSTRES", name:"Gelatina de vainilla con rompope",price:60, desc:"", mods:false, img:"postresgdp.png"},
-  {id:"pos_arroz",       cat:"POSTRES", name:"Arroz con leche",                 price:60, desc:"", mods:false, img:"postresgdp.png"},
-  {id:"pos_flan",        cat:"POSTRES", name:"Flan",                            price:60, desc:"", mods:false, img:"postresgdp.png"},
-  {id:"pos_gel_fresa",   cat:"POSTRES", name:"Gelatina de fresa con yoghurt",   price:60, desc:"", mods:false, img:"postresgdp.png"},
-  {id:"pos_napolitano",  cat:"POSTRES", name:"Napolitano",                      price:60, desc:"", mods:false, img:"postresgdp.png"},
+  {id:"pos_pay",         cat:"POSTRES",    name:"Pay de queso",                   desc:"", requiereNota:false},
+  {id:"pos_rompope",     cat:"POSTRES",    name:"Gelatina vainilla con rompope", desc:"", requiereNota:false},
+  {id:"pos_arroz",       cat:"POSTRES",    name:"Arroz con leche",               desc:"", requiereNota:false},
+  {id:"pos_flan",        cat:"POSTRES",    name:"Flan",                          desc:"", requiereNota:false},
+  {id:"pos_fresa",       cat:"POSTRES",    name:"Gelatina fresa con yoghurt",    desc:"", requiereNota:false},
+  {id:"pos_napolitano",  cat:"POSTRES",    name:"Napolitano",                    desc:"", requiereNota:false},
 ];
+
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
+const PERSONAS = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","General"];
 
-const MODS = {
-  conSin: {
-    title:"Indicaciones",
-    type:"multi",
-    required:false,
-    options:["Con todo","Sin cebolla","Sin cilantro","Sin piña","Sin salsa"]
-  }
-};
+const mesa = document.getElementById("mesa");
+const mesero = document.getElementById("mesero");
+const personasBox = document.getElementById("personas");
+const catsBox = document.getElementById("cats");
+const itemsBox = document.getElementById("items");
+const cartBox = document.getElementById("cart");
+const pill = document.getElementById("pill");
 
-function modsPara(item){
-  if(!item.mods) return [];
-  return ["conSin"];
+const backdrop = document.getElementById("backdrop");
+const modalTitle = document.getElementById("modalTitle");
+const modalPersonaLabel = document.getElementById("modalPersonaLabel");
+const notaRapida = document.getElementById("notaRapida");
+const btnCerrarModal = document.getElementById("btnCerrarModal");
+const btnCancelarModal = document.getElementById("btnCancelarModal");
+const btnGuardarModal = document.getElementById("btnGuardarModal");
+
+let activeCat = "TACOS";
+let personaActiva = "Persona 1";
+let cart = [];
+let draftItem = null;
+
+for(let i=1;i<=20;i++){
+  const op = document.createElement("option");
+  op.value = "Mesa " + i;
+  op.textContent = "Mesa " + i;
+  mesa.appendChild(op);
 }
 
-function requierePersona(item){
-  return ["TACOS","QUESADILLAS","VOLCANES"].includes(item.cat);
-}
-
-function money(n){ return "$" + Number(n||0).toFixed(2); }
 function escapeHtml(s){
   return String(s || "")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;");
 }
-function modsToText(mods){
-  const parts = [];
-  for(const k of Object.keys(mods || {})){
-    const g = MODS[k];
-    if(!g) continue;
-    const val = mods[k];
-    if(Array.isArray(val) && val.length) parts.push(val.join(", "));
-    if(typeof val === "string" && val) parts.push(val);
-  }
-  return parts.join(" • ");
-}
-function normalizaPersona(v){
-  const txt = String(v || "").trim();
-  return txt || "General";
-}
-function buildKey(item, mods, note, persona){
-  return item.id + "|" + JSON.stringify(mods || {}) + "|" + (note || "") + "|" + normalizaPersona(persona);
-}
-function validateRequired(item, mods){
-  const keys = modsPara(item);
-  for(const k of keys){
-    const g = MODS[k];
-    if(!g || !g.required) continue;
-    const v = mods[k];
-    if(g.type==="single" && !v) return `${g.title} es obligatorio.`;
-    if(g.type==="multi" && (!v || !v.length)) return `${g.title} es obligatorio.`;
-  }
-  return null;
+
+function totalProductos(){
+  return cart.reduce((a,x)=>a + x.qty, 0);
 }
 
-const tabs = document.getElementById("tabs");
-const itemsBox = document.getElementById("items");
-const sectionTitle = document.getElementById("sectionTitle");
-const q = document.getElementById("q");
-
-let activeCat = CATS[0];
-let cart = [];
-
-const cartBox = document.getElementById("cart");
-const totalEl = document.getElementById("total");
-const cartPill = document.getElementById("cartPill");
-const barTotal = document.getElementById("barTotal");
-
-const mesaSelect = document.getElementById("mesaSelect");
-const meseroInput = document.getElementById("meseroInput");
-const mesaPreview = document.getElementById("mesaPreview");
-const meseroPreview = document.getElementById("meseroPreview");
-
-for(let i=1; i<=20; i++){
-  const op = document.createElement("option");
-  op.value = "Mesa " + i;
-  op.textContent = "Mesa " + i;
-  mesaSelect.appendChild(op);
+function makeKey(item, persona, note){
+  return [item.id, persona, note || ""].join("|");
 }
 
-function refreshPreview(){
-  mesaPreview.textContent = mesaSelect.value || "Mesa 1";
-  meseroPreview.textContent = meseroInput.value.trim() || "—";
+function renderPersonas(){
+  personasBox.innerHTML = "";
+  PERSONAS.forEach(p=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "personaBtn" + (p === personaActiva ? " active" : "");
+    b.textContent = p;
+    b.addEventListener("click", ()=>{
+      personaActiva = p;
+      renderPersonas();
+    });
+    personasBox.appendChild(b);
+  });
 }
-mesaSelect.addEventListener("change", refreshPreview);
-meseroInput.addEventListener("input", refreshPreview);
 
-function renderTabs(){
-  tabs.innerHTML = "";
+function renderCats(){
+  catsBox.innerHTML = "";
   CATS.forEach(c=>{
-    const el = document.createElement("div");
-    el.className = "tab" + (c===activeCat ? " active":"");
-    el.textContent = c;
-    el.addEventListener("click", ()=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "catBtn" + (c === activeCat ? " active" : "");
+    b.textContent = c;
+    b.addEventListener("click", ()=>{
       activeCat = c;
-      renderTabs();
+      renderCats();
       renderItems();
     });
-    tabs.appendChild(el);
+    catsBox.appendChild(b);
   });
 }
+
 function renderItems(){
-  sectionTitle.textContent = activeCat;
-  const term = (q.value || "").trim().toLowerCase();
-  const list = catalogo.filter(x=>{
-    const inCat = x.cat === activeCat;
-    const inSearch = !term || x.name.toLowerCase().includes(term) || (x.desc || "").toLowerCase().includes(term);
-    return inCat && inSearch;
-  });
-
   itemsBox.innerHTML = "";
-  list.forEach(it=>{
-    const card = document.createElement("div");
-    card.className = "prod";
-    card.innerHTML = `
-      <div class="prodLeft">
-        <h3 class="prodName">${escapeHtml(it.name)}</h3>
-        <p class="prodDesc">${escapeHtml(it.desc || "")}</p>
-        <div class="price">MXN <b>${money(it.price)}</b></div>
-      </div>
-      <div class="prodRight">
-        <div class="prodImg"><img src="${IMG_BASE + it.img}" alt="${escapeHtml(it.name)}"></div>
-        <button class="btnAdd" type="button">Agregar</button>
-      </div>
+  const list = catalogo.filter(x => x.cat === activeCat);
+
+  list.forEach(item=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "itemBtn";
+    b.innerHTML = `
+      <div class="name">${escapeHtml(item.name)}</div>
+      <div class="desc">${escapeHtml(item.desc || "")}</div>
     `;
-    card.querySelector("button").addEventListener("click", ()=> openModal(it));
-    itemsBox.appendChild(card);
+    b.addEventListener("click", ()=> agregarDesdeClick(item));
+    itemsBox.appendChild(b);
   });
-
-  if(!list.length){
-    itemsBox.innerHTML = `<div class="muted" style="font-weight:1000">No hay resultados.</div>`;
-  }
 }
-q.addEventListener("input", renderItems);
 
-function cartCount(){ return cart.reduce((a,x)=> a + x.qty, 0); }
-function cartTotal(){ return cart.reduce((a,x)=> a + x.qty * x.basePrice, 0); }
+function agregarDesdeClick(item){
+  if(item.requiereNota){
+    abrirModal(item);
+    return;
+  }
+  agregarLinea(item, personaActiva, "");
+}
 
-function agruparCartPorPersona(){
-  const groups = {};
+function agregarLinea(item, persona, note){
+  const key = makeKey(item, persona, note);
+  const existing = cart.find(x=>x.key === key);
+
+  if(existing){
+    existing.qty += 1;
+  }else{
+    cart.push({
+      key,
+      id:item.id,
+      name:item.name,
+      persona,
+      note:note || "",
+      qty:1
+    });
+  }
+
+  renderCart();
+}
+
+function agruparCart(){
+  const grupos = {};
   cart.forEach(line=>{
-    const persona = normalizaPersona(line.persona);
-    if(!groups[persona]) groups[persona] = [];
-    groups[persona].push(line);
+    if(!grupos[line.persona]) grupos[line.persona] = [];
+    grupos[line.persona].push(line);
   });
 
-  const orden = Object.keys(groups).sort((a,b)=>{
-    if(a === "General") return 1;
-    if(b === "General") return -1;
-    const na = parseInt(a.replace(/\D/g,''),10);
-    const nb = parseInt(b.replace(/\D/g,''),10);
-    if(!isNaN(na) && !isNaN(nb)) return na - nb;
-    return a.localeCompare(b, 'es');
-  });
-
-  return orden.map(persona=>({persona, lines:groups[persona]}));
+  return PERSONAS
+    .filter(p => grupos[p] && grupos[p].length)
+    .map(p => ({ persona:p, lines:grupos[p] }));
 }
 
 function renderCart(){
-  const count = cartCount();
-  cartPill.innerHTML = `🧾 <b>${count}</b> • <span id="pillTotal">${money(cartTotal())}</span>`;
-  totalEl.textContent = money(cartTotal());
-  barTotal.textContent = money(cartTotal());
+  pill.textContent = `${totalProductos()} productos`;
 
   if(!cart.length){
-    cartBox.innerHTML = `<div class="muted" style="font-weight:1000; padding-top:8px;">Aún no agregas productos 😄</div>`;
+    cartBox.innerHTML = `<div class="empty">Aún no agregas productos.</div>`;
     return;
   }
 
   cartBox.innerHTML = "";
-  const grupos = agruparCartPorPersona();
+
+  const grupos = agruparCart();
 
   grupos.forEach(group=>{
     const g = document.createElement("div");
-    g.className = "cartGroup";
+    g.className = "group";
 
     const head = document.createElement("div");
-    head.className = "cartGroupHead";
-    head.textContent = `🍽️ ${group.persona}`;
+    head.className = "groupHead";
+    head.textContent = group.persona;
     g.appendChild(head);
 
-    group.lines.forEach((line)=>{
+    group.lines.forEach(line=>{
       const idx = cart.indexOf(line);
-      const wrap = document.createElement("div");
-      wrap.className = "cartLine";
-      const lineTotal = line.qty * line.basePrice;
-
-      wrap.innerHTML = `
+      const row = document.createElement("div");
+      row.className = "line";
+      row.innerHTML = `
         <div style="min-width:0">
-          <div class="cartItemTitle">${escapeHtml(line.name)}</div>
-          <div class="badgePersona">${escapeHtml(normalizaPersona(line.persona))}</div>
-          <div class="muted" style="font-size:12px; margin-top:6px; line-height:1.25; font-weight:900">
-            ${escapeHtml(modsToText(line.mods) || "")}
-          </div>
-          ${line.note ? `<div class="muted" style="font-size:12px; margin-top:4px; font-weight:900">Nota: ${escapeHtml(line.note)}</div>` : ``}
+          <div class="lineName">${escapeHtml(line.name)}</div>
+          ${line.note ? `<div class="lineNote">${escapeHtml(line.note)}</div>` : ``}
         </div>
-        <div style="text-align:right">
-          <div class="qtyRow">
-            <button class="mini" type="button" data-act="dec">−</button>
-            <div style="min-width:26px; text-align:center; font-weight:1000; font-size:16px">${line.qty}</div>
-            <button class="mini" type="button" data-act="inc">+</button>
-          </div>
-          <div style="margin-top:6px; font-weight:1000">${money(lineTotal)}</div>
-          <button class="mini" type="button" data-act="del" style="margin-top:8px;width:100%;height:36px;border-radius:12px;">✕</button>
+        <div class="rightBtns">
+          <button class="mini" type="button" data-a="dec">−</button>
+          <button class="mini" type="button" disabled style="font-size:15px;font-weight:1000">${line.qty}</button>
+          <button class="mini" type="button" data-a="inc">+</button>
+          <button class="mini" type="button" data-a="del">✕</button>
         </div>
       `;
 
-      wrap.querySelector('[data-act="dec"]').addEventListener("click", ()=>{
+      row.querySelector('[data-a="dec"]').addEventListener("click", ()=>{
         line.qty = Math.max(1, line.qty - 1);
         renderCart();
       });
-      wrap.querySelector('[data-act="inc"]').addEventListener("click", ()=>{
+      row.querySelector('[data-a="inc"]').addEventListener("click", ()=>{
         line.qty += 1;
         renderCart();
       });
-      wrap.querySelector('[data-act="del"]').addEventListener("click", ()=>{
+      row.querySelector('[data-a="del"]').addEventListener("click", ()=>{
         cart.splice(idx, 1);
         renderCart();
       });
 
-      g.appendChild(wrap);
+      g.appendChild(row);
     });
 
     cartBox.appendChild(g);
   });
 }
 
-function addLine(item, mods, note, qty=1, persona="General"){
-  const personaFinal = normalizaPersona(persona);
-  const key = buildKey(item, mods, note, personaFinal);
-  const existing = cart.find(x=>x.key===key);
-
-  if(existing){
-    existing.qty += qty;
-  }else{
-    cart.push({
-      key,
-      id:item.id,
-      name:item.name,
-      cat:item.cat,
-      basePrice:item.price,
-      qty:Number(qty || 1),
-      mods:mods || {},
-      note:note || "",
-      persona:personaFinal
-    });
-  }
-  renderCart();
-}
-
-const backdrop = document.getElementById("backdrop");
-const mTitle = document.getElementById("mTitle");
-const mBody  = document.getElementById("mBody");
-const mClose = document.getElementById("mClose");
-const mCancel= document.getElementById("mCancel");
-const mAdd   = document.getElementById("mAdd");
-
-let currentItem = null;
-let draft = null;
-
-function sugerenciasPersona(){
-  const usadas = new Set(
-    cart
-      .map(x => normalizaPersona(x.persona))
-      .filter(x => x !== "General")
-  );
-
-  const base = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","Persona 6"];
-  base.forEach(x => usadas.add(x));
-  return Array.from(usadas);
-}
-
-function openModal(item){
-  currentItem = item;
-  draft = {mods:{}, note:"", qty:1, persona: requierePersona(item) ? "Persona 1" : "General"};
-
-  mTitle.textContent = `${item.name} — ${money(item.price)}`;
-  mBody.innerHTML = "";
-
-  const qtyBox = document.createElement("div");
-  qtyBox.className = "optGroup";
-  qtyBox.innerHTML = `
-    <div class="optTitle">
-      <b>Cantidad</b>
-      <span>elige cuántos vas a agregar</span>
-    </div>
-    <div style="display:flex; align-items:center; gap:12px; margin-top:12px;">
-      <button type="button" class="mini" id="qtyMinus" style="width:44px;height:44px;font-size:24px;">−</button>
-      <div id="qtyValue" style="min-width:44px;text-align:center;font-size:24px;font-weight:1000;">1</div>
-      <button type="button" class="mini" id="qtyPlus" style="width:44px;height:44px;font-size:24px;">+</button>
-    </div>
-  `;
-  mBody.appendChild(qtyBox);
-
-  if(requierePersona(item)){
-    const personaBox = document.createElement("div");
-    personaBox.className = "optGroup";
-
-    const sugeridas = sugerenciasPersona();
-    const chips = sugeridas.map(p => `
-      <button type="button" class="optBtn personaBtn ${draft.persona===p ? 'active':''}" data-persona="${escapeHtml(p)}">${escapeHtml(p)}</button>
-    `).join("");
-
-    personaBox.innerHTML = `
-      <div class="optTitle">
-        <b>Persona / Plato</b>
-        <span>para saber qué va en cada plato</span>
-      </div>
-      <div class="optList" id="personaQuick">${chips}</div>
-      <div style="margin-top:10px">
-        <input id="personaInput" placeholder="Ej. Persona 1 / Niño / Señora de azul" value="${escapeHtml(draft.persona)}">
-      </div>
-    `;
-    mBody.appendChild(personaBox);
-  }
-
-  const keys = modsPara(item);
-  if(keys.length){
-    keys.forEach(k=>{
-      const g = MODS[k];
-      const box = document.createElement("div");
-      box.className = "optGroup";
-      box.innerHTML = `
-        <div class="optTitle">
-          <b>${g.title}</b>
-          <span>elige las que quieras</span>
-        </div>
-        <div class="optList" data-k="${k}"></div>
-      `;
-      const list = box.querySelector(".optList");
-
-      g.options.forEach(opt=>{
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "optBtn";
-        btn.textContent = opt;
-        btn.addEventListener("click", ()=> toggleOpt(k, opt, btn));
-        list.appendChild(btn);
-      });
-
-      mBody.appendChild(box);
-    });
-  }
-
-  const n = document.createElement("div");
-  n.className = "optGroup";
-  n.innerHTML = `
-    <div class="optTitle">
-      <b>Nota de producto</b>
-      <span>solo si afecta cocina</span>
-    </div>
-    <div style="margin-top:10px">
-      <input id="noteProd" placeholder="Ej. bien dorado / combinado tripa y bistec">
-    </div>
-  `;
-  mBody.appendChild(n);
-
+function abrirModal(item){
+  draftItem = item;
+  modalTitle.textContent = item.name;
+  modalPersonaLabel.textContent = `Nota para ${personaActiva}`;
+  notaRapida.value = "";
   backdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
-
-  setTimeout(()=>{
-    const inp = document.getElementById("noteProd");
-    if(inp) inp.oninput = ()=> draft.note = inp.value;
-
-    const personaInput = document.getElementById("personaInput");
-    if(personaInput){
-      personaInput.oninput = ()=>{
-        draft.persona = personaInput.value;
-        syncPersonaButtons();
-      };
-    }
-
-    const qtyValue = document.getElementById("qtyValue");
-    const qtyMinus = document.getElementById("qtyMinus");
-    const qtyPlus = document.getElementById("qtyPlus");
-
-    function refreshQty(){
-      qtyValue.textContent = draft.qty;
-    }
-
-    qtyMinus.addEventListener("click", ()=>{
-      draft.qty = Math.max(1, draft.qty - 1);
-      refreshQty();
-    });
-    qtyPlus.addEventListener("click", ()=>{
-      draft.qty += 1;
-      refreshQty();
-    });
-
-    document.querySelectorAll(".personaBtn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        const val = btn.getAttribute("data-persona") || "General";
-        draft.persona = val;
-        if(personaInput) personaInput.value = val;
-        syncPersonaButtons();
-      });
-    });
-
-    function syncPersonaButtons(){
-      document.querySelectorAll(".personaBtn").forEach(btn=>{
-        const val = btn.getAttribute("data-persona") || "";
-        btn.classList.toggle("active", normalizaPersona(draft.persona) === normalizaPersona(val));
-      });
-    }
-
-    syncPersonaButtons();
-  }, 0);
+  setTimeout(()=>notaRapida.focus(), 50);
 }
-function closeModal(){
+
+function cerrarModal(){
+  draftItem = null;
+  notaRapida.value = "";
   backdrop.style.display = "none";
   document.body.style.overflow = "";
-  currentItem = null;
-  draft = null;
 }
-function toggleOpt(k, opt, el){
-  const g = MODS[k];
-  if(g.type==="single"){
-    draft.mods[k] = opt;
-    el.parentElement.querySelectorAll(".optBtn").forEach(x=>x.classList.remove("active"));
-    el.classList.add("active");
-  }else{
-    draft.mods[k] = draft.mods[k] || [];
-    const arr = draft.mods[k];
-    const i = arr.indexOf(opt);
-    if(i >= 0){
-      arr.splice(i,1);
-      el.classList.remove("active");
-    }else{
-      arr.push(opt);
-      el.classList.add("active");
-    }
-  }
-}
-mClose.addEventListener("click", closeModal);
-mCancel.addEventListener("click", closeModal);
+
+btnCerrarModal.addEventListener("click", cerrarModal);
+btnCancelarModal.addEventListener("click", cerrarModal);
 backdrop.addEventListener("click", (e)=>{
-  if(e.target === backdrop) closeModal();
-});
-mAdd.addEventListener("click", ()=>{
-  if(!currentItem || !draft) return;
-  const err = validateRequired(currentItem, draft.mods);
-  if(err){
-    alert(err);
-    return;
-  }
-  addLine(
-    currentItem,
-    draft.mods,
-    draft.note,
-    Number(draft.qty || 1),
-    requierePersona(currentItem) ? draft.persona : "General"
-  );
-  closeModal();
+  if(e.target === backdrop) cerrarModal();
 });
 
-function validateComanda(){
-  if(!mesaSelect.value.trim()) return "Selecciona una mesa.";
-  if(!meseroInput.value.trim()) return "Escribe el nombre del mesero.";
-  if(!cart.length) return "Agrega al menos un producto.";
+btnGuardarModal.addEventListener("click", ()=>{
+  if(!draftItem) return;
+  agregarLinea(draftItem, personaActiva, notaRapida.value.trim());
+  cerrarModal();
+});
+
+function validarAntesImprimir(){
+  if(!mesa.value.trim()) return "Selecciona una mesa.";
+  if(!mesero.value.trim()) return "Escribe el nombre del mesero.";
+  if(!cart.length) return "Agrega productos a la comanda.";
   return null;
 }
 
-function buildKitchenTicketHTML(){
-  const grupos = agruparCartPorPersona();
+function buildTicketHTML(){
+  const grupos = agruparCart();
 
   const gruposHtml = grupos.map(group=>{
-    const itemsHtml = group.lines.map(x=>{
-      const mods = modsToText(x.mods);
-      const note = (x.note || "").trim();
-      return `
-        <div class="item">
-          <div class="item-name">${escapeHtml(x.qty)} x ${escapeHtml(x.name)}</div>
-          ${mods ? `<div class="item-sub">• ${escapeHtml(mods)}</div>` : ""}
-          ${note ? `<div class="item-sub">• ${escapeHtml(note)}</div>` : ""}
-        </div>
-      `;
-    }).join("");
+    const itemsHtml = group.lines.map(line=>`
+      <div class="it">
+        <div class="itn">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
+        ${line.note ? `<div class="sub">• ${escapeHtml(line.note)}</div>` : ``}
+      </div>
+    `).join("");
 
     return `
-      <div class="person-head">${escapeHtml(group.persona)}</div>
+      <div class="g">${escapeHtml(group.persona)}</div>
       ${itemsHtml}
       <div class="hr"></div>
     `;
@@ -1219,39 +837,37 @@ function buildKitchenTicketHTML(){
 
   return `
     <div class="ticket">
-      <div class="center b lg">COMANDA</div>
-      <div class="center b">${escapeHtml(mesaSelect.value)}</div>
+      <div class="c b lg">COMANDA</div>
+      <div class="c b">${escapeHtml(mesa.value)}</div>
       <div class="hr"></div>
       ${gruposHtml}
     </div>
   `;
 }
 
-function printCurrentComanda(){
-  const err = validateComanda();
+function imprimir(){
+  const err = validarAntesImprimir();
   if(err){
     alert(err);
     return;
   }
-
   const area = document.getElementById("printArea");
-  area.innerHTML = buildKitchenTicketHTML();
-  setTimeout(()=> window.print(), 120);
+  area.innerHTML = buildTicketHTML();
+  setTimeout(()=>window.print(), 120);
 }
 
-document.getElementById("btnClear").addEventListener("click", ()=>{
-  if(confirm("¿Vaciar la comanda actual?")){
+document.getElementById("btnVaciar").addEventListener("click", ()=>{
+  if(confirm("¿Vaciar la comanda?")){
     cart = [];
     renderCart();
   }
 });
-document.getElementById("btnImprimir").addEventListener("click", ()=>{
-  printCurrentComanda();
-});
 
-renderTabs();
+document.getElementById("btnImprimir").addEventListener("click", imprimir);
+
+renderPersonas();
+renderCats();
 renderItems();
-refreshPreview();
 renderCart();
 </script>
 </body>
