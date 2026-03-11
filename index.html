@@ -22,6 +22,8 @@
 }
 
 *{box-sizing:border-box}
+html,body{height:100%}
+
 body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
@@ -77,8 +79,9 @@ header{
 
 .grid{
   display:grid;
-  grid-template-columns:1.2fr .9fr;
+  grid-template-columns:minmax(0,1.2fr) minmax(320px,.9fr);
   gap:14px;
+  align-items:start;
 }
 @media(max-width:900px){
   .grid{grid-template-columns:1fr}
@@ -392,6 +395,55 @@ input,select{
 }
 .modalFoot button{flex:1}
 
+.stickyAside{
+  position:sticky;
+  top:78px;
+}
+
+.cartTools{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+
+.toolBtn{
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.toolBtn.active{
+  background:var(--gold);
+  color:#fff;
+  border-color:var(--gold);
+}
+
+.cartScroll{
+  max-height:58vh;
+  overflow:auto;
+  padding-right:4px;
+  scroll-behavior:smooth;
+  border-radius:12px;
+}
+
+.cartScroll::-webkit-scrollbar{
+  width:10px;
+}
+.cartScroll::-webkit-scrollbar-thumb{
+  background:rgba(0,0,0,.15);
+  border-radius:999px;
+}
+
+.group.flash{
+  outline:3px solid rgba(185,132,42,.35);
+  transition:outline .25s ease;
+}
+
 .print-area{display:none}
 
 @media print{
@@ -456,7 +508,7 @@ input,select{
   <div class="head">
     <div class="title">
       <h1>🍽️ Comandas Cocina</h1>
-      <div class="sub">Modo taquero • bebidas visibles en pantalla, fuera del ticket cocina</div>
+      <div class="sub">Modo taquero • comanda fija con scroll interno</div>
     </div>
     <div class="pill" id="pill">0 productos</div>
   </div>
@@ -494,11 +546,19 @@ input,select{
       </div>
     </section>
 
-    <aside class="card">
+    <aside class="card stickyAside">
       <h2>Comanda</h2>
       <div class="content">
 
-        <div id="cart"></div>
+        <div class="cartTools">
+          <button class="toolBtn active" id="btnFiltroTodo" type="button">Ver todo</button>
+          <button class="toolBtn" id="btnFiltroPersona" type="button">Solo persona activa</button>
+          <button class="toolBtn" id="btnIrPersona" type="button">Ir a persona activa</button>
+        </div>
+
+        <div class="cartScroll" id="cartScroll">
+          <div id="cart"></div>
+        </div>
 
         <div class="btnRow">
           <button class="btnDanger" id="btnVaciar">Vaciar</button>
@@ -578,12 +638,12 @@ const catalogo = [
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PERSONAS = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","General"];
-const CATS_COCINA = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES"];
 
 let personaActiva = "Persona 1";
 let activeCat = "TACOS";
 let cart = [];
 let draftItem = null;
+let filtroCart = "todo";
 
 const mesa = document.getElementById("mesa");
 const mesero = document.getElementById("mesero");
@@ -600,6 +660,11 @@ const notaRapida = document.getElementById("notaRapida");
 const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const btnGuardarModal = document.getElementById("btnGuardarModal");
+
+const cartScroll = document.getElementById("cartScroll");
+const btnFiltroTodo = document.getElementById("btnFiltroTodo");
+const btnFiltroPersona = document.getElementById("btnFiltroPersona");
+const btnIrPersona = document.getElementById("btnIrPersona");
 
 for(let i=1;i<=20;i++){
   const o = document.createElement("option");
@@ -633,6 +698,9 @@ function renderPersonas(){
     b.onclick = ()=>{
       personaActiva = p;
       renderPersonas();
+      if(filtroCart === "persona"){
+        renderCart();
+      }
     };
     personasBox.appendChild(b);
   });
@@ -698,6 +766,10 @@ function agregarLinea(item, persona, note){
   }
 
   renderCart();
+
+  if(filtroCart === "todo"){
+    setTimeout(irAPersonaActiva, 50);
+  }
 }
 
 function agruparCart(){
@@ -722,11 +794,18 @@ function renderCart(){
 
   cartBox.innerHTML = "";
 
-  const grupos = agruparCart();
+  const grupos = agruparCart()
+    .filter(group => filtroCart === "todo" ? true : group.persona === personaActiva);
+
+  if(!grupos.length){
+    cartBox.innerHTML = `<div class="empty">No hay productos para este filtro.</div>`;
+    return;
+  }
 
   grupos.forEach(group=>{
     const g = document.createElement("div");
     g.className = "group";
+    g.dataset.persona = group.persona;
 
     const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+x.qty,0);
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
@@ -774,6 +853,27 @@ function renderCart(){
 
     cartBox.appendChild(g);
   });
+}
+
+function syncCartTools(){
+  btnFiltroTodo.classList.toggle("active", filtroCart === "todo");
+  btnFiltroPersona.classList.toggle("active", filtroCart === "persona");
+}
+
+function irAPersonaActiva(){
+  let selectorPersona = personaActiva;
+  if (window.CSS && typeof CSS.escape === "function") {
+    selectorPersona = CSS.escape(personaActiva);
+  } else {
+    selectorPersona = personaActiva.replace(/"/g, '\\"');
+  }
+
+  const grupo = cartBox.querySelector(`[data-persona="${selectorPersona}"]`);
+  if(!grupo) return;
+
+  grupo.scrollIntoView({behavior:"smooth", block:"start"});
+  grupo.classList.add("flash");
+  setTimeout(()=>grupo.classList.remove("flash"), 700);
 }
 
 function abrirModal(item){
@@ -893,6 +993,29 @@ function verResumen(){
   setTimeout(()=>window.print(),100);
 }
 
+btnFiltroTodo.onclick = ()=>{
+  filtroCart = "todo";
+  syncCartTools();
+  renderCart();
+};
+
+btnFiltroPersona.onclick = ()=>{
+  filtroCart = "persona";
+  syncCartTools();
+  renderCart();
+};
+
+btnIrPersona.onclick = ()=>{
+  if(filtroCart !== "todo"){
+    filtroCart = "todo";
+    syncCartTools();
+    renderCart();
+    setTimeout(irAPersonaActiva, 60);
+    return;
+  }
+  irAPersonaActiva();
+};
+
 document.getElementById("btnImprimir").onclick = imprimirCocina;
 document.getElementById("btnResumen").onclick = verResumen;
 
@@ -907,6 +1030,7 @@ renderPersonas();
 renderCats();
 renderItems();
 renderCart();
+syncCartTools();
 </script>
 
 </body>
