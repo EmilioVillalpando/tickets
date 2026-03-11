@@ -16,7 +16,6 @@
   --brand:#3b2a1f;
   --gold:#b9842a;
   --danger:#b42318;
-  --ok:#245a2a;
   --shadow:0 14px 34px rgba(32,24,16,.12);
   --r:18px;
 }
@@ -221,13 +220,28 @@ input,select{
 }
 
 .groupHead{
-  padding:8px 10px;
+  padding:10px;
   background:#eee1c6;
   font-weight:900;
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:8px;
+}
+
+.groupHeadLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+.groupHeadRight{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .groupTag{
@@ -237,6 +251,25 @@ input,select{
   background:#fff;
   border:1px solid var(--line);
   color:var(--muted);
+}
+
+.toggleBtn{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.groupBody{
+  display:none;
+}
+
+.group.open .groupBody{
+  display:block;
 }
 
 .line{
@@ -508,7 +541,7 @@ input,select{
   <div class="head">
     <div class="title">
       <h1>🍽️ Comandas Cocina</h1>
-      <div class="sub">Modo taquero • comanda fija con scroll interno</div>
+      <div class="sub">Modo taquero • comanda colapsable para no scrollear de más</div>
     </div>
     <div class="pill" id="pill">0 productos</div>
   </div>
@@ -567,7 +600,7 @@ input,select{
         </div>
 
         <div class="noteBox">
-          En pantalla sí verás bebidas y postres. En el ticket de cocina no salen refrescos ni postres.
+          Los pedidos salen escondidos por defecto. Abre solo la persona que quieras revisar.
         </div>
 
       </div>
@@ -644,6 +677,7 @@ let activeCat = "TACOS";
 let cart = [];
 let draftItem = null;
 let filtroCart = "todo";
+const openGroups = new Set();
 
 const mesa = document.getElementById("mesa");
 const mesero = document.getElementById("mesero");
@@ -697,6 +731,7 @@ function renderPersonas(){
     b.textContent = p;
     b.onclick = ()=>{
       personaActiva = p;
+      openGroups.add(p);
       renderPersonas();
       if(filtroCart === "persona"){
         renderCart();
@@ -765,6 +800,7 @@ function agregarLinea(item, persona, note){
     });
   }
 
+  openGroups.add(persona);
   renderCart();
 
   if(filtroCart === "todo"){
@@ -782,6 +818,15 @@ function agruparCart(){
   return PERSONAS
     .filter(p => grupos[p] && grupos[p].length)
     .map(p => ({ persona:p, lines:grupos[p] }));
+}
+
+function toggleGroup(persona){
+  if(openGroups.has(persona)){
+    openGroups.delete(persona);
+  }else{
+    openGroups.add(persona);
+  }
+  renderCart();
 }
 
 function renderCart(){
@@ -804,54 +849,85 @@ function renderCart(){
 
   grupos.forEach(group=>{
     const g = document.createElement("div");
-    g.className = "group";
+    g.className = "group" + (openGroups.has(group.persona) ? " open" : "");
     g.dataset.persona = group.persona;
 
     const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+x.qty,0);
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
+    const isOpen = openGroups.has(group.persona);
+
+    const bodyRows = group.lines.map((line)=>{
+      const idx = cart.indexOf(line);
+      return `
+        <div class="line" data-idx="${idx}">
+          <div class="lineLeft">
+            <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
+            ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
+            <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
+          </div>
+          <div class="rightBtns">
+            <button class="mini" type="button" data-a="dec" data-idx="${idx}">−</button>
+            <button class="mini" type="button" disabled style="font-size:15px;font-weight:1000">${line.qty}</button>
+            <button class="mini" type="button" data-a="inc" data-idx="${idx}">+</button>
+            <button class="mini" type="button" data-a="del" data-idx="${idx}">✕</button>
+          </div>
+        </div>
+      `;
+    }).join("");
 
     g.innerHTML = `
       <div class="groupHead">
-        <span>${escapeHtml(group.persona)}</span>
-        <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
+        <div class="groupHeadLeft">
+          <span>${escapeHtml(group.persona)}</span>
+        </div>
+        <div class="groupHeadRight">
+          <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
+          <button class="toggleBtn" type="button" data-toggle="${escapeHtml(group.persona)}">
+            ${isOpen ? "▼ Ocultar pedidos" : "▶ Ver pedidos"}
+          </button>
+        </div>
+      </div>
+      <div class="groupBody">
+        ${bodyRows}
       </div>
     `;
 
-    group.lines.forEach(line=>{
-      const idx = cart.indexOf(line);
-      const row = document.createElement("div");
-      row.className = "line";
-      row.innerHTML = `
-        <div class="lineLeft">
-          <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
-          ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
-          <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
-        </div>
-        <div class="rightBtns">
-          <button class="mini" type="button" data-a="dec">−</button>
-          <button class="mini" type="button" disabled style="font-size:15px;font-weight:1000">${line.qty}</button>
-          <button class="mini" type="button" data-a="inc">+</button>
-          <button class="mini" type="button" data-a="del">✕</button>
-        </div>
-      `;
-
-      row.querySelector('[data-a="dec"]').onclick = ()=>{
-        line.qty = Math.max(1, line.qty - 1);
-        renderCart();
-      };
-      row.querySelector('[data-a="inc"]').onclick = ()=>{
-        line.qty += 1;
-        renderCart();
-      };
-      row.querySelector('[data-a="del"]').onclick = ()=>{
-        cart.splice(idx, 1);
-        renderCart();
-      };
-
-      g.appendChild(row);
-    });
-
     cartBox.appendChild(g);
+  });
+
+  cartBox.querySelectorAll("[data-toggle]").forEach(btn=>{
+    btn.onclick = ()=>{
+      toggleGroup(btn.getAttribute("data-toggle"));
+    };
+  });
+
+  cartBox.querySelectorAll('[data-a="dec"]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = Number(btn.getAttribute("data-idx"));
+      const line = cart[idx];
+      if(!line) return;
+      line.qty = Math.max(1, line.qty - 1);
+      renderCart();
+    };
+  });
+
+  cartBox.querySelectorAll('[data-a="inc"]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = Number(btn.getAttribute("data-idx"));
+      const line = cart[idx];
+      if(!line) return;
+      line.qty += 1;
+      renderCart();
+    };
+  });
+
+  cartBox.querySelectorAll('[data-a="del"]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const idx = Number(btn.getAttribute("data-idx"));
+      if(Number.isNaN(idx) || !cart[idx]) return;
+      cart.splice(idx, 1);
+      renderCart();
+    };
   });
 }
 
@@ -861,6 +937,9 @@ function syncCartTools(){
 }
 
 function irAPersonaActiva(){
+  openGroups.add(personaActiva);
+  renderCart();
+
   let selectorPersona = personaActiva;
   if (window.CSS && typeof CSS.escape === "function") {
     selectorPersona = CSS.escape(personaActiva);
@@ -1001,6 +1080,7 @@ btnFiltroTodo.onclick = ()=>{
 
 btnFiltroPersona.onclick = ()=>{
   filtroCart = "persona";
+  openGroups.add(personaActiva);
   syncCartTools();
   renderCart();
 };
@@ -1022,6 +1102,7 @@ document.getElementById("btnResumen").onclick = verResumen;
 document.getElementById("btnVaciar").onclick = ()=>{
   if(confirm("¿Vaciar comanda?")){
     cart = [];
+    openGroups.clear();
     renderCart();
   }
 };
