@@ -1,487 +1,474 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-  <title>Comandas Cocina — Guadalupe Victoria</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Comandas Cocina — Guadalupe Victoria</title>
 
-  <style>
-    :root{
-      --bg:#f4ead9;
-      --paper:#fbf4e8;
-      --card:#fffaf2;
-      --ink:#2f241c;
-      --muted:#7a6554;
-      --line:rgba(47,36,28,.14);
-      --brand:#3b2a1f;
-      --gold:#b9842a;
-      --green:#245a2a;
-      --danger:#b42318;
-      --shadow:0 14px 34px rgba(32,24,16,.12);
-      --r:18px;
-    }
+<style>
+:root{
+  --bg:#f4ead9;
+  --paper:#fbf4e8;
+  --card:#fffaf2;
+  --ink:#2f241c;
+  --muted:#7a6554;
+  --line:rgba(47,36,28,.14);
+  --brand:#3b2a1f;
+  --gold:#b9842a;
+  --danger:#b42318;
+  --ok:#245a2a;
+  --shadow:0 14px 34px rgba(32,24,16,.12);
+  --r:18px;
+}
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
 
-    body{
-      margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      background:var(--bg);
-      color:var(--ink);
-    }
+header{
+  background:var(--brand);
+  color:#fff;
+  padding:12px;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
 
-    header{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:var(--brand);
-      color:#fff;
-      padding:12px;
-      box-shadow:0 10px 24px rgba(0,0,0,.18);
-    }
+.head{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
 
-    .head{
-      max-width:1200px;
-      margin:0 auto;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
+.title h1{
+  margin:0;
+  font-size:18px;
+  line-height:1.1;
+}
+.title .sub{
+  font-size:12px;
+  opacity:.9;
+  margin-top:3px;
+}
 
-    .title{
-      min-width:0;
-    }
-    .title h1{
-      margin:0;
-      font-size:18px;
-      line-height:1.1;
-    }
-    .title .sub{
-      margin-top:4px;
-      font-size:12px;
-      opacity:.9;
-    }
+.pill{
+  background:rgba(255,255,255,.15);
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:900;
+  white-space:nowrap;
+}
 
-    .pill{
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:900;
-      white-space:nowrap;
-    }
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:14px;
+  display:grid;
+  gap:14px;
+}
 
-    .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:14px;
-      display:grid;
-      gap:14px;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:1.2fr .9fr;
+  gap:14px;
+}
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
 
-    .hero{
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:var(--shadow);
-      border:1px solid var(--line);
-      background:#111;
-    }
-    .hero img{
-      width:100%;
-      height:150px;
-      object-fit:cover;
-      display:block;
-    }
+.card{
+  background:var(--paper);
+  border-radius:var(--r);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns:1.2fr .9fr;
-      gap:14px;
-      align-items:start;
-    }
-    @media (max-width:980px){
-      .grid{grid-template-columns:1fr}
-    }
+.card h2{
+  margin:0;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+  font-size:16px;
+  background:rgba(255,255,255,.35);
+}
 
-    .card{
-      background:var(--paper);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-    }
+.content{padding:14px}
 
-    .card h2{
-      margin:0;
-      padding:14px 16px;
-      border-bottom:1px solid var(--line);
-      font-size:16px;
-      background:rgba(255,255,255,.35);
-    }
+label{
+  display:block;
+  font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+  margin-bottom:6px;
+}
 
-    .content{padding:14px}
+input,select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  margin-top:4px;
+  background:#fff;
+  font-size:16px;
+  color:var(--ink);
+}
 
-    label{
-      display:block;
-      font-size:12px;
-      font-weight:1000;
-      margin:0 0 6px;
-      color:var(--muted);
-    }
+.topForm{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:14px;
+}
+@media(max-width:620px){
+  .topForm{grid-template-columns:1fr}
+}
 
-    input, select{
-      width:100%;
-      padding:14px 12px;
-      border:1px solid var(--line);
-      border-radius:14px;
-      font-size:16px;
-      background:#fff;
-      color:var(--ink);
-      outline:none;
-    }
+.personas{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-bottom:14px;
+}
+@media(max-width:620px){
+  .personas{grid-template-columns:repeat(2,1fr)}
+}
 
-    .topForm{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:14px;
-    }
-    @media (max-width:620px){
-      .topForm{grid-template-columns:1fr}
-    }
+.personaBtn{
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+  min-height:62px;
+  font-size:16px;
+}
+.personaBtn.active{
+  background:var(--gold);
+  color:#fff;
+  border-color:var(--gold);
+}
 
-    .personas{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:10px;
-      margin-bottom:14px;
-    }
-    @media (max-width:620px){
-      .personas{grid-template-columns:repeat(2, 1fr)}
-    }
+.cats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-bottom:12px;
+}
 
-    .personaBtn{
-      border:1px solid rgba(185,132,42,.35);
-      background:#fff;
-      color:var(--ink);
-      border-radius:16px;
-      padding:16px 10px;
-      font-size:18px;
-      font-weight:1000;
-      cursor:pointer;
-      box-shadow:0 8px 20px rgba(0,0,0,.06);
-      min-height:70px;
-    }
-    .personaBtn.active{
-      background:var(--gold);
-      color:#fff;
-      box-shadow:0 0 0 3px rgba(185,132,42,.18);
-    }
+.catBtn{
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.catBtn.active{
+  background:var(--brand);
+  color:#fff;
+  border-color:var(--brand);
+}
 
-    .cats{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      margin-bottom:14px;
-    }
-    .catBtn{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:999px;
-      padding:11px 14px;
-      font-size:14px;
-      font-weight:1000;
-      cursor:pointer;
-    }
-    .catBtn.active{
-      background:var(--brand);
-      color:#fff;
-      border-color:var(--brand);
-    }
+.items{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+@media(max-width:620px){
+  .items{grid-template-columns:1fr}
+}
 
-    .items{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:10px;
-    }
-    @media (max-width:620px){
-      .items{grid-template-columns:1fr}
-    }
+.itemBtn{
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#fff;
+  text-align:left;
+  cursor:pointer;
+  min-height:76px;
+  box-shadow:0 6px 16px rgba(0,0,0,.04);
+}
+.itemBtn .name{
+  font-weight:900;
+  font-size:18px;
+  line-height:1.1;
+}
+.itemBtn .desc{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+  font-weight:700;
+}
 
-    .itemBtn{
-      border:1px solid var(--line);
-      background:#fff;
-      border-radius:18px;
-      padding:16px 14px;
-      text-align:left;
-      cursor:pointer;
-      min-height:84px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:4px;
-      box-shadow:0 8px 22px rgba(0,0,0,.05);
-    }
-    .itemBtn .name{
-      font-size:20px;
-      font-weight:1000;
-      line-height:1.1;
-    }
-    .itemBtn .desc{
-      font-size:13px;
-      color:var(--muted);
-      font-weight:800;
-      line-height:1.2;
-    }
+.group{
+  border:1px solid var(--line);
+  border-radius:14px;
+  margin-bottom:10px;
+  overflow:hidden;
+  background:#fff;
+}
 
-    .miniNote{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,.45);
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-size:12px;
-      font-weight:800;
-    }
+.groupHead{
+  padding:8px 10px;
+  background:#eee1c6;
+  font-weight:900;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
 
-    .group{
-      margin-bottom:12px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      overflow:hidden;
-      background:#fffdf9;
-    }
-    .groupHead{
-      padding:10px 12px;
-      background:rgba(185,132,42,.12);
-      border-bottom:1px solid var(--line);
-      font-weight:1000;
-      font-size:15px;
-    }
+.groupTag{
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--muted);
+}
 
-    .line{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
-      padding:12px;
-      border-bottom:1px dashed var(--line);
-    }
-    .line:last-child{border-bottom:none}
+.line{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  padding:10px;
+  border-bottom:1px dashed var(--line);
+  align-items:flex-start;
+}
+.line:last-child{border-bottom:none}
 
-    .lineName{
-      font-weight:1000;
-      font-size:15px;
-      line-height:1.2;
-    }
-    .lineNote{
-      margin-top:4px;
-      color:var(--muted);
-      font-size:12px;
-      font-weight:900;
-      line-height:1.25;
-      white-space:pre-wrap;
-    }
+.lineLeft{
+  min-width:0;
+}
+.lineTitle{
+  font-weight:900;
+  line-height:1.2;
+}
+.lineMeta{
+  font-size:12px;
+  color:var(--muted);
+  margin-top:4px;
+  white-space:pre-wrap;
+  font-weight:800;
+}
+.lineCat{
+  display:inline-block;
+  margin-top:6px;
+  font-size:11px;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  color:var(--muted);
+  background:#faf7f1;
+}
 
-    .rightBtns{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-      align-items:stretch;
-      min-width:92px;
-    }
+.rightBtns{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width:92px;
+}
 
-    .mini, .btn, .btnDark, .btnDanger{
-      border:none;
-      border-radius:12px;
-      cursor:pointer;
-      font-weight:1000;
-    }
+.mini, .btnDark, .btnDanger, .btnSoft{
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:900;
+}
 
-    .mini{
-      height:36px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--ink);
-      font-size:18px;
-    }
+.mini{
+  height:36px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:var(--ink);
+  font-size:18px;
+}
 
-    .btnRow{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
+.btnRow{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+  flex-wrap:wrap;
+}
+.btnDanger{
+  background:var(--danger);
+  color:#fff;
+  padding:12px 14px;
+  font-size:14px;
+}
+.btnDark{
+  background:var(--brand);
+  color:#fff;
+  padding:12px 14px;
+  font-size:14px;
+}
+.btnSoft{
+  background:#fff;
+  color:var(--ink);
+  padding:12px 14px;
+  font-size:14px;
+  border:1px solid var(--line);
+}
 
-    .btn{
-      background:var(--gold);
-      color:#fff;
-      padding:14px 16px;
-      font-size:15px;
-      border-radius:14px;
-      box-shadow:0 10px 24px rgba(185,132,42,.22);
-    }
-    .btnDark{
-      background:var(--brand);
-      color:#fff;
-      padding:14px 16px;
-      font-size:15px;
-      border-radius:14px;
-    }
-    .btnDanger{
-      background:var(--danger);
-      color:#fff;
-      padding:14px 16px;
-      font-size:15px;
-      border-radius:14px;
-    }
+.empty{
+  color:var(--muted);
+  font-weight:900;
+  padding:4px 0;
+}
 
-    .empty{
-      color:var(--muted);
-      font-weight:1000;
-      padding:8px 0;
-    }
+.noteBox{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:12px;
+  background:rgba(255,255,255,.55);
+  border:1px solid var(--line);
+  color:var(--muted);
+  font-size:12px;
+  font-weight:800;
+  line-height:1.35;
+}
 
-    .backdrop{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:16px;
-      z-index:50;
-    }
+.backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:50;
+}
+.modal{
+  width:min(520px, 100%);
+  background:var(--paper);
+  border-radius:18px;
+  box-shadow:0 30px 80px rgba(0,0,0,.32);
+  border:1px solid var(--line);
+  overflow:hidden;
+}
+.modalHead{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  background:#fff;
+}
+.modalHead h3{
+  margin:0;
+  font-size:17px;
+}
+.closeX{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:#fff;
+  font-size:18px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.modalBody{
+  padding:14px;
+  display:grid;
+  gap:10px;
+}
+.modalFoot{
+  padding:14px;
+  border-top:1px solid var(--line);
+  display:flex;
+  gap:10px;
+  background:rgba(255,255,255,.4);
+}
+.modalFoot button{flex:1}
 
-    .modal{
-      width:min(520px, 100%);
-      background:var(--paper);
-      border-radius:18px;
-      box-shadow:0 30px 80px rgba(0,0,0,.32);
-      border:1px solid var(--line);
-      overflow:hidden;
-    }
+.print-area{display:none}
 
-    .modalHead{
-      padding:14px 16px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      background:#fff;
-    }
-    .modalHead h3{
-      margin:0;
-      font-size:17px;
-    }
+@media print{
+  body *{visibility:hidden!important}
+  .print-area,.print-area *{visibility:visible!important}
+  .print-area{
+    display:block!important;
+    position:absolute;
+    inset:0;
+    background:#fff;
+  }
+  @page{
+    size:80mm auto;
+    margin:2mm;
+  }
+}
 
-    .closeX{
-      width:40px;
-      height:40px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-size:18px;
-      font-weight:1000;
-      cursor:pointer;
-    }
-
-    .modalBody{
-      padding:14px;
-      display:grid;
-      gap:10px;
-    }
-
-    .modalFoot{
-      padding:14px;
-      border-top:1px solid var(--line);
-      display:flex;
-      gap:10px;
-      background:rgba(255,255,255,.4);
-    }
-    .modalFoot button{flex:1}
-
-    .print-area{display:none}
-
-    @media print{
-      body *{visibility:hidden !important}
-      .print-area, .print-area *{visibility:visible !important}
-      .print-area{
-        display:block !important;
-        position:absolute;
-        inset:0;
-        background:#fff;
-        color:#000;
-      }
-      @page{
-        size:80mm auto;
-        margin:2mm;
-      }
-    }
-
-    .ticket{
-      width:76mm;
-      margin:0 auto;
-      padding:3mm 2mm;
-      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-      color:#000;
-      background:#fff;
-      font-size:12px;
-      line-height:1.25;
-    }
-    .ticket .c{text-align:center}
-    .ticket .b{font-weight:900}
-    .ticket .lg{font-size:18px}
-    .ticket .hr{
-      border-top:1px dashed #000;
-      margin:6px 0;
-    }
-    .ticket .g{
-      margin:8px 0 4px;
-      font-weight:900;
-      font-size:13px;
-      text-transform:uppercase;
-    }
-    .ticket .it{
-      margin:6px 0;
-    }
-    .ticket .itn{
-      font-weight:900;
-      font-size:15px;
-      line-height:1.15;
-    }
-    .ticket .sub{
-      padding-left:8px;
-      font-size:11px;
-      white-space:pre-wrap;
-    }
-  </style>
+.ticket{
+  width:76mm;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  color:#000;
+  background:#fff;
+  padding:2mm;
+  font-size:12px;
+  line-height:1.24;
+}
+.ticket .c{text-align:center}
+.ticket .b{font-weight:900}
+.ticket .lg{font-size:18px}
+.ticket .hr{
+  border-top:1px dashed #000;
+  margin:6px 0;
+}
+.ticket .g{
+  font-weight:900;
+  margin-top:7px;
+  font-size:13px;
+  text-transform:uppercase;
+}
+.ticket .it{
+  margin:5px 0;
+}
+.ticket .itn{
+  font-weight:900;
+  font-size:15px;
+  line-height:1.15;
+}
+.ticket .sub{
+  padding-left:8px;
+  font-size:11px;
+  white-space:pre-wrap;
+}
+.ticket .small{
+  font-size:11px;
+}
+</style>
 </head>
+
 <body>
+
 <header>
   <div class="head">
     <div class="title">
       <h1>🍽️ Comandas Cocina</h1>
-      <div class="sub">Simple para mesero • limpio para cocina</div>
+      <div class="sub">Modo taquero • bebidas visibles en pantalla, fuera del ticket cocina</div>
     </div>
     <div class="pill" id="pill">0 productos</div>
   </div>
 </header>
 
 <div class="wrap">
-  <div class="hero">
-    <img src="portadagdp.png" alt="Taquería Guadalupe Victoria">
-  </div>
-
   <div class="grid">
-    <!-- IZQUIERDA -->
+
     <section class="card">
       <h2>Tomar pedido</h2>
       <div class="content">
+
         <div class="topForm">
           <div>
             <label>Mesa</label>
@@ -493,39 +480,42 @@
           </div>
         </div>
 
-        <label>¿Para quién es?</label>
+        <label>Persona</label>
         <div class="personas" id="personas"></div>
 
         <div class="cats" id="cats"></div>
 
         <div class="items" id="items"></div>
 
-        <div class="miniNote">
-          Toca una persona y luego toca los productos. Así queda claro qué va en cada plato.
+        <div class="noteBox">
+          El mesero registra todo aquí. El ticket de cocina solo imprime comida importante para el taquero.
         </div>
+
       </div>
     </section>
 
-    <!-- DERECHA -->
     <aside class="card">
-      <h2>Comanda actual</h2>
+      <h2>Comanda</h2>
       <div class="content">
+
         <div id="cart"></div>
 
         <div class="btnRow">
           <button class="btnDanger" id="btnVaciar">Vaciar</button>
+          <button class="btnSoft" id="btnResumen">Ver resumen</button>
           <button class="btnDark" id="btnImprimir">Imprimir cocina</button>
         </div>
 
-        <div class="miniNote">
-          El ticket sale por persona y sin precios.
+        <div class="noteBox">
+          En pantalla sí verás bebidas y postres. En el ticket de cocina no salen refrescos ni postres.
         </div>
+
       </div>
     </aside>
+
   </div>
 </div>
 
-<!-- MODAL NOTA -->
 <div class="backdrop" id="backdrop">
   <div class="modal">
     <div class="modalHead">
@@ -549,48 +539,51 @@
 
 <script>
 const catalogo = [
-  {id:"taco_tripa",    cat:"TACOS",        name:"Taco de Tripa",    desc:"Tripa doradita", requiereNota:false},
-  {id:"taco_pastor",   cat:"TACOS",        name:"Taco de Pastor",   desc:"", requiereNota:false},
-  {id:"taco_bistec",   cat:"TACOS",        name:"Taco de Bistec",   desc:"", requiereNota:false},
-  {id:"taco_chorizo",  cat:"TACOS",        name:"Taco de Chorizo",  desc:"", requiereNota:false},
-  {id:"taco_alambre",  cat:"TACOS",        name:"Taco de Alambre",  desc:"", requiereNota:false},
-  {id:"taco_costilla", cat:"TACOS",        name:"Taco de Costilla", desc:"", requiereNota:false},
-  {id:"taco_barbacoa", cat:"TACOS",        name:"Taco de Barbacoa", desc:"", requiereNota:false},
-  {id:"taco_higado",   cat:"TACOS",        name:"Taco de Hígado",   desc:"", requiereNota:false},
-  {id:"taco_combi",    cat:"TACOS",        name:"Taco Combinado",   desc:"Escribe combinación", requiereNota:true},
+  {id:"taco_tripa",    cat:"TACOS",        name:"Taco de Tripa",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",   cat:"TACOS",        name:"Taco de Pastor",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",   cat:"TACOS",        name:"Taco de Bistec",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",  cat:"TACOS",        name:"Taco de Chorizo",      desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",   cat:"TACOS",        name:"Taco de Hígado",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",    cat:"TACOS",        name:"Taco Combinado",       desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",   cat:"QUESADILLAS",  name:"Quesadilla de Tripa",   desc:"", requiereNota:false},
-  {id:"quesa_pastor",  cat:"QUESADILLAS",  name:"Quesadilla de Pastor",  desc:"", requiereNota:false},
-  {id:"quesa_bistec",  cat:"QUESADILLAS",  name:"Quesadilla de Bistec",  desc:"", requiereNota:false},
-  {id:"quesa_chorizo", cat:"QUESADILLAS",  name:"Quesadilla de Chorizo", desc:"", requiereNota:false},
-  {id:"quesa_higado",  cat:"QUESADILLAS",  name:"Quesadilla de Hígado",  desc:"", requiereNota:false},
+  {id:"quesa_tripa",   cat:"QUESADILLAS",  name:"Quesadilla de Tripa",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",  cat:"QUESADILLAS",  name:"Quesadilla de Pastor", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",  cat:"QUESADILLAS",  name:"Quesadilla de Bistec", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo", cat:"QUESADILLAS",  name:"Quesadilla de Chorizo",desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",  cat:"QUESADILLAS",  name:"Quesadilla de Hígado", desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi", cat:"CHAROLAS",     name:"Charola Combinada", desc:"Escribe combinación", requiereNota:true},
-  {id:"charola_alam",  cat:"CHAROLAS",     name:"Charola de Alambre", desc:"", requiereNota:false},
+  {id:"charola_combi", cat:"CHAROLAS",     name:"Charola Combinada",    desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",  cat:"CHAROLAS",     name:"Charola de Alambre",   desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",   cat:"VOLCANES",    name:"Volcán de Tripa",   desc:"", requiereNota:false},
-  {id:"volcan_pastor",  cat:"VOLCANES",    name:"Volcán de Pastor",  desc:"", requiereNota:false},
-  {id:"volcan_bistec",  cat:"VOLCANES",    name:"Volcán de Bistec",  desc:"", requiereNota:false},
-  {id:"volcan_chorizo", cat:"VOLCANES",    name:"Volcán de Chorizo", desc:"", requiereNota:false},
-  {id:"volcan_higado",  cat:"VOLCANES",    name:"Volcán de Hígado",  desc:"", requiereNota:false},
+  {id:"volcan_tripa",   cat:"VOLCANES",    name:"Volcán de Tripa",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",  cat:"VOLCANES",    name:"Volcán de Pastor",     desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",  cat:"VOLCANES",    name:"Volcán de Bistec",     desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo", cat:"VOLCANES",    name:"Volcán de Chorizo",    desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",  cat:"VOLCANES",    name:"Volcán de Hígado",     desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS",    name:"Coca Light",       desc:"", requiereNota:false},
-  {id:"beb_coca",        cat:"BEBIDAS",    name:"Coca",             desc:"", requiereNota:false},
-  {id:"beb_fresca",      cat:"BEBIDAS",    name:"Fresca",           desc:"", requiereNota:false},
-  {id:"beb_sprite",      cat:"BEBIDAS",    name:"Sprite",           desc:"", requiereNota:false},
-  {id:"beb_agua",        cat:"BEBIDAS",    name:"Agua fresca",      desc:"", requiereNota:false},
-  {id:"beb_agua_lt",     cat:"BEBIDAS",    name:"Agua fresca 1 Lt", desc:"", requiereNota:false},
+  {id:"beb_coca_light", cat:"BEBIDAS",     name:"Coca Light",           desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",       cat:"BEBIDAS",     name:"Coca",                 desc:"", requiereNota:false, cocina:false},
+  {id:"beb_fresca",     cat:"BEBIDAS",     name:"Fresca",               desc:"", requiereNota:false, cocina:false},
+  {id:"beb_sprite",     cat:"BEBIDAS",     name:"Sprite",               desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua",       cat:"BEBIDAS",     name:"Agua fresca",          desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",    cat:"BEBIDAS",     name:"Agua fresca 1 Lt",     desc:"", requiereNota:false, cocina:false},
 
-  {id:"pos_pay",         cat:"POSTRES",    name:"Pay de queso",                   desc:"", requiereNota:false},
-  {id:"pos_rompope",     cat:"POSTRES",    name:"Gelatina vainilla con rompope", desc:"", requiereNota:false},
-  {id:"pos_arroz",       cat:"POSTRES",    name:"Arroz con leche",               desc:"", requiereNota:false},
-  {id:"pos_flan",        cat:"POSTRES",    name:"Flan",                          desc:"", requiereNota:false},
-  {id:"pos_fresa",       cat:"POSTRES",    name:"Gelatina fresa con yoghurt",    desc:"", requiereNota:false},
-  {id:"pos_napolitano",  cat:"POSTRES",    name:"Napolitano",                    desc:"", requiereNota:false},
+  {id:"pos_pay",        cat:"POSTRES",     name:"Pay de queso",         desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",    cat:"POSTRES",     name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",      cat:"POSTRES",     name:"Arroz con leche",      desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",       cat:"POSTRES",     name:"Flan",                 desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",      cat:"POSTRES",     name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano", cat:"POSTRES",     name:"Napolitano",           desc:"", requiereNota:false, cocina:false},
 ];
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PERSONAS = ["Persona 1","Persona 2","Persona 3","Persona 4","Persona 5","General"];
+const CATS_COCINA = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES"];
+
+let personaActiva = "Persona 1";
+let activeCat = "TACOS";
+let cart = [];
+let draftItem = null;
 
 const mesa = document.getElementById("mesa");
 const mesero = document.getElementById("mesero");
@@ -608,16 +601,11 @@ const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const btnGuardarModal = document.getElementById("btnGuardarModal");
 
-let activeCat = "TACOS";
-let personaActiva = "Persona 1";
-let cart = [];
-let draftItem = null;
-
 for(let i=1;i<=20;i++){
-  const op = document.createElement("option");
-  op.value = "Mesa " + i;
-  op.textContent = "Mesa " + i;
-  mesa.appendChild(op);
+  const o = document.createElement("option");
+  o.value = "Mesa " + i;
+  o.textContent = "Mesa " + i;
+  mesa.appendChild(o);
 }
 
 function escapeHtml(s){
@@ -640,12 +628,12 @@ function renderPersonas(){
   PERSONAS.forEach(p=>{
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "personaBtn" + (p === personaActiva ? " active" : "");
+    b.className = "personaBtn" + (p===personaActiva ? " active" : "");
     b.textContent = p;
-    b.addEventListener("click", ()=>{
+    b.onclick = ()=>{
       personaActiva = p;
       renderPersonas();
-    });
+    };
     personasBox.appendChild(b);
   });
 }
@@ -655,30 +643,29 @@ function renderCats(){
   CATS.forEach(c=>{
     const b = document.createElement("button");
     b.type = "button";
-    b.className = "catBtn" + (c === activeCat ? " active" : "");
+    b.className = "catBtn" + (c===activeCat ? " active" : "");
     b.textContent = c;
-    b.addEventListener("click", ()=>{
+    b.onclick = ()=>{
       activeCat = c;
       renderCats();
       renderItems();
-    });
+    };
     catsBox.appendChild(b);
   });
 }
 
 function renderItems(){
   itemsBox.innerHTML = "";
-  const list = catalogo.filter(x => x.cat === activeCat);
-
+  const list = catalogo.filter(x=>x.cat===activeCat);
   list.forEach(item=>{
     const b = document.createElement("button");
     b.type = "button";
     b.className = "itemBtn";
     b.innerHTML = `
       <div class="name">${escapeHtml(item.name)}</div>
-      <div class="desc">${escapeHtml(item.desc || "")}</div>
+      ${item.desc ? `<div class="desc">${escapeHtml(item.desc)}</div>` : ``}
     `;
-    b.addEventListener("click", ()=> agregarDesdeClick(item));
+    b.onclick = ()=> agregarDesdeClick(item);
     itemsBox.appendChild(b);
   });
 }
@@ -693,7 +680,7 @@ function agregarDesdeClick(item){
 
 function agregarLinea(item, persona, note){
   const key = makeKey(item, persona, note);
-  const existing = cart.find(x=>x.key === key);
+  const existing = cart.find(x=>x.key===key);
 
   if(existing){
     existing.qty += 1;
@@ -704,7 +691,9 @@ function agregarLinea(item, persona, note){
       name:item.name,
       persona,
       note:note || "",
-      qty:1
+      qty:1,
+      cat:item.cat,
+      cocina:!!item.cocina
     });
   }
 
@@ -739,19 +728,25 @@ function renderCart(){
     const g = document.createElement("div");
     g.className = "group";
 
-    const head = document.createElement("div");
-    head.className = "groupHead";
-    head.textContent = group.persona;
-    g.appendChild(head);
+    const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+x.qty,0);
+    const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
+
+    g.innerHTML = `
+      <div class="groupHead">
+        <span>${escapeHtml(group.persona)}</span>
+        <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
+      </div>
+    `;
 
     group.lines.forEach(line=>{
       const idx = cart.indexOf(line);
       const row = document.createElement("div");
       row.className = "line";
       row.innerHTML = `
-        <div style="min-width:0">
-          <div class="lineName">${escapeHtml(line.name)}</div>
-          ${line.note ? `<div class="lineNote">${escapeHtml(line.note)}</div>` : ``}
+        <div class="lineLeft">
+          <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
+          ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
+          <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
         </div>
         <div class="rightBtns">
           <button class="mini" type="button" data-a="dec">−</button>
@@ -761,18 +756,18 @@ function renderCart(){
         </div>
       `;
 
-      row.querySelector('[data-a="dec"]').addEventListener("click", ()=>{
+      row.querySelector('[data-a="dec"]').onclick = ()=>{
         line.qty = Math.max(1, line.qty - 1);
         renderCart();
-      });
-      row.querySelector('[data-a="inc"]').addEventListener("click", ()=>{
+      };
+      row.querySelector('[data-a="inc"]').onclick = ()=>{
         line.qty += 1;
         renderCart();
-      });
-      row.querySelector('[data-a="del"]').addEventListener("click", ()=>{
+      };
+      row.querySelector('[data-a="del"]').onclick = ()=>{
         cart.splice(idx, 1);
         renderCart();
-      });
+      };
 
       g.appendChild(row);
     });
@@ -798,77 +793,121 @@ function cerrarModal(){
   document.body.style.overflow = "";
 }
 
-btnCerrarModal.addEventListener("click", cerrarModal);
-btnCancelarModal.addEventListener("click", cerrarModal);
+btnCerrarModal.onclick = cerrarModal;
+btnCancelarModal.onclick = cerrarModal;
 backdrop.addEventListener("click", (e)=>{
   if(e.target === backdrop) cerrarModal();
 });
 
-btnGuardarModal.addEventListener("click", ()=>{
+btnGuardarModal.onclick = ()=>{
   if(!draftItem) return;
   agregarLinea(draftItem, personaActiva, notaRapida.value.trim());
   cerrarModal();
-});
+};
 
 function validarAntesImprimir(){
   if(!mesa.value.trim()) return "Selecciona una mesa.";
   if(!mesero.value.trim()) return "Escribe el nombre del mesero.";
   if(!cart.length) return "Agrega productos a la comanda.";
+  const cocinaLines = cart.filter(x=>x.cocina);
+  if(!cocinaLines.length) return "No hay productos de cocina para imprimir.";
   return null;
 }
 
-function buildTicketHTML(){
-  const grupos = agruparCart();
-
-  const gruposHtml = grupos.map(group=>{
-    const itemsHtml = group.lines.map(line=>`
-      <div class="it">
-        <div class="itn">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
-        ${line.note ? `<div class="sub">• ${escapeHtml(line.note)}</div>` : ``}
-      </div>
-    `).join("");
-
-    return `
-      <div class="g">${escapeHtml(group.persona)}</div>
-      ${itemsHtml}
-      <div class="hr"></div>
-    `;
-  }).join("");
-
-  return `
+function buildTicketCocina(){
+  let html = `
     <div class="ticket">
-      <div class="c b lg">COMANDA</div>
+      <div class="c b lg">COMANDA COCINA</div>
       <div class="c b">${escapeHtml(mesa.value)}</div>
       <div class="hr"></div>
-      ${gruposHtml}
-    </div>
   `;
+
+  PERSONAS.forEach(persona=>{
+    const lines = cart.filter(x => x.persona===persona && x.cocina);
+    if(!lines.length) return;
+
+    html += `<div class="g">${escapeHtml(persona)}</div>`;
+    lines.forEach(l=>{
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(l.qty)} x ${escapeHtml(l.name)}</div>
+          ${l.note ? `<div class="sub">• ${escapeHtml(l.note)}</div>` : ``}
+        </div>
+      `;
+    });
+    html += `<div class="hr"></div>`;
+  });
+
+  html += `</div>`;
+  return html;
 }
 
-function imprimir(){
+function buildResumenComanda(){
+  let html = `
+    <div class="ticket">
+      <div class="c b lg">RESUMEN COMANDA</div>
+      <div class="c b">${escapeHtml(mesa.value)}</div>
+      <div class="small c">Mesero: ${escapeHtml(mesero.value || "—")}</div>
+      <div class="hr"></div>
+  `;
+
+  PERSONAS.forEach(persona=>{
+    const lines = cart.filter(x => x.persona===persona);
+    if(!lines.length) return;
+
+    html += `<div class="g">${escapeHtml(persona)}</div>`;
+    lines.forEach(l=>{
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(l.qty)} x ${escapeHtml(l.name)}</div>
+          <div class="sub">${escapeHtml(l.cat)}</div>
+          ${l.note ? `<div class="sub">• ${escapeHtml(l.note)}</div>` : ``}
+        </div>
+      `;
+    });
+    html += `<div class="hr"></div>`;
+  });
+
+  html += `</div>`;
+  return html;
+}
+
+function imprimirCocina(){
   const err = validarAntesImprimir();
   if(err){
     alert(err);
     return;
   }
   const area = document.getElementById("printArea");
-  area.innerHTML = buildTicketHTML();
-  setTimeout(()=>window.print(), 120);
+  area.innerHTML = buildTicketCocina();
+  setTimeout(()=>window.print(),100);
 }
 
-document.getElementById("btnVaciar").addEventListener("click", ()=>{
-  if(confirm("¿Vaciar la comanda?")){
+function verResumen(){
+  if(!cart.length){
+    alert("Sin productos en la comanda.");
+    return;
+  }
+  const area = document.getElementById("printArea");
+  area.innerHTML = buildResumenComanda();
+  setTimeout(()=>window.print(),100);
+}
+
+document.getElementById("btnImprimir").onclick = imprimirCocina;
+document.getElementById("btnResumen").onclick = verResumen;
+
+document.getElementById("btnVaciar").onclick = ()=>{
+  if(confirm("¿Vaciar comanda?")){
     cart = [];
     renderCart();
   }
-});
-
-document.getElementById("btnImprimir").addEventListener("click", imprimir);
+};
 
 renderPersonas();
 renderCats();
 renderItems();
 renderCart();
 </script>
+
 </body>
 </html>
