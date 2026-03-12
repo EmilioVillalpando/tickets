@@ -365,39 +365,73 @@ input:focus, select:focus{
 @media (max-width:640px){
   .items{grid-template-columns:1fr}
 }
-.itemBtn{
-  border:none;
-  cursor:pointer;
-  text-align:left;
-  padding:14px;
+.itemCard{
   border-radius:18px;
   background:linear-gradient(180deg,#ffffff,#fff5f5);
   border:2px solid rgba(198,40,40,.14);
   box-shadow:0 6px 16px rgba(198,40,40,.06);
-  transition:transform .08s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+  overflow:hidden;
+  transition:background .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-.itemBtn:active{
-  transform:scale(.98);
-}
-.itemBtn.added{
+.itemCard.added{
   background:linear-gradient(180deg,#ecfff0,#c8f2d2);
   border-color:rgba(46,125,50,.55);
   box-shadow:0 10px 22px rgba(46,125,50,.22);
 }
-.itemBtn .name{
+.itemMain{
+  border:none;
+  width:100%;
+  cursor:pointer;
+  text-align:left;
+  padding:14px 14px 10px;
+  background:transparent;
+}
+.itemMain:active{
+  transform:scale(.99);
+}
+.itemName{
   font-size:20px;
   font-weight:1000;
   color:#8e1d1d;
   line-height:1.1;
 }
-.itemBtn.added .name{
+.itemCard.added .itemName{
   color:var(--green-dark);
 }
-.itemBtn .desc{
+.itemDesc{
   margin-top:5px;
   font-size:12px;
   color:var(--muted);
   font-weight:700;
+}
+.qtyMiniBar{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:6px;
+  padding:0 10px 10px;
+}
+.qtyMiniBtn, .qtyMiniVal{
+  height:28px;
+  min-width:28px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:1000;
+}
+.qtyMiniBtn{
+  border:1.5px solid rgba(21,101,192,.18);
+  background:#fff;
+  color:#0b4f93;
+  cursor:pointer;
+}
+.qtyMiniVal{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  background:#f7fbff;
+  border:1.5px solid rgba(21,101,192,.12);
+  color:#355070;
 }
 
 .comandaCompacta{
@@ -978,6 +1012,7 @@ function renderPersonas(){
       personaActiva = p;
       openGroups.add(p);
       renderPersonas();
+      renderItems();
     };
     personasBox.appendChild(b);
   });
@@ -999,10 +1034,10 @@ function renderCats(){
   });
 }
 
-function flashAddedButton(buttonEl){
-  if(!buttonEl) return;
-  buttonEl.classList.add("added");
-  setTimeout(()=>buttonEl.classList.remove("added"), 550);
+function flashAddedCard(cardEl){
+  if(!cardEl) return;
+  cardEl.classList.add("added");
+  setTimeout(()=>cardEl.classList.remove("added"), 550);
 }
 
 function showToast(text){
@@ -1028,18 +1063,47 @@ function getQuickMods(item){
   return mods;
 }
 
+function getQtyForItemOnActivePlate(itemId){
+  return cart
+    .filter(x => x.id === itemId && x.persona === personaActiva)
+    .reduce((sum, x) => sum + x.qty, 0);
+}
+
 function renderItems(){
   itemsBox.innerHTML = "";
   catalogo.filter(x=>x.cat===activeCat).forEach(item=>{
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "itemBtn";
-    b.innerHTML = `
-      <div class="name">${escapeHtml(item.name)}</div>
-      ${item.desc ? `<div class="desc">${escapeHtml(item.desc)}</div>` : ``}
+    const qty = getQtyForItemOnActivePlate(item.id);
+
+    const card = document.createElement("div");
+    card.className = "itemCard";
+
+    card.innerHTML = `
+      <button type="button" class="itemMain">
+        <div class="itemName">${escapeHtml(item.name)}</div>
+        ${item.desc ? `<div class="itemDesc">${escapeHtml(item.desc)}</div>` : ``}
+      </button>
+      <div class="qtyMiniBar">
+        <button type="button" class="qtyMiniBtn" data-act="dec">−</button>
+        <div class="qtyMiniVal">${qty}</div>
+        <button type="button" class="qtyMiniBtn" data-act="inc">+</button>
+      </div>
     `;
-    b.onclick = ()=> agregarDesdeClick(item, b);
-    itemsBox.appendChild(b);
+
+    const mainBtn = card.querySelector(".itemMain");
+    const decBtn = card.querySelector('[data-act="dec"]');
+    const incBtn = card.querySelector('[data-act="inc"]');
+
+    mainBtn.onclick = ()=> agregarDesdeClick(item, card);
+    incBtn.onclick = (e)=>{
+      e.stopPropagation();
+      agregarDesdeClick(item, card);
+    };
+    decBtn.onclick = (e)=>{
+      e.stopPropagation();
+      quitarUnoDelPaso3(item.id, personaActiva);
+    };
+
+    itemsBox.appendChild(card);
   });
 }
 
@@ -1047,15 +1111,15 @@ function shouldOpenModal(item){
   return item.requiereNota || getQuickMods(item).length > 0;
 }
 
-function agregarDesdeClick(item, buttonEl){
+function agregarDesdeClick(item, cardEl){
   if(shouldOpenModal(item)){
-    abrirModal(item, buttonEl);
+    abrirModal(item, cardEl);
     return;
   }
-  agregarLinea(item, personaActiva, "", buttonEl);
+  agregarLinea(item, personaActiva, "", cardEl);
 }
 
-function agregarLinea(item, persona, note, buttonEl=null){
+function agregarLinea(item, persona, note, cardEl=null){
   const cleanNote = (note || "").trim();
   const key = makeKey(item, persona, cleanNote);
   const existing = cart.find(x=>x.key===key);
@@ -1078,7 +1142,8 @@ function agregarLinea(item, persona, note, buttonEl=null){
   openGroups.add(persona);
   updateHeaderPill();
   renderCart();
-  flashAddedButton(buttonEl);
+  renderItems();
+  flashAddedCard(cardEl);
 
   const nombreSimple = item.cat === "TACOS" ? "Taco" :
                        item.cat === "QUESADILLAS" ? "Quesadilla" :
@@ -1087,6 +1152,28 @@ function agregarLinea(item, persona, note, buttonEl=null){
                        "Producto";
 
   showToast(`${nombreSimple} añadido a ${persona}`);
+}
+
+function quitarUnoDelPaso3(itemId, persona){
+  const candidates = cart
+    .map((x, idx) => ({...x, idx}))
+    .filter(x => x.id === itemId && x.persona === persona);
+
+  if(!candidates.length) return;
+
+  const exactNoNote = candidates.find(x => !x.note);
+  const target = exactNoNote || candidates[candidates.length - 1];
+  if(!target) return;
+
+  if(cart[target.idx].qty > 1){
+    cart[target.idx].qty -= 1;
+  }else{
+    cart.splice(target.idx, 1);
+  }
+
+  updateHeaderPill();
+  renderCart();
+  renderItems();
 }
 
 function agruparCart(){
@@ -1168,6 +1255,7 @@ function renderCart(){
       cart[idx].qty = Math.max(1, cart[idx].qty - 1);
       updateHeaderPill();
       renderCart();
+      renderItems();
     };
   });
 
@@ -1178,6 +1266,7 @@ function renderCart(){
       cart[idx].qty += 1;
       updateHeaderPill();
       renderCart();
+      renderItems();
     };
   });
 
@@ -1188,12 +1277,13 @@ function renderCart(){
       cart.splice(idx,1);
       updateHeaderPill();
       renderCart();
+      renderItems();
     };
   });
 }
 
-function abrirModal(item, buttonEl){
-  draftItem = { item, buttonEl, selectedMods: new Set() };
+function abrirModal(item, cardEl){
+  draftItem = { item, cardEl, selectedMods: new Set() };
   modalTitle.textContent = item.name;
   modalPersonaLabel.textContent = `Indicaciones para ${personaActiva}`;
   notaRapida.value = "";
@@ -1243,7 +1333,7 @@ btnGuardarModal.onclick = ()=>{
   const freeText = notaRapida.value.trim();
   const finalNote = [modsText, freeText].filter(Boolean).join(" • ");
 
-  agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.buttonEl);
+  agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.cardEl);
   cerrarModal();
 };
 
@@ -1361,6 +1451,7 @@ document.getElementById("btnVaciar").onclick = ()=>{
     openGroups.clear();
     updateHeaderPill();
     renderCart();
+    renderItems();
     goToStep(3);
   }
 };
@@ -1380,3 +1471,5 @@ updateContinueButton();
 </script>
 </body>
 </html>
+
+
