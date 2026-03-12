@@ -746,7 +746,7 @@ input:focus, select:focus{
         <div class="items" id="items"></div>
 
         <div class="noteBox">
-          Aquí solo eliges plato y productos. No necesitas bajar hasta la comanda mientras capturas.
+          Toca el nombre del producto para abrir indicaciones. Usa <b>+</b> para sumar rápido sin abrir ventana.
         </div>
       </section>
 
@@ -816,41 +816,47 @@ input:focus, select:focus{
 
 <script>
 const catalogo = [
-  {id:"taco_tripa",    cat:"TACOS",        name:"Taco de Tripa",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_pastor",   cat:"TACOS",        name:"Taco de Pastor",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_bistec",   cat:"TACOS",        name:"Taco de Bistec",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_chorizo",  cat:"TACOS",        name:"Taco de Chorizo",      desc:"", requiereNota:false, cocina:true},
-  {id:"taco_higado",   cat:"TACOS",        name:"Taco de Hígado",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_combi",    cat:"TACOS",        name:"Taco Combinado",       desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"taco_tripa",      cat:"TACOS",        name:"Taco de Tripa",         desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",     cat:"TACOS",        name:"Taco de Pastor",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",     cat:"TACOS",        name:"Taco de Bistec",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",    cat:"TACOS",        name:"Taco de Chorizo",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",     cat:"TACOS",        name:"Taco de Hígado",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_costilla",   cat:"TACOS",        name:"Taco de Costilla",      desc:"", requiereNota:false, cocina:true},
+  {id:"taco_barbacoa",   cat:"TACOS",        name:"Taco de Barbacoa",      desc:"", requiereNota:false, cocina:true},
+  {id:"taco_alambre",    cat:"TACOS",        name:"Taco de Alambre",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",      cat:"TACOS",        name:"Taco Combinado",        desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",   cat:"QUESADILLAS",  name:"Quesadilla de Tripa",  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_pastor",  cat:"QUESADILLAS",  name:"Quesadilla de Pastor", desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_bistec",  cat:"QUESADILLAS",  name:"Quesadilla de Bistec", desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_chorizo", cat:"QUESADILLAS",  name:"Quesadilla de Chorizo",desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_higado",  cat:"QUESADILLAS",  name:"Quesadilla de Hígado", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_tripa",     cat:"QUESADILLAS",  name:"Quesadilla de Tripa",   desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",    cat:"QUESADILLAS",  name:"Quesadilla de Pastor",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",    cat:"QUESADILLAS",  name:"Quesadilla de Bistec",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo",   cat:"QUESADILLAS",  name:"Quesadilla de Chorizo", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",    cat:"QUESADILLAS",  name:"Quesadilla de Hígado",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_costilla",  cat:"QUESADILLAS",  name:"Quesadilla de Costilla",desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_barbacoa",  cat:"QUESADILLAS",  name:"Quesadilla de Barbacoa",desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_alambre",   cat:"QUESADILLAS",  name:"Quesadilla de Alambre", desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi", cat:"CHAROLAS",     name:"Charola Combinada",    desc:"Escribe combinación", requiereNota:true, cocina:true},
-  {id:"charola_alam",  cat:"CHAROLAS",     name:"Charola de Alambre",   desc:"", requiereNota:false, cocina:true},
+  {id:"charola_combi",   cat:"CHAROLAS",     name:"Charola Combinada",     desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",    cat:"CHAROLAS",     name:"Charola de Alambre",    desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",   cat:"VOLCANES",    name:"Volcán de Tripa",      desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_pastor",  cat:"VOLCANES",    name:"Volcán de Pastor",     desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_bistec",  cat:"VOLCANES",    name:"Volcán de Bistec",     desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_chorizo", cat:"VOLCANES",    name:"Volcán de Chorizo",    desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_higado",  cat:"VOLCANES",    name:"Volcán de Hígado",     desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_tripa",    cat:"VOLCANES",     name:"Volcán de Tripa",       desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",   cat:"VOLCANES",     name:"Volcán de Pastor",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",   cat:"VOLCANES",     name:"Volcán de Bistec",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo",  cat:"VOLCANES",     name:"Volcán de Chorizo",     desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",   cat:"VOLCANES",     name:"Volcán de Hígado",      desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light", cat:"BEBIDAS",     name:"Coca Light",           desc:"", requiereNota:false, cocina:false},
-  {id:"beb_coca",       cat:"BEBIDAS",     name:"Coca",                 desc:"", requiereNota:false, cocina:false},
-  {id:"beb_fresca",     cat:"BEBIDAS",     name:"Fresca",               desc:"", requiereNota:false, cocina:false},
-  {id:"beb_sprite",     cat:"BEBIDAS",     name:"Sprite",               desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua",       cat:"BEBIDAS",     name:"Agua fresca",          desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua_lt",    cat:"BEBIDAS",     name:"Agua fresca 1 Lt",     desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca_light",  cat:"BEBIDAS",      name:"Coca Light",            desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",        cat:"BEBIDAS",      name:"Coca",                  desc:"", requiereNota:false, cocina:false},
+  {id:"beb_fresca",      cat:"BEBIDAS",      name:"Fresca",                desc:"", requiereNota:false, cocina:false},
+  {id:"beb_sprite",      cat:"BEBIDAS",      name:"Sprite",                desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua",        cat:"BEBIDAS",      name:"Agua fresca",           desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",      name:"Agua fresca 1 Lt",      desc:"", requiereNota:false, cocina:false},
 
-  {id:"pos_pay",        cat:"POSTRES",     name:"Pay de queso",         desc:"", requiereNota:false, cocina:false},
-  {id:"pos_rompope",    cat:"POSTRES",     name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_arroz",      cat:"POSTRES",     name:"Arroz con leche",      desc:"", requiereNota:false, cocina:false},
-  {id:"pos_flan",       cat:"POSTRES",     name:"Flan",                 desc:"", requiereNota:false, cocina:false},
-  {id:"pos_fresa",      cat:"POSTRES",     name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_napolitano", cat:"POSTRES",     name:"Napolitano",           desc:"", requiereNota:false, cocina:false},
+  {id:"pos_pay",         cat:"POSTRES",      name:"Pay de queso",          desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",     cat:"POSTRES",      name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",       cat:"POSTRES",      name:"Arroz con leche",       desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",        cat:"POSTRES",      name:"Flan",                  desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",       cat:"POSTRES",      name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano",  cat:"POSTRES",      name:"Napolitano",            desc:"", requiereNota:false, cocina:false},
 ];
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
@@ -1093,10 +1099,10 @@ function renderItems(){
     const decBtn = card.querySelector('[data-act="dec"]');
     const incBtn = card.querySelector('[data-act="inc"]');
 
-    mainBtn.onclick = ()=> agregarDesdeClick(item, card);
+    mainBtn.onclick = ()=> agregarDesdeClick(item, card, true);
     incBtn.onclick = (e)=>{
       e.stopPropagation();
-      agregarDesdeClick(item, card);
+      agregarRapido(item, card);
     };
     decBtn.onclick = (e)=>{
       e.stopPropagation();
@@ -1111,11 +1117,15 @@ function shouldOpenModal(item){
   return item.requiereNota || getQuickMods(item).length > 0;
 }
 
-function agregarDesdeClick(item, cardEl){
-  if(shouldOpenModal(item)){
+function agregarDesdeClick(item, cardEl, allowModal=true){
+  if(allowModal && shouldOpenModal(item)){
     abrirModal(item, cardEl);
     return;
   }
+  agregarLinea(item, personaActiva, "", cardEl);
+}
+
+function agregarRapido(item, cardEl){
   agregarLinea(item, personaActiva, "", cardEl);
 }
 
@@ -1471,5 +1481,3 @@ updateContinueButton();
 </script>
 </body>
 </html>
-
-
