@@ -412,10 +412,10 @@ input:focus, select:focus{
   padding:0 10px 10px;
 }
 .qtyMiniBtn, .qtyMiniVal{
-  height:28px;
-  min-width:28px;
+  height:32px;
+  min-width:32px;
   border-radius:10px;
-  font-size:13px;
+  font-size:14px;
   font-weight:1000;
 }
 .qtyMiniBtn{
@@ -428,7 +428,7 @@ input:focus, select:focus{
   display:flex;
   align-items:center;
   justify-content:center;
-  min-width:34px;
+  min-width:38px;
   background:#f7fbff;
   border:1.5px solid rgba(21,101,192,.12);
   color:#355070;
@@ -720,7 +720,6 @@ input:focus, select:focus{
         <div class="noteBox" style="margin-top:0">
           Elige la mesa tocando un botón grande. Pensado para usar rápido en celular o tablet.
         </div>
-
         <div class="mesasGrid" id="mesasGrid" style="margin-top:12px"></div>
       </section>
 
@@ -746,7 +745,7 @@ input:focus, select:focus{
         <div class="items" id="items"></div>
 
         <div class="noteBox">
-          Toca el nombre del producto para abrir indicaciones. Usa <b>+</b> para sumar rápido sin abrir ventana.
+          Toca el nombre del producto para agregar indicaciones. Usa + para sumar rápido.
         </div>
       </section>
 
@@ -816,47 +815,53 @@ input:focus, select:focus{
 
 <script>
 const catalogo = [
-  {id:"taco_tripa",      cat:"TACOS",        name:"Taco de Tripa",         desc:"", requiereNota:false, cocina:true},
-  {id:"taco_pastor",     cat:"TACOS",        name:"Taco de Pastor",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_bistec",     cat:"TACOS",        name:"Taco de Bistec",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_chorizo",    cat:"TACOS",        name:"Taco de Chorizo",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_higado",     cat:"TACOS",        name:"Taco de Hígado",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_costilla",   cat:"TACOS",        name:"Taco de Costilla",      desc:"", requiereNota:false, cocina:true},
-  {id:"taco_barbacoa",   cat:"TACOS",        name:"Taco de Barbacoa",      desc:"", requiereNota:false, cocina:true},
-  {id:"taco_alambre",    cat:"TACOS",        name:"Taco de Alambre",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_combi",      cat:"TACOS",        name:"Taco Combinado",        desc:"Escribe combinación", requiereNota:true, cocina:true},
+  // TACOS
+  {id:"taco_tripa",      cat:"TACOS",       name:"Taco de Tripa",         desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",     cat:"TACOS",       name:"Taco de Pastor",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",     cat:"TACOS",       name:"Taco de Bistec",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",    cat:"TACOS",       name:"Taco de Chorizo",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",     cat:"TACOS",       name:"Taco de Hígado",        desc:"", requiereNota:false, cocina:true},
+  {id:"taco_costilla",   cat:"TACOS",       name:"Taco de Costilla",      desc:"", requiereNota:false, cocina:true},
+  {id:"taco_barbacoa",   cat:"TACOS",       name:"Taco de Barbacoa",      desc:"", requiereNota:false, cocina:true},
+  {id:"taco_alambre",    cat:"TACOS",       name:"Taco de Alambre",       desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",      cat:"TACOS",       name:"Taco Combinado",        desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",     cat:"QUESADILLAS",  name:"Quesadilla de Tripa",   desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_pastor",    cat:"QUESADILLAS",  name:"Quesadilla de Pastor",  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_bistec",    cat:"QUESADILLAS",  name:"Quesadilla de Bistec",  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_chorizo",   cat:"QUESADILLAS",  name:"Quesadilla de Chorizo", desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_higado",    cat:"QUESADILLAS",  name:"Quesadilla de Hígado",  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_costilla",  cat:"QUESADILLAS",  name:"Quesadilla de Costilla",desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_barbacoa",  cat:"QUESADILLAS",  name:"Quesadilla de Barbacoa",desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_alambre",   cat:"QUESADILLAS",  name:"Quesadilla de Alambre", desc:"", requiereNota:false, cocina:true},
+  // QUESADILLAS
+  {id:"quesa_tripa",     cat:"QUESADILLAS", name:"Quesadilla de Tripa",    desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",    cat:"QUESADILLAS", name:"Quesadilla de Pastor",   desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",    cat:"QUESADILLAS", name:"Quesadilla de Bistec",   desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo",   cat:"QUESADILLAS", name:"Quesadilla de Chorizo",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",    cat:"QUESADILLAS", name:"Quesadilla de Hígado",   desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_costilla",  cat:"QUESADILLAS", name:"Quesadilla de Costilla", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_barbacoa",  cat:"QUESADILLAS", name:"Quesadilla de Barbacoa", desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_alambre",   cat:"QUESADILLAS", name:"Quesadilla de Alambre",  desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi",   cat:"CHAROLAS",     name:"Charola Combinada",     desc:"Escribe combinación", requiereNota:true, cocina:true},
-  {id:"charola_alam",    cat:"CHAROLAS",     name:"Charola de Alambre",    desc:"", requiereNota:false, cocina:true},
+  // CHAROLAS
+  {id:"charola_combi",   cat:"CHAROLAS",    name:"Charola Combinada",     desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",    cat:"CHAROLAS",    name:"Charola de Alambre",    desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",    cat:"VOLCANES",     name:"Volcán de Tripa",       desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_pastor",   cat:"VOLCANES",     name:"Volcán de Pastor",      desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_bistec",   cat:"VOLCANES",     name:"Volcán de Bistec",      desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_chorizo",  cat:"VOLCANES",     name:"Volcán de Chorizo",     desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_higado",   cat:"VOLCANES",     name:"Volcán de Hígado",      desc:"", requiereNota:false, cocina:true},
+  // VOLCANES
+  {id:"volcan_tripa",    cat:"VOLCANES",    name:"Volcán de Tripa",       desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",   cat:"VOLCANES",    name:"Volcán de Pastor",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",   cat:"VOLCANES",    name:"Volcán de Bistec",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo",  cat:"VOLCANES",    name:"Volcán de Chorizo",     desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",   cat:"VOLCANES",    name:"Volcán de Hígado",      desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS",      name:"Coca Light",            desc:"", requiereNota:false, cocina:false},
-  {id:"beb_coca",        cat:"BEBIDAS",      name:"Coca",                  desc:"", requiereNota:false, cocina:false},
-  {id:"beb_fresca",      cat:"BEBIDAS",      name:"Fresca",                desc:"", requiereNota:false, cocina:false},
-  {id:"beb_sprite",      cat:"BEBIDAS",      name:"Sprite",                desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua",        cat:"BEBIDAS",      name:"Agua fresca",           desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua_lt",     cat:"BEBIDAS",      name:"Agua fresca 1 Lt",      desc:"", requiereNota:false, cocina:false},
+  // BEBIDAS
+  {id:"beb_coca_light",  cat:"BEBIDAS",     name:"Coca Light",            desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",        cat:"BEBIDAS",     name:"Coca",                  desc:"", requiereNota:false, cocina:false},
+  {id:"beb_fresca",      cat:"BEBIDAS",     name:"Fresca",                desc:"", requiereNota:false, cocina:false},
+  {id:"beb_sprite",      cat:"BEBIDAS",     name:"Sprite",                desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua",        cat:"BEBIDAS",     name:"Agua fresca",           desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",     name:"Agua fresca 1 Lt",      desc:"", requiereNota:false, cocina:false},
 
-  {id:"pos_pay",         cat:"POSTRES",      name:"Pay de queso",          desc:"", requiereNota:false, cocina:false},
-  {id:"pos_rompope",     cat:"POSTRES",      name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_arroz",       cat:"POSTRES",      name:"Arroz con leche",       desc:"", requiereNota:false, cocina:false},
-  {id:"pos_flan",        cat:"POSTRES",      name:"Flan",                  desc:"", requiereNota:false, cocina:false},
-  {id:"pos_fresa",       cat:"POSTRES",      name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_napolitano",  cat:"POSTRES",      name:"Napolitano",            desc:"", requiereNota:false, cocina:false},
+  // POSTRES
+  {id:"pos_pay",         cat:"POSTRES",     name:"Pay de queso",         desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",     cat:"POSTRES",     name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",       cat:"POSTRES",     name:"Arroz con leche",      desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",        cat:"POSTRES",     name:"Flan",                 desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",       cat:"POSTRES",     name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano",  cat:"POSTRES",     name:"Napolitano",           desc:"", requiereNota:false, cocina:false},
 ];
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
@@ -1052,7 +1057,7 @@ function showToast(text){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>{
     toastMsg.classList.remove("show");
-  }, 1200);
+  }, 1100);
 }
 
 function getQuickMods(item){
@@ -1077,7 +1082,9 @@ function getQtyForItemOnActivePlate(itemId){
 
 function renderItems(){
   itemsBox.innerHTML = "";
-  catalogo.filter(x=>x.cat===activeCat).forEach(item=>{
+  const productos = catalogo.filter(x => x.cat === activeCat);
+
+  productos.forEach(item=>{
     const qty = getQtyForItemOnActivePlate(item.id);
 
     const card = document.createElement("div");
@@ -1099,15 +1106,22 @@ function renderItems(){
     const decBtn = card.querySelector('[data-act="dec"]');
     const incBtn = card.querySelector('[data-act="inc"]');
 
-    mainBtn.onclick = ()=> agregarDesdeClick(item, card, true);
-    incBtn.onclick = (e)=>{
+    mainBtn.addEventListener("click", function(e){
+      e.preventDefault();
+      abrirProducto(item, card, false);
+    });
+
+    incBtn.addEventListener("click", function(e){
+      e.preventDefault();
       e.stopPropagation();
-      agregarRapido(item, card);
-    };
-    decBtn.onclick = (e)=>{
+      abrirProducto(item, card, true);
+    });
+
+    decBtn.addEventListener("click", function(e){
+      e.preventDefault();
       e.stopPropagation();
       quitarUnoDelPaso3(item.id, personaActiva);
-    };
+    });
 
     itemsBox.appendChild(card);
   });
@@ -1117,15 +1131,17 @@ function shouldOpenModal(item){
   return item.requiereNota || getQuickMods(item).length > 0;
 }
 
-function agregarDesdeClick(item, cardEl, allowModal=true){
-  if(allowModal && shouldOpenModal(item)){
+function abrirProducto(item, cardEl, sumaRapida=false){
+  if(sumaRapida){
+    agregarLinea(item, personaActiva, "", cardEl);
+    return;
+  }
+
+  if(shouldOpenModal(item)){
     abrirModal(item, cardEl);
     return;
   }
-  agregarLinea(item, personaActiva, "", cardEl);
-}
 
-function agregarRapido(item, cardEl){
   agregarLinea(item, personaActiva, "", cardEl);
 }
 
@@ -1171,8 +1187,8 @@ function quitarUnoDelPaso3(itemId, persona){
 
   if(!candidates.length) return;
 
-  const exactNoNote = candidates.find(x => !x.note);
-  const target = exactNoNote || candidates[candidates.length - 1];
+  const sinNota = candidates.find(x => !x.note);
+  const target = sinNota || candidates[candidates.length - 1];
   if(!target) return;
 
   if(cart[target.idx].qty > 1){
@@ -1211,6 +1227,7 @@ function renderCart(){
   }
 
   cartBox.innerHTML = "";
+
   agruparCart().forEach(group=>{
     const g = document.createElement("div");
     const isOpen = openGroups.has(group.persona);
@@ -1262,7 +1279,13 @@ function renderCart(){
     btn.onclick = ()=>{
       const idx = Number(btn.dataset.idx);
       if(!cart[idx]) return;
-      cart[idx].qty = Math.max(1, cart[idx].qty - 1);
+
+      if(cart[idx].qty > 1){
+        cart[idx].qty -= 1;
+      }else{
+        cart.splice(idx,1);
+      }
+
       updateHeaderPill();
       renderCart();
       renderItems();
@@ -1320,7 +1343,7 @@ function abrirModal(item, cardEl){
 
   backdrop.style.display = "flex";
   document.body.style.overflow = "hidden";
-  setTimeout(()=>notaRapida.focus(), 50);
+  setTimeout(()=>notaRapida.focus(), 60);
 }
 
 function cerrarModal(){
@@ -1333,9 +1356,11 @@ function cerrarModal(){
 
 btnCerrarModal.onclick = cerrarModal;
 btnCancelarModal.onclick = cerrarModal;
+
 backdrop.addEventListener("click", (e)=>{
   if(e.target === backdrop) cerrarModal();
 });
+
 btnGuardarModal.onclick = ()=>{
   if(!draftItem) return;
 
@@ -1354,10 +1379,13 @@ function buildTicketCocina(){
       <div class="c b">${escapeHtml(mesaActiva)}</div>
       <div class="hr"></div>
   `;
+
   PLATOS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona && x.cocina);
     if(!lines.length) return;
+
     html += `<div class="g">${escapeHtml(persona)}</div>`;
+
     lines.forEach(l=>{
       html += `
         <div class="it">
@@ -1366,8 +1394,10 @@ function buildTicketCocina(){
         </div>
       `;
     });
+
     html += `<div class="hr"></div>`;
   });
+
   return html + `</div>`;
 }
 
@@ -1379,10 +1409,13 @@ function buildResumenComanda(){
       <div class="small c">Mesero: ${escapeHtml(meseroNombre || "—")}</div>
       <div class="hr"></div>
   `;
+
   PLATOS.forEach(persona=>{
     const lines = cart.filter(x => x.persona===persona);
     if(!lines.length) return;
+
     html += `<div class="g">${escapeHtml(persona)}</div>`;
+
     lines.forEach(l=>{
       html += `
         <div class="it">
@@ -1392,8 +1425,10 @@ function buildResumenComanda(){
         </div>
       `;
     });
+
     html += `<div class="hr"></div>`;
   });
+
   return html + `</div>`;
 }
 
