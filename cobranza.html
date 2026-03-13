@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
@@ -88,7 +88,7 @@ header{
 
 .grid{
   display:grid;
-  grid-template-columns:360px 1fr;
+  grid-template-columns:380px 1fr;
   gap:16px;
 }
 @media (max-width:960px){
@@ -122,30 +122,6 @@ header{
   padding:18px;
 }
 
-label{
-  display:block;
-  margin-bottom:8px;
-  font-size:13px;
-  font-weight:1000;
-  color:#365779;
-  text-transform:uppercase;
-  letter-spacing:.35px;
-}
-select{
-  width:100%;
-  padding:18px 16px;
-  border-radius:18px;
-  border:2px solid #d4e2f2;
-  background:#fff;
-  font-size:22px;
-  color:var(--ink);
-  outline:none;
-}
-select:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 5px rgba(21,101,192,.10);
-}
-
 .syncStatus{
   margin-top:12px;
   padding:12px 14px;
@@ -172,10 +148,113 @@ select:focus{
   border-color:rgba(198,40,40,.25);
 }
 
+/* ===== Mesas tipo tarjeta ===== */
+.mesasGrid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  margin-top:16px;
+}
+@media (max-width:520px){
+  .mesasGrid{grid-template-columns:1fr 1fr}
+}
+.mesaBtn{
+  border:none;
+  cursor:pointer;
+  background:transparent;
+  padding:0;
+}
+.mesaCard{
+  position:relative;
+  min-height:128px;
+  border-radius:24px;
+  border:2px solid rgba(21,101,192,.16);
+  background:linear-gradient(180deg,#ffffff,#eef6ff);
+  box-shadow:0 10px 24px rgba(21,101,192,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:8px;
+  transition:.18s ease;
+}
+.mesaBtn:active .mesaCard{
+  transform:scale(.98);
+}
+.mesaTop{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  border:3px solid rgba(90,59,0,.12);
+  box-shadow:inset 0 2px 8px rgba(255,255,255,.35);
+}
+.mesaLegs{
+  display:flex;
+  gap:18px;
+  margin-top:-4px;
+}
+.mesaLegs span{
+  width:6px;
+  height:18px;
+  border-radius:99px;
+  background:#8d6e63;
+}
+.mesaText{
+  font-weight:1000;
+  color:#0b3d6e;
+  font-size:20px;
+  line-height:1;
+}
+.mesaState{
+  font-size:12px;
+  font-weight:1000;
+  border-radius:999px;
+  padding:6px 10px;
+  background:#fff;
+  border:1px solid #d7e4f2;
+  color:#466887;
+}
+
+/* seleccionada */
+.mesaBtn.selected .mesaCard{
+  border-color:var(--red);
+  background:linear-gradient(180deg,#fff1f1,#ffe2e2);
+  box-shadow:0 14px 30px rgba(198,40,40,.18);
+}
+.mesaBtn.selected .mesaText{
+  color:var(--red-dark);
+}
+
+/* activa en sistema */
+.mesaBtn.activeMesa .mesaCard{
+  border-color:rgba(46,125,50,.55);
+  background:linear-gradient(180deg,#effdf2,#d9f6df);
+  box-shadow:0 14px 30px rgba(46,125,50,.18);
+}
+.mesaBtn.activeMesa .mesaText{
+  color:var(--green-dark);
+}
+.mesaBtn.activeMesa .mesaState{
+  background:#edf9ef;
+  color:#1f6a24;
+  border-color:rgba(46,125,50,.22);
+}
+
+/* activa + seleccionada */
+.mesaBtn.activeMesa.selected .mesaCard{
+  border-color:#14591b;
+  background:linear-gradient(180deg,#e4f8e8,#c6efcf);
+  box-shadow:0 16px 34px rgba(46,125,50,.24);
+}
+.mesaBtn.activeMesa.selected .mesaText{
+  color:#14591b;
+}
+
 .actions{
   display:grid;
   gap:12px;
-  margin-top:16px;
+  margin-top:18px;
 }
 .btn{
   border:none;
@@ -450,20 +529,12 @@ select:focus{
     <section class="card">
       <div class="cardHead">
         <h2>1. Elegir mesa</h2>
-        <p>Primero selecciona la mesa y luego toca el botón azul.</p>
+        <p>Toca una mesa y luego presiona el botón azul.</p>
         <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
       </div>
 
       <div class="cardBody">
-        <label>Mesa</label>
-        <select id="mesa">
-          <option value="">Selecciona una mesa</option>
-          <option value="Mesa 1">Mesa 1</option>
-          <option value="Mesa 2">Mesa 2</option>
-          <option value="Mesa 3">Mesa 3</option>
-          <option value="Mesa 4">Mesa 4</option>
-          <option value="Mesa 5">Mesa 5</option>
-        </select>
+        <div class="mesasGrid" id="mesasGrid"></div>
 
         <div class="actions">
           <button class="btn btnBlue" id="btnBuscar" type="button">Cargar cuenta</button>
@@ -474,11 +545,8 @@ select:focus{
         </div>
 
         <div class="tip">
-          Usa esta pantalla así:<br>
-          <b>1.</b> Elige la mesa<br>
-          <b>2.</b> Toca <b>Cargar cuenta</b><br>
-          <b>3.</b> Revisa el total<br>
-          <b>4.</b> Imprime o cierra
+          Verde = mesa con cuenta abierta.<br>
+          Rojo/seleccionada = mesa que vas a revisar ahorita.
         </div>
       </div>
     </section>
@@ -516,7 +584,8 @@ select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -567,19 +636,21 @@ const PRECIOS = {
   pos_napolitano:60
 };
 
+const MESAS = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"];
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
 
 let comandaActual = null;
 let itemsActuales = [];
 let mesaActual = "";
+let mesasConCuenta = new Set();
 
 const syncStatus = document.getElementById("syncStatus");
 const pillMesa = document.getElementById("pillMesa");
-const mesaSelect = document.getElementById("mesa");
 const kpiMesa = document.getElementById("kpiMesa");
 const kpiMesero = document.getElementById("kpiMesero");
 const detalleCuenta = document.getElementById("detalleCuenta");
 const printArea = document.getElementById("printArea");
+const mesasGrid = document.getElementById("mesasGrid");
 
 function money(n){
   return "$" + Number(n || 0).toFixed(2);
@@ -632,19 +703,72 @@ function resetVista(){
   detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
 }
 
+function renderMesas(){
+  mesasGrid.innerHTML = "";
+
+  MESAS.forEach(mesa => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+
+    let cls = "mesaBtn";
+    if (mesaActual === mesa) cls += " selected";
+    if (mesasConCuenta.has(mesa)) cls += " activeMesa";
+
+    btn.className = cls;
+    btn.innerHTML = `
+      <div class="mesaCard">
+        <div class="mesaTop"></div>
+        <div class="mesaLegs"><span></span><span></span></div>
+        <div class="mesaText">${mesa}</div>
+        <div class="mesaState">${mesasConCuenta.has(mesa) ? "Cuenta activa" : "Disponible"}</div>
+      </div>
+    `;
+
+    btn.onclick = () => {
+      mesaActual = mesa;
+      pillMesa.textContent = mesa;
+      renderMesas();
+    };
+
+    mesasGrid.appendChild(btn);
+  });
+}
+
+async function cargarEstadoMesas(){
+  if(!supabaseReady){
+    mesasConCuenta = new Set();
+    renderMesas();
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("comandas")
+    .select("mesa, estado")
+    .eq("estado", "abierta");
+
+  if(error){
+    console.error(error);
+    mesasConCuenta = new Set();
+    renderMesas();
+    return;
+  }
+
+  mesasConCuenta = new Set((data || []).map(x => x.mesa).filter(Boolean));
+  renderMesas();
+}
+
 async function cargarCuenta(){
   if(!supabaseReady){
     setSyncStatus("Configura SUPABASE_URL y SUPABASE_ANON_KEY", "bad");
     return;
   }
 
-  const mesa = mesaSelect.value;
+  const mesa = mesaActual;
   if(!mesa){
     alert("Selecciona una mesa.");
     return;
   }
 
-  mesaActual = mesa;
   pillMesa.textContent = mesa;
   setSyncStatus(`Buscando cuenta en ${mesa}...`, "warn");
 
@@ -671,6 +795,7 @@ async function cargarCuenta(){
     pillMesa.textContent = mesa;
     detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta abierta en ${escapeHtml(mesa)}.</div>`;
     setSyncStatus(`No hay comanda abierta en ${mesa}`, "warn");
+    await cargarEstadoMesas();
     return;
   }
 
@@ -692,6 +817,7 @@ async function cargarCuenta(){
   itemsActuales = items || [];
   renderCuenta();
   setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
+  await cargarEstadoMesas();
 }
 
 function renderCuenta(){
@@ -798,6 +924,7 @@ async function cerrarCuenta(){
 
   setSyncStatus(`Cuenta cerrada: ${comandaActual.mesa}`, "ok");
   alert("Cuenta cerrada correctamente.");
+  await cargarEstadoMesas();
   await cargarCuenta();
 }
 
@@ -899,7 +1026,10 @@ function imprimirResumen(){
 }
 
 document.getElementById("btnBuscar").onclick = cargarCuenta;
-document.getElementById("btnRecargar").onclick = cargarCuenta;
+document.getElementById("btnRecargar").onclick = async ()=>{
+  await cargarEstadoMesas();
+  await cargarCuenta();
+};
 document.getElementById("btnCerrar").onclick = cerrarCuenta;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
 document.getElementById("btnResumen").onclick = imprimirResumen;
@@ -909,6 +1039,9 @@ if(supabaseReady){
 }else{
   setSyncStatus("Supabase pendiente de configurar", "warn");
 }
+
+cargarEstadoMesas();
+renderMesas();
 </script>
 </body>
 </html>
