@@ -1,1 +1,914 @@
 
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Cuentas por Mesa — Guadalupe Victoria</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root{
+  --bg:#f6f8fc;
+  --paper:#ffffff;
+  --ink:#102033;
+  --muted:#5f7187;
+  --line:rgba(16,32,51,.12);
+
+  --red:#c62828;
+  --red-dark:#8e1d1d;
+  --blue:#1565c0;
+  --blue-dark:#0f4f98;
+  --yellow:#fbc02d;
+  --yellow-dark:#e0a800;
+  --green:#2e7d32;
+  --green-dark:#1f6a24;
+
+  --shadow:0 16px 40px rgba(2,6,23,.10);
+  --r:20px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(1000px 420px at 0% 0%, rgba(251,192,45,.18), transparent 60%),
+    radial-gradient(1000px 420px at 100% 0%, rgba(21,101,192,.14), transparent 60%),
+    linear-gradient(180deg,#f6f8fc 0%, #eef4fb 100%);
+  color:var(--ink);
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  padding:12px;
+  background:linear-gradient(135deg,var(--blue) 0%, var(--blue-dark) 100%);
+  color:#fff;
+  box-shadow:0 12px 30px rgba(21,101,192,.25);
+}
+.head{
+  max-width:1100px;
+  margin:auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.brand h1{
+  margin:0;
+  font-size:18px;
+  line-height:1.1;
+}
+.brand .sub{
+  margin-top:4px;
+  font-size:12px;
+  opacity:.95;
+}
+.pill{
+  background:rgba(255,255,255,.16);
+  border:1px solid rgba(255,255,255,.18);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.wrap{
+  max-width:1100px;
+  margin:auto;
+  padding:14px;
+  display:grid;
+  gap:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 380px 1fr;
+  gap:14px;
+}
+@media (max-width:920px){
+  .grid{grid-template-columns:1fr}
+}
+
+.card{
+  background:var(--paper);
+  border:1px solid rgba(21,101,192,.12);
+  border-radius:var(--r);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.cardHead{
+  padding:14px 16px;
+  border-bottom:1px solid rgba(21,101,192,.12);
+  background:linear-gradient(180deg, rgba(21,101,192,.05), rgba(251,192,45,.08));
+}
+.cardHead h2{
+  margin:0;
+  font-size:18px;
+  color:#0b3d6e;
+}
+.cardHead p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:700;
+}
+.cardBody{
+  padding:14px;
+}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  font-size:12px;
+  font-weight:900;
+  color:#355070;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+}
+select, input{
+  width:100%;
+  padding:15px 14px;
+  border-radius:16px;
+  border:2px solid rgba(21,101,192,.14);
+  background:#fff;
+  font-size:18px;
+  color:var(--ink);
+  outline:none;
+}
+select:focus, input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 4px rgba(21,101,192,.10);
+}
+
+.btnRow{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.btn{
+  border:none;
+  border-radius:16px;
+  padding:14px 18px;
+  font-weight:1000;
+  font-size:15px;
+  cursor:pointer;
+}
+.btnBlue{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(21,101,192,.22);
+}
+.btnRed{
+  background:linear-gradient(180deg,var(--red),var(--red-dark));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(198,40,40,.22);
+}
+.btnYellow{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+  box-shadow:0 10px 24px rgba(251,192,45,.24);
+}
+.btnGreen{
+  background:linear-gradient(180deg,var(--green),var(--green-dark));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(46,125,50,.22);
+}
+.btnLight{
+  background:#fff;
+  color:#0b4f93;
+  border:2px solid rgba(21,101,192,.16);
+}
+
+.syncStatus{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid rgba(21,101,192,.14);
+  background:#f4f9ff;
+  color:#0b4f93;
+}
+.syncStatus.ok{
+  background:#edf9ef;
+  color:#1f6a24;
+  border-color:rgba(46,125,50,.22);
+}
+.syncStatus.warn{
+  background:#fff7e8;
+  color:#8a5a00;
+  border-color:rgba(251,192,45,.35);
+}
+.syncStatus.bad{
+  background:#fff1f1;
+  color:#8e1d1d;
+  border-color:rgba(198,40,40,.25);
+}
+
+.kpis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.kpi{
+  border-radius:16px;
+  padding:12px 14px;
+  background:#fff;
+  border:2px solid rgba(21,101,192,.12);
+  box-shadow:0 8px 18px rgba(2,6,23,.05);
+}
+.kpi b{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:5px;
+  text-transform:uppercase;
+}
+.kpi span{
+  font-size:24px;
+  font-weight:1000;
+  line-height:1;
+}
+
+.ticketBox{
+  display:grid;
+  gap:12px;
+}
+.ticketHeader{
+  border-radius:18px;
+  padding:14px;
+  background:linear-gradient(180deg,#ffffff,#eef6ff);
+  border:2px solid rgba(21,101,192,.12);
+}
+.ticketHeader h3{
+  margin:0;
+  font-size:22px;
+  color:#0b3d6e;
+}
+.ticketHeader .sub{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:14px;
+  font-weight:700;
+}
+
+.group{
+  border-radius:16px;
+  overflow:hidden;
+  border:2px solid rgba(21,101,192,.14);
+  background:#fff;
+}
+.groupHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  background:linear-gradient(90deg, rgba(251,192,45,.22), rgba(21,101,192,.12));
+}
+.groupTitle{
+  font-weight:1000;
+  color:#0b3d6e;
+}
+.groupTag{
+  font-size:11px;
+  background:#fff;
+  border:1px solid rgba(21,101,192,.18);
+  color:#33597f;
+  border-radius:999px;
+  padding:4px 8px;
+  font-weight:900;
+}
+.line{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px;
+  border-top:1px dashed rgba(16,32,51,.12);
+}
+.lineTitle{
+  font-weight:1000;
+  line-height:1.2;
+  font-size:16px;
+}
+.lineMeta{
+  margin-top:4px;
+  font-size:12px;
+  color:var(--muted);
+  white-space:pre-wrap;
+  font-weight:700;
+}
+.lineRight{
+  text-align:right;
+  min-width:110px;
+}
+.linePrice{
+  font-weight:900;
+  font-size:15px;
+}
+.lineTotal{
+  margin-top:4px;
+  font-weight:1000;
+  font-size:18px;
+  color:#0b3d6e;
+}
+
+.totalBox{
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg,#fff9e9,#ffe7a9);
+  border:2px solid rgba(251,192,45,.40);
+}
+.totalRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-weight:1000;
+  font-size:18px;
+}
+.totalRow strong{
+  font-size:28px;
+  color:#5a3b00;
+}
+
+.noteBox{
+  margin-top:12px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:linear-gradient(180deg, rgba(21,101,192,.06), rgba(251,192,45,.10));
+  border:1px solid rgba(21,101,192,.14);
+  color:#355070;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.35;
+}
+
+.emptyState{
+  border-radius:18px;
+  padding:18px;
+  background:#fff;
+  border:2px dashed rgba(21,101,192,.18);
+  color:var(--muted);
+  font-weight:800;
+  text-align:center;
+}
+
+.print-area{display:none}
+@media print{
+  body *{visibility:hidden!important}
+  .print-area,.print-area *{visibility:visible!important}
+  .print-area{
+    display:block!important;
+    position:absolute;
+    inset:0;
+    background:#fff;
+  }
+  @page{
+    size:80mm auto;
+    margin:1mm;
+  }
+}
+.ticket{
+  width:76mm;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  color:#000;
+  background:#fff;
+  padding:2mm;
+  font-size:14px;
+  line-height:1.24;
+}
+.ticket .c{text-align:center}
+.ticket .b{font-weight:900}
+.ticket .lg{font-size:22px}
+.ticket .hr{border-top:1px dashed #000;margin:6px 0}
+.ticket .g{font-weight:900;margin-top:7px;font-size:15px;text-transform:uppercase}
+.ticket .it{margin:5px 0}
+.ticket .itn{font-weight:900;font-size:16px;line-height:1.15}
+.ticket .sub{padding-left:8px;font-size:12px;white-space:pre-wrap}
+.ticket .priceRow{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:13px;
+  margin-top:2px;
+}
+.ticket .totalRowPrint{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:18px;
+  font-weight:900;
+  margin-top:8px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head">
+    <div class="brand">
+      <h1>💳 Cuentas por Mesa</h1>
+      <div class="sub">Consulta, imprime y cierra cuentas</div>
+    </div>
+    <div class="pill" id="pillMesa">Sin mesa</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="grid">
+    <section class="card">
+      <div class="cardHead">
+        <h2>Buscar cuenta</h2>
+        <p>Selecciona una mesa para cargar la comanda abierta.</p>
+        <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
+      </div>
+
+      <div class="cardBody">
+        <label>Mesa</label>
+        <select id="mesa">
+          <option value="">Selecciona una mesa</option>
+          <option value="Mesa 1">Mesa 1</option>
+          <option value="Mesa 2">Mesa 2</option>
+          <option value="Mesa 3">Mesa 3</option>
+          <option value="Mesa 4">Mesa 4</option>
+          <option value="Mesa 5">Mesa 5</option>
+        </select>
+
+        <div class="btnRow">
+          <button class="btn btnBlue" id="btnBuscar">Cargar cuenta</button>
+          <button class="btn btnLight" id="btnRecargar">Recargar</button>
+        </div>
+
+        <div class="btnRow">
+          <button class="btn btnYellow" id="btnResumen">Imprimir resumen</button>
+          <button class="btn btnGreen" id="btnCuenta">Imprimir cuenta</button>
+          <button class="btn btnRed" id="btnCerrar">Cerrar cuenta</button>
+        </div>
+
+        <div class="noteBox">
+          Esta pantalla lee la comanda abierta desde Supabase. Al cerrar la cuenta, la comanda cambia a estado <b>cerrada</b>.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHead">
+        <h2>Detalle de la cuenta</h2>
+        <p>Vista previa antes de imprimir.</p>
+      </div>
+
+      <div class="cardBody">
+        <div class="kpis">
+          <div class="kpi">
+            <b>Mesa</b>
+            <span id="kpiMesa">—</span>
+          </div>
+          <div class="kpi">
+            <b>Mesero</b>
+            <span id="kpiMesero">—</span>
+          </div>
+        </div>
+
+        <div class="ticketBox" id="detalleCuenta" style="margin-top:12px">
+          <div class="emptyState">Selecciona una mesa y carga la cuenta.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="print-area" id="printArea"></div>
+
+<script>
+/* =========================
+   CONFIG SUPABASE
+   ========================= */
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
+
+let supabase = null;
+let supabaseReady = false;
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  supabaseReady = true;
+}
+
+/* =========================
+   PRECIOS FALLBACK
+   ========================= */
+const PRECIOS = {
+  taco_tripa:38,
+  taco_pastor:28,
+  taco_bistec:28,
+  taco_chorizo:28,
+  taco_higado:28,
+  taco_costilla:28,
+  taco_barbacoa:28,
+  taco_alambre:28,
+  taco_combi:38,
+
+  quesa_tripa:100,
+  quesa_pastor:90,
+  quesa_bistec:90,
+  quesa_chorizo:90,
+  quesa_higado:90,
+  quesa_costilla:90,
+  quesa_barbacoa:90,
+  quesa_alambre:90,
+
+  charola_combi:100,
+  charola_alam:90,
+
+  volcan_tripa:90,
+  volcan_pastor:85,
+  volcan_bistec:85,
+  volcan_chorizo:85,
+  volcan_higado:85,
+
+  beb_coca_light:35,
+  beb_coca:35,
+  beb_fresca:35,
+  beb_sprite:35,
+  beb_agua:30,
+  beb_agua_lt:60,
+
+  pos_pay:60,
+  pos_rompope:60,
+  pos_arroz:60,
+  pos_flan:60,
+  pos_fresa:60,
+  pos_napolitano:60
+};
+
+const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
+
+/* =========================
+   STATE
+   ========================= */
+let comandaActual = null;
+let itemsActuales = [];
+let mesaActual = "";
+
+/* =========================
+   DOM
+   ========================= */
+const syncStatus = document.getElementById("syncStatus");
+const pillMesa = document.getElementById("pillMesa");
+const mesaSelect = document.getElementById("mesa");
+const kpiMesa = document.getElementById("kpiMesa");
+const kpiMesero = document.getElementById("kpiMesero");
+const detalleCuenta = document.getElementById("detalleCuenta");
+const printArea = document.getElementById("printArea");
+
+/* =========================
+   HELPERS
+   ========================= */
+function money(n){
+  return "$" + Number(n || 0).toFixed(2);
+}
+
+function escapeHtml(s){
+  return String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+function setSyncStatus(text, type="warn"){
+  syncStatus.textContent = text;
+  syncStatus.className = `syncStatus ${type}`;
+}
+
+function getPrecioUnitario(item){
+  if (item.precio_unitario != null && item.precio_unitario !== "") {
+    return Number(item.precio_unitario || 0);
+  }
+  return Number(PRECIOS[item.producto_id] || 0);
+}
+
+function getTotalCuenta(){
+  return itemsActuales.reduce((sum, item) => {
+    return sum + (Number(item.qty || 0) * getPrecioUnitario(item));
+  }, 0);
+}
+
+function agruparItemsPorPlato(items){
+  const grupos = {};
+  items.forEach(item => {
+    const plato = item.plato || "General";
+    if(!grupos[plato]) grupos[plato] = [];
+    grupos[plato].push(item);
+  });
+
+  return PLATOS
+    .filter(plato => grupos[plato] && grupos[plato].length)
+    .map(plato => ({ plato, items: grupos[plato] }));
+}
+
+function resetVista(){
+  comandaActual = null;
+  itemsActuales = [];
+  kpiMesa.textContent = "—";
+  kpiMesero.textContent = "—";
+  pillMesa.textContent = "Sin mesa";
+  detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
+}
+
+/* =========================
+   DATA
+   ========================= */
+async function cargarCuenta(){
+  if(!supabaseReady){
+    setSyncStatus("Configura SUPABASE_URL y SUPABASE_ANON_KEY", "bad");
+    return;
+  }
+
+  const mesa = mesaSelect.value;
+  if(!mesa){
+    alert("Selecciona una mesa.");
+    return;
+  }
+
+  mesaActual = mesa;
+  pillMesa.textContent = mesa;
+  setSyncStatus(`Buscando cuenta en ${mesa}...`, "warn");
+
+  const { data: comanda, error: errCom } = await supabase
+    .from("comandas")
+    .select("*")
+    .eq("mesa", mesa)
+    .eq("estado", "abierta")
+    .order("created_at", { ascending:false })
+    .limit(1)
+    .maybeSingle();
+
+  if(errCom){
+    console.error(errCom);
+    setSyncStatus("Error al buscar la cuenta", "bad");
+    alert("No se pudo consultar la cuenta.");
+    return;
+  }
+
+  if(!comanda){
+    resetVista();
+    mesaActual = mesa;
+    kpiMesa.textContent = mesa;
+    pillMesa.textContent = mesa;
+    detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta abierta en ${escapeHtml(mesa)}.</div>`;
+    setSyncStatus(`No hay comanda abierta en ${mesa}`, "warn");
+    return;
+  }
+
+  comandaActual = comanda;
+
+  const { data: items, error: errItems } = await supabase
+    .from("comandas_items")
+    .select("*")
+    .eq("comanda_id", comanda.id)
+    .order("created_at", { ascending:true });
+
+  if(errItems){
+    console.error(errItems);
+    setSyncStatus("Error al cargar productos", "bad");
+    alert("No se pudieron cargar los productos.");
+    return;
+  }
+
+  itemsActuales = items || [];
+  renderCuenta();
+  setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
+}
+
+function renderCuenta(){
+  if(!comandaActual){
+    resetVista();
+    return;
+  }
+
+  kpiMesa.textContent = comandaActual.mesa || "—";
+  kpiMesero.textContent = comandaActual.mesero || "—";
+  pillMesa.textContent = comandaActual.mesa || "Sin mesa";
+
+  const grupos = agruparItemsPorPlato(itemsActuales);
+  const total = getTotalCuenta();
+
+  let html = `
+    <div class="ticketHeader">
+      <h3>${escapeHtml(comandaActual.mesa || "Mesa")}</h3>
+      <div class="sub">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+      <div class="sub">Estado: ${escapeHtml(comandaActual.estado || "—")}</div>
+    </div>
+  `;
+
+  if(!itemsActuales.length){
+    html += `<div class="emptyState">La comanda está vacía.</div>`;
+  } else {
+    grupos.forEach(group => {
+      const countGrupo = group.items.reduce((a, x) => a + Number(x.qty || 0), 0);
+
+      html += `
+        <div class="group">
+          <div class="groupHead">
+            <div class="groupTitle">${escapeHtml(group.plato)}</div>
+            <div class="groupTag">${countGrupo} productos</div>
+          </div>
+      `;
+
+      group.items.forEach(item => {
+        const precio = getPrecioUnitario(item);
+        const importe = Number(item.qty || 0) * precio;
+
+        html += `
+          <div class="line">
+            <div>
+              <div class="lineTitle">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || item.name || "Producto")}</div>
+              <div class="lineMeta">${escapeHtml(item.categoria || "")}</div>
+              ${item.nota ? `<div class="lineMeta">• ${escapeHtml(item.nota)}</div>` : ``}
+            </div>
+            <div class="lineRight">
+              <div class="linePrice">${money(precio)} c/u</div>
+              <div class="lineTotal">${money(importe)}</div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+    });
+
+    html += `
+      <div class="totalBox">
+        <div class="totalRow">
+          <span>Total</span>
+          <strong>${money(total)}</strong>
+        </div>
+      </div>
+    `;
+  }
+
+  detalleCuenta.innerHTML = html;
+}
+
+async function cerrarCuenta(){
+  if(!supabaseReady){
+    setSyncStatus("Configura Supabase primero", "bad");
+    return;
+  }
+
+  if(!comandaActual){
+    alert("Primero carga una cuenta.");
+    return;
+  }
+
+  if(!confirm(`¿Cerrar la cuenta de ${comandaActual.mesa}?`)) return;
+
+  setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
+
+  const { error } = await supabase
+    .from("comandas")
+    .update({
+      estado: "cerrada",
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", comandaActual.id);
+
+  if(error){
+    console.error(error);
+    setSyncStatus("Error al cerrar la cuenta", "bad");
+    alert("No se pudo cerrar la cuenta.");
+    return;
+  }
+
+  setSyncStatus(`Cuenta cerrada: ${comandaActual.mesa}`, "ok");
+  alert("Cuenta cerrada correctamente.");
+  await cargarCuenta();
+}
+
+/* =========================
+   PRINT
+   ========================= */
+function buildCuentaPrint(){
+  if(!comandaActual) return "";
+
+  const total = getTotalCuenta();
+  const grupos = agruparItemsPorPlato(itemsActuales);
+
+  let html = `
+    <div class="ticket">
+      <div class="c b lg">CUENTA</div>
+      <div class="c b">${escapeHtml(comandaActual.mesa || "Mesa")}</div>
+      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+      <div class="hr"></div>
+  `;
+
+  grupos.forEach(group => {
+    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
+
+    group.items.forEach(item => {
+      const precio = getPrecioUnitario(item);
+      const importe = Number(item.qty || 0) * precio;
+
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
+          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
+          <div class="priceRow">
+            <span>${money(precio)} c/u</span>
+            <span>${money(importe)}</span>
+          </div>
+        </div>
+      `;
+    });
+
+    html += `<div class="hr"></div>`;
+  });
+
+  html += `
+      <div class="totalRowPrint">
+        <span>TOTAL</span>
+        <span>${money(total)}</span>
+      </div>
+    </div>
+  `;
+
+  return html;
+}
+
+function buildResumenPrint(){
+  if(!comandaActual) return "";
+
+  const grupos = agruparItemsPorPlato(itemsActuales);
+
+  let html = `
+    <div class="ticket">
+      <div class="c b lg">RESUMEN</div>
+      <div class="c b">${escapeHtml(comandaActual.mesa || "Mesa")}</div>
+      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+      <div class="hr"></div>
+  `;
+
+  grupos.forEach(group => {
+    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
+
+    group.items.forEach(item => {
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
+          <div class="sub">${escapeHtml(item.categoria || "")}</div>
+          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
+        </div>
+      `;
+    });
+
+    html += `<div class="hr"></div>`;
+  });
+
+  return html + `</div>`;
+}
+
+function imprimirCuenta(){
+  if(!comandaActual){
+    alert("Primero carga una cuenta.");
+    return;
+  }
+  printArea.innerHTML = buildCuentaPrint();
+  setTimeout(()=>window.print(), 100);
+}
+
+function imprimirResumen(){
+  if(!comandaActual){
+    alert("Primero carga una cuenta.");
+    return;
+  }
+  printArea.innerHTML = buildResumenPrint();
+  setTimeout(()=>window.print(), 100);
+}
+
+/* =========================
+   EVENTS
+   ========================= */
+document.getElementById("btnBuscar").onclick = cargarCuenta;
+document.getElementById("btnRecargar").onclick = cargarCuenta;
+document.getElementById("btnCerrar").onclick = cerrarCuenta;
+document.getElementById("btnCuenta").onclick = imprimirCuenta;
+document.getElementById("btnResumen").onclick = imprimirResumen;
+
+/* =========================
+   INIT
+   ========================= */
+if(supabaseReady){
+  setSyncStatus("Supabase conectado. Listo para consultar cuentas.", "ok");
+}else{
+  setSyncStatus("Supabase pendiente de configurar", "warn");
+}
+</script>
+</body>
+</html>
