@@ -50,7 +50,7 @@ header{
   box-shadow:0 12px 28px rgba(21,101,192,.24);
 }
 .head{
-  max-width:1120px;
+  max-width:1180px;
   margin:auto;
   display:flex;
   justify-content:space-between;
@@ -79,7 +79,7 @@ header{
 }
 
 .wrap{
-  max-width:1120px;
+  max-width:1180px;
   margin:auto;
   padding:16px;
   display:grid;
@@ -88,7 +88,7 @@ header{
 
 .grid{
   display:grid;
-  grid-template-columns:380px 1fr;
+  grid-template-columns:390px 1fr;
   gap:16px;
 }
 @media (max-width:960px){
@@ -148,15 +148,25 @@ header{
   border-color:rgba(198,40,40,.25);
 }
 
-/* ===== Mesas visuales ===== */
+.roleBox{
+  margin-top:12px;
+  display:grid;
+  gap:10px;
+}
+.roleInfo{
+  padding:12px 14px;
+  border-radius:16px;
+  background:#f7fbff;
+  border:1px solid #d8e5f3;
+  font-weight:900;
+  color:#365779;
+}
+
 .mesasGrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:14px;
   margin-top:12px;
-}
-@media (max-width:520px){
-  .mesasGrid{grid-template-columns:1fr 1fr}
 }
 .mesaBtn{
   border:none;
@@ -178,9 +188,7 @@ header{
   gap:8px;
   transition:.18s ease;
 }
-.mesaBtn:active .mesaCard{
-  transform:scale(.98);
-}
+.mesaBtn:active .mesaCard{ transform:scale(.98); }
 .mesaTop{
   width:58px;
   height:58px;
@@ -222,26 +230,23 @@ header{
   color:#143f70;
 }
 
-/* seleccionada */
 .mesaBtn.selected .mesaCard{
   border-color:var(--red);
   background:linear-gradient(180deg,#fff1f1,#ffe2e2);
   box-shadow:0 14px 30px rgba(198,40,40,.18);
 }
-.mesaBtn.selected .mesaText{
-  color:var(--red-dark);
-}
+.mesaBtn.selected .mesaText,
 .mesaBtn.selected .mesaAmount{
   color:var(--red-dark);
 }
 
-/* activa */
 .mesaBtn.activeMesa .mesaCard{
   border-color:rgba(46,125,50,.55);
   background:linear-gradient(180deg,#effdf2,#d9f6df);
   box-shadow:0 14px 30px rgba(46,125,50,.18);
 }
-.mesaBtn.activeMesa .mesaText{
+.mesaBtn.activeMesa .mesaText,
+.mesaBtn.activeMesa .mesaAmount{
   color:var(--green-dark);
 }
 .mesaBtn.activeMesa .mesaState{
@@ -249,19 +254,11 @@ header{
   color:#1f6a24;
   border-color:rgba(46,125,50,.22);
 }
-.mesaBtn.activeMesa .mesaAmount{
-  color:var(--green-dark);
-}
 
-/* activa + seleccionada */
 .mesaBtn.activeMesa.selected .mesaCard{
   border-color:#14591b;
   background:linear-gradient(180deg,#e4f8e8,#c6efcf);
   box-shadow:0 16px 34px rgba(46,125,50,.24);
-}
-.mesaBtn.activeMesa.selected .mesaText,
-.mesaBtn.activeMesa.selected .mesaAmount{
-  color:#14591b;
 }
 
 .actions{
@@ -274,29 +271,50 @@ header{
   border-radius:20px;
   padding:18px 18px;
   font-weight:1000;
-  font-size:24px;
+  font-size:22px;
   cursor:pointer;
   width:100%;
+}
+.btnBlue{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
 }
 .btnGreen{
   background:linear-gradient(180deg,var(--green),var(--green-dark));
   color:#fff;
-  box-shadow:0 10px 24px rgba(46,125,50,.20);
 }
 .btnYellow{
   background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
   color:#5a3b00;
-  box-shadow:0 10px 24px rgba(246,195,59,.24);
 }
 .btnRed{
   background:linear-gradient(180deg,var(--red),var(--red-dark));
   color:#fff;
-  box-shadow:0 10px 24px rgba(198,40,40,.20);
 }
 .btnLight{
   background:#fff;
   color:#0b4f93;
   border:2px solid #d4e2f2;
+}
+.btnSmall{
+  border:none;
+  border-radius:14px;
+  padding:10px 12px;
+  font-weight:1000;
+  font-size:14px;
+  cursor:pointer;
+}
+.btnMiniBlue{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
+}
+.btnMiniRed{
+  background:linear-gradient(180deg,var(--red),var(--red-dark));
+  color:#fff;
+}
+.btnMiniYellow{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
 }
 
 .tip{
@@ -422,7 +440,7 @@ header{
 }
 .lineRight{
   text-align:right;
-  min-width:120px;
+  min-width:160px;
 }
 .linePrice{
   font-size:15px;
@@ -434,6 +452,13 @@ header{
   font-weight:1000;
   color:#143f70;
   line-height:1;
+}
+.adminTools{
+  margin-top:8px;
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
 }
 
 .totalBox{
@@ -468,6 +493,67 @@ header{
   font-weight:900;
   text-align:center;
   font-size:18px;
+}
+
+.backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.52);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+  z-index:80;
+}
+.modal{
+  width:min(520px,100%);
+  background:#fff;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid rgba(21,101,192,.14);
+  box-shadow:0 30px 80px rgba(2,6,23,.24);
+}
+.modalHead{
+  padding:16px 18px;
+  border-bottom:1px solid rgba(21,101,192,.12);
+  background:linear-gradient(180deg, rgba(21,101,192,.06), rgba(246,195,59,.08));
+}
+.modalHead h3{
+  margin:0;
+  font-size:18px;
+  color:#0b3d6e;
+}
+.modalBody{ padding:16px 18px; }
+.modalFoot{
+  padding:16px 18px;
+  border-top:1px solid rgba(21,101,192,.12);
+  display:flex;
+  gap:10px;
+}
+.modalInput, .modalSelect{
+  width:100%;
+  padding:14px 14px;
+  border-radius:16px;
+  border:2px solid #d4e2f2;
+  background:#fff;
+  font-size:18px;
+  color:var(--ink);
+  outline:none;
+}
+.modalLabel{
+  display:block;
+  margin-bottom:8px;
+  font-size:13px;
+  font-weight:1000;
+  color:#365779;
+  text-transform:uppercase;
+  letter-spacing:.35px;
+}
+.modalHelp{
+  margin-top:8px;
+  color:var(--muted);
+  font-weight:800;
+  font-size:14px;
 }
 
 .print-area{display:none}
@@ -542,6 +628,11 @@ header{
       </div>
 
       <div class="cardBody">
+        <div class="roleBox">
+          <div class="roleInfo" id="roleInfo">Modo actual: Operador</div>
+          <button class="btn btnLight" id="btnCambiarModo" type="button">Cambiar modo</button>
+        </div>
+
         <div class="mesasGrid" id="mesasGrid"></div>
 
         <div class="actions">
@@ -549,12 +640,13 @@ header{
           <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
           <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
           <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar mesas</button>
+          <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">Ajuste admin</button>
         </div>
 
         <div class="tip">
           Verde = mesa con cuenta abierta.<br>
           Rojo = mesa seleccionada.<br>
-          Al tocar una mesa, la cuenta se carga solita.
+          Admin puede editar precios, borrar productos y ajustar total.
         </div>
       </div>
     </section>
@@ -586,13 +678,63 @@ header{
   </div>
 </div>
 
+<div class="backdrop" id="loginBackdrop">
+  <div class="modal">
+    <div class="modalHead">
+      <h3>Entrar como operador o admin</h3>
+    </div>
+    <div class="modalBody">
+      <label class="modalLabel">Modo</label>
+      <select class="modalSelect" id="loginRol">
+        <option value="operador">Operador</option>
+        <option value="admin">Admin</option>
+      </select>
+
+      <div id="pinWrap" style="display:none; margin-top:14px;">
+        <label class="modalLabel">PIN admin</label>
+        <input class="modalInput" id="loginPin" type="password" placeholder="Escribe el PIN">
+      </div>
+
+      <div class="modalHelp">
+        Operador: solo consulta, imprime y cierra.<br>
+        Admin: además puede editar precios, borrar productos y hacer ajustes.
+      </div>
+    </div>
+    <div class="modalFoot">
+      <button class="btn btnLight" id="btnCerrarLogin" type="button">Cancelar</button>
+      <button class="btn btnBlue" id="btnEntrarLogin" type="button">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<div class="backdrop" id="editBackdrop">
+  <div class="modal">
+    <div class="modalHead">
+      <h3 id="editTitle">Editar</h3>
+    </div>
+    <div class="modalBody">
+      <label class="modalLabel">Valor</label>
+      <input class="modalInput" id="editValue" type="text" placeholder="Escribe el valor">
+      <div class="modalHelp" id="editHelp"></div>
+    </div>
+    <div class="modalFoot">
+      <button class="btn btnLight" id="btnEditCancel" type="button">Cancelar</button>
+      <button class="btn btnBlue" id="btnEditSave" type="button">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div class="print-area" id="printArea"></div>
 
 <script>
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
+/* Solo operativo, no seguridad real */
+const ADMIN_PIN = "1234";
 
+let supabase = null;
+let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -651,6 +793,9 @@ let itemsActuales = [];
 let mesaActual = "";
 let mesasConCuenta = new Set();
 let resumenMesas = {};
+let userRole = "operador";
+let currentEditAction = null;
+let currentEditItem = null;
 
 const syncStatus = document.getElementById("syncStatus");
 const pillMesa = document.getElementById("pillMesa");
@@ -659,6 +804,18 @@ const kpiMesero = document.getElementById("kpiMesero");
 const detalleCuenta = document.getElementById("detalleCuenta");
 const printArea = document.getElementById("printArea");
 const mesasGrid = document.getElementById("mesasGrid");
+const roleInfo = document.getElementById("roleInfo");
+const btnAjusteAdmin = document.getElementById("btnAjusteAdmin");
+
+const loginBackdrop = document.getElementById("loginBackdrop");
+const loginRol = document.getElementById("loginRol");
+const loginPin = document.getElementById("loginPin");
+const pinWrap = document.getElementById("pinWrap");
+
+const editBackdrop = document.getElementById("editBackdrop");
+const editTitle = document.getElementById("editTitle");
+const editValue = document.getElementById("editValue");
+const editHelp = document.getElementById("editHelp");
 
 function money(n){
   return "$" + Number(n || 0).toFixed(2);
@@ -674,6 +831,39 @@ function escapeHtml(s){
 function setSyncStatus(text, type="warn"){
   syncStatus.textContent = text;
   syncStatus.className = `syncStatus ${type}`;
+}
+
+function updateRoleUI(){
+  roleInfo.textContent = `Modo actual: ${userRole === "admin" ? "Admin" : "Operador"}`;
+  btnAjusteAdmin.style.display = userRole === "admin" ? "block" : "none";
+}
+
+function openLoginModal(){
+  loginRol.value = userRole;
+  loginPin.value = "";
+  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
+  loginBackdrop.style.display = "flex";
+}
+
+function closeLoginModal(){
+  loginBackdrop.style.display = "none";
+}
+
+function openEditModal(title, help, action, item=null, initialValue=""){
+  currentEditAction = action;
+  currentEditItem = item;
+  editTitle.textContent = title;
+  editHelp.textContent = help || "";
+  editValue.value = initialValue;
+  editBackdrop.style.display = "flex";
+  setTimeout(()=>editValue.focus(), 50);
+}
+
+function closeEditModal(){
+  currentEditAction = null;
+  currentEditItem = null;
+  editValue.value = "";
+  editBackdrop.style.display = "none";
 }
 
 function getPrecioUnitario(item){
@@ -912,6 +1102,12 @@ function renderCuenta(){
             <div class="lineRight">
               <div class="linePrice">${money(precio)} c/u</div>
               <div class="lineTotal">${money(importe)}</div>
+              ${userRole === "admin" ? `
+                <div class="adminTools">
+                  <button class="btnSmall btnMiniBlue" onclick="editarPrecio('${item.id}')">Precio</button>
+                  <button class="btnSmall btnMiniRed" onclick="eliminarProducto('${item.id}')">Borrar</button>
+                </div>
+              ` : ``}
             </div>
           </div>
         `;
@@ -932,6 +1128,120 @@ function renderCuenta(){
 
   html += `</div>`;
   detalleCuenta.innerHTML = html;
+}
+
+function findItemById(id){
+  return itemsActuales.find(x => String(x.id) === String(id));
+}
+
+async function editarPrecio(id){
+  if(userRole !== "admin") return;
+  const item = findItemById(id);
+  if(!item) return;
+
+  openEditModal(
+    `Cambiar precio de ${item.producto_nombre}`,
+    "Escribe el nuevo precio unitario.",
+    "precio",
+    item,
+    String(getPrecioUnitario(item))
+  );
+}
+
+async function eliminarProducto(id){
+  if(userRole !== "admin") return;
+  const item = findItemById(id);
+  if(!item) return;
+
+  if(!confirm(`¿Eliminar "${item.producto_nombre}" de la cuenta?`)) return;
+
+  const { error } = await supabase
+    .from("comandas_items")
+    .delete()
+    .eq("id", item.id);
+
+  if(error){
+    console.error(error);
+    alert("No se pudo eliminar el producto.");
+    return;
+  }
+
+  await cargarCuenta();
+}
+
+async function crearAjusteAdmin(){
+  if(userRole !== "admin"){
+    alert("Solo admin puede hacer ajustes.");
+    return;
+  }
+  if(!comandaActual){
+    alert("Primero toca una mesa con cuenta.");
+    return;
+  }
+
+  openEditModal(
+    "Ajuste admin",
+    "Ejemplo: -50 para descuento o 30 para recargo.",
+    "ajuste",
+    null,
+    ""
+  );
+}
+
+async function guardarEdicion(){
+  if(currentEditAction === "precio" && currentEditItem){
+    const nuevo = Number(editValue.value);
+    if(isNaN(nuevo) || nuevo < 0){
+      alert("Pon un precio válido.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("comandas_items")
+      .update({ precio_unitario: nuevo })
+      .eq("id", currentEditItem.id);
+
+    if(error){
+      console.error(error);
+      alert("No se pudo actualizar el precio.");
+      return;
+    }
+
+    closeEditModal();
+    await cargarCuenta();
+    return;
+  }
+
+  if(currentEditAction === "ajuste"){
+    const ajuste = Number(editValue.value);
+    if(isNaN(ajuste) || ajuste === 0){
+      alert("Pon un ajuste válido. Usa negativo para descuento.");
+      return;
+    }
+
+    const { error } = await supabase
+      .from("comandas_items")
+      .insert([{
+        comanda_id: comandaActual.id,
+        producto_id: "ajuste_admin",
+        producto_nombre: ajuste < 0 ? "Descuento admin" : "Recargo admin",
+        categoria: "AJUSTE",
+        plato: "General",
+        nota: "Ajuste manual admin",
+        qty: 1,
+        cocina: false,
+        precio_unitario: ajuste
+      }]);
+
+    if(error){
+      console.error(error);
+      alert("No se pudo guardar el ajuste.");
+      return;
+    }
+
+    closeEditModal();
+    await cargarCuenta();
+  }
 }
 
 async function cerrarCuenta(){
@@ -1076,21 +1386,45 @@ function imprimirResumen(){
   setTimeout(()=>window.print(), 100);
 }
 
+loginRol.addEventListener("change", ()=>{
+  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
+});
+
+document.getElementById("btnCambiarModo").onclick = openLoginModal;
+document.getElementById("btnCerrarLogin").onclick = closeLoginModal;
+document.getElementById("btnEntrarLogin").onclick = ()=>{
+  const rol = loginRol.value;
+  if(rol === "admin"){
+    if(loginPin.value !== ADMIN_PIN){
+      alert("PIN admin incorrecto.");
+      return;
+    }
+  }
+  userRole = rol;
+  updateRoleUI();
+  closeLoginModal();
+  renderCuenta();
+};
+
+document.getElementById("btnEditCancel").onclick = closeEditModal;
+document.getElementById("btnEditSave").onclick = guardarEdicion;
+
 document.getElementById("btnCerrar").onclick = cerrarCuenta;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
 document.getElementById("btnResumen").onclick = imprimirResumen;
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
   await cargarEstadoMesas();
-  if (mesaActual) {
-    await cargarCuenta();
-  }
+  if (mesaActual) await cargarCuenta();
 };
+document.getElementById("btnAjusteAdmin").onclick = crearAjusteAdmin;
 
 if(supabaseReady){
   setSyncStatus("Supabase conectado. Toca una mesa para cargarla.", "ok");
 }else{
   setSyncStatus("Supabase pendiente de configurar", "warn");
 }
+
+updateRoleUI();
 
 (async function init(){
   await cargarEstadoMesas();
