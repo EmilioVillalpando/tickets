@@ -768,6 +768,10 @@ input:focus, select:focus{
             </div>
           </div>
 
+          <div class="btnRow" style="margin-top:10px">
+            <button class="btn btnLight" id="btnCambiarMesaPaso3" type="button">Cambiar mesa</button>
+          </div>
+
           <label style="margin-top:12px">Plato</label>
           <div class="personasGrid" id="personas"></div>
 
@@ -791,6 +795,10 @@ input:focus, select:focus{
             <b>Mesa</b>
             <span id="mesaView4">—</span>
           </div>
+        </div>
+
+        <div class="btnRow" style="margin-top:10px">
+          <button class="btn btnLight" id="btnCambiarMesaPaso4" type="button">Cambiar mesa</button>
         </div>
 
         <div class="btnRow">
@@ -852,7 +860,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -1074,6 +1083,15 @@ function goToStep(n){
   setTimeout(()=>{
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, 20);
+}
+
+function regresarASeleccionMesa(){
+  if(!meseroNombre){
+    alert("Primero selecciona un mesero.");
+    goToStep(1);
+    return;
+  }
+  goToStep(2);
 }
 
 /* =========================
@@ -1914,6 +1932,8 @@ mainContinueBtn.addEventListener("touchend", function(e){
 }, { passive:false });
 
 document.getElementById("backTo3").onclick = ()=> goToStep(3);
+document.getElementById("btnCambiarMesaPaso3").onclick = regresarASeleccionMesa;
+document.getElementById("btnCambiarMesaPaso4").onclick = regresarASeleccionMesa;
 
 document.getElementById("expandAll").onclick = ()=>{
   PLATOS.forEach(p=>openGroups.add(p));
