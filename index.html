@@ -849,15 +849,25 @@ input:focus, select:focus{
 /* =========================
    CONFIG SUPABASE
    ========================= */
-const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
+const SUPABASE_URL = "";
+const SUPABASE_ANON_KEY = "";
 
 let supabase = null;
 let supabaseReady = false;
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  supabaseReady = true;
+try{
+  if (
+    SUPABASE_URL &&
+    SUPABASE_ANON_KEY &&
+    window.supabase &&
+    typeof window.supabase.createClient === "function"
+  ) {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseReady = true;
+  }
+}catch(err){
+  console.error("Error inicializando Supabase:", err);
+  supabaseReady = false;
 }
 
 /* =========================
@@ -1111,6 +1121,7 @@ async function cargarComandaDeMesa(mesa){
     cart = [];
     comandaIdActual = null;
     openGroups.clear();
+    Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
     updateHeaderPill();
     renderCart();
     renderItems();
@@ -1150,8 +1161,10 @@ async function cargarComandaDeMesa(mesa){
   }
 
   comandaIdActual = comanda.id;
-  meseroNombre = comanda.mesero || meseroNombre || "";
-  if (meseroNombre) meseroInput.value = meseroNombre;
+  if (comanda.mesero) {
+    meseroNombre = comanda.mesero;
+    meseroInput.value = comanda.mesero;
+  }
 
   const { data: items, error: errItems } = await supabase
     .from("comandas_items")
@@ -1329,7 +1342,13 @@ function renderMesas(){
       mesaActiva = mesa;
       renderMesas();
       updateResumeViews();
-      await cargarComandaDeMesa(mesaActiva);
+
+      try{
+        await cargarComandaDeMesa(mesaActiva);
+      }catch(err){
+        console.error(err);
+        setSyncStatus("No se pudo cargar la mesa desde Supabase", "bad");
+      }
     };
     mesasGrid.appendChild(btn);
   });
@@ -1824,26 +1843,36 @@ function verResumen(){
 
 function handleMainContinue(){
   if(currentStep === 1){
-    const nombre = meseroInput.value.trim();
-    if(!nombre) return alert("Selecciona un mesero.");
+    const nombre = (meseroInput.value || "").trim();
+
+    if(!nombre){
+      alert("Selecciona un mesero.");
+      return;
+    }
+
     meseroNombre = nombre;
     updateResumeViews();
-    if(supabaseReady && mesaActiva){
-      syncComandaToSupabase();
-    }
     goToStep(2);
     return;
   }
 
   if(currentStep === 2){
-    if(!mesaActiva) return alert("Selecciona una mesa.");
+    if(!mesaActiva){
+      alert("Selecciona una mesa.");
+      return;
+    }
+
     updateResumeViews();
     goToStep(3);
     return;
   }
 
   if(currentStep === 3){
-    if(!cart.length) return alert("Agrega al menos un producto.");
+    if(!cart.length){
+      alert("Agrega al menos un producto.");
+      return;
+    }
+
     renderCart();
     goToStep(4);
     return;
