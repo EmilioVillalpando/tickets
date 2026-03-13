@@ -742,7 +742,7 @@ input:focus, select:focus{
       <section class="step active" id="step1">
         <label>Mesero</label>
         <select id="mesero">
-          <option value="">Selecciona un mesero</option>
+          <option value="" selected disabled>Selecciona un mesero</option>
           <option value="Mesero 1">Mesero 1</option>
           <option value="Mesero 2">Mesero 2</option>
         </select>
@@ -794,17 +794,17 @@ input:focus, select:focus{
         </div>
 
         <div class="btnRow">
-          <button class="btn btnLight" id="backTo3">Seguir capturando</button>
-          <button class="btn btnLight" id="expandAll">Abrir todo</button>
-          <button class="btn btnLight" id="collapseAll">Cerrar todo</button>
+          <button class="btn btnLight" id="backTo3" type="button">Seguir capturando</button>
+          <button class="btn btnLight" id="expandAll" type="button">Abrir todo</button>
+          <button class="btn btnLight" id="collapseAll" type="button">Cerrar todo</button>
         </div>
 
         <div class="comandaCompacta" id="cart"></div>
 
         <div class="btnRow">
-          <button class="btn btnRed" id="btnVaciar">Vaciar comanda</button>
-          <button class="btn btnYellow" id="btnResumen">Resumen</button>
-          <button class="btn btnBlue" id="btnImprimir">Imprimir cocina</button>
+          <button class="btn btnRed" id="btnVaciar" type="button">Vaciar comanda</button>
+          <button class="btn btnYellow" id="btnResumen" type="button">Resumen</button>
+          <button class="btn btnBlue" id="btnImprimir" type="button">Imprimir cocina</button>
         </div>
 
         <div class="noteBox">
@@ -816,7 +816,7 @@ input:focus, select:focus{
 </div>
 
 <div class="fixedContinue" id="fixedContinue">
-  <button class="btn btnBlue" id="mainContinueBtn">Continuar</button>
+  <button type="button" class="btn btnBlue" id="mainContinueBtn">Continuar</button>
 </div>
 
 <div class="backdrop" id="backdrop">
@@ -851,7 +851,6 @@ input:focus, select:focus{
    ========================= */
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
-
 
 let supabase = null;
 let supabaseReady = false;
@@ -1054,22 +1053,32 @@ function setSyncStatus(text, type="warn"){
 }
 
 function goToStep(n){
-  currentStep = n;
-  Object.keys(steps).forEach(k=>{
-    steps[k].classList.toggle("active", Number(k) === n);
+  currentStep = Number(n);
+
+  Object.values(steps).forEach(stepEl=>{
+    if(stepEl) stepEl.classList.remove("active");
   });
+
+  if(steps[currentStep]){
+    steps[currentStep].classList.add("active");
+  }
 
   [1,2,3,4].forEach(i=>{
-    const dot = document.getElementById("dot"+i);
+    const dot = document.getElementById("dot" + i);
+    if(!dot) return;
     dot.classList.remove("active","done");
-    if(i < n) dot.classList.add("done");
-    if(i === n) dot.classList.add("active");
+    if(i < currentStep) dot.classList.add("done");
+    if(i === currentStep) dot.classList.add("active");
   });
 
-  screenTitle.textContent = titles[n][0];
-  screenSub.textContent = titles[n][1];
+  if(screenTitle) screenTitle.textContent = titles[currentStep][0];
+  if(screenSub) screenSub.textContent = titles[currentStep][1];
+
   updateContinueButton();
-  window.scrollTo({top:0, behavior:"smooth"});
+
+  setTimeout(()=>{
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, 20);
 }
 
 /* =========================
@@ -1842,49 +1851,69 @@ function verResumen(){
   setTimeout(()=>window.print(),100);
 }
 
-function handleMainContinue(){
+function handleMainContinue(e){
+  if(e) e.preventDefault();
+
   if(currentStep === 1){
-    const nombre = (meseroInput.value || "").trim();
+    const selectedIndex = meseroInput.selectedIndex;
+    const nombre = selectedIndex > 0
+      ? String(meseroInput.options[selectedIndex].value || "").trim()
+      : String(meseroInput.value || "").trim();
 
     if(!nombre){
       alert("Selecciona un mesero.");
-      return;
+      return false;
     }
 
     meseroNombre = nombre;
     updateResumeViews();
     goToStep(2);
-    return;
+    return false;
   }
 
   if(currentStep === 2){
     if(!mesaActiva){
       alert("Selecciona una mesa.");
-      return;
+      return false;
     }
 
     updateResumeViews();
     goToStep(3);
-    return;
+    return false;
   }
 
   if(currentStep === 3){
     if(!cart.length){
       alert("Agrega al menos un producto.");
-      return;
+      return false;
     }
 
     renderCart();
     goToStep(4);
-    return;
+    return false;
   }
 
   if(currentStep === 4){
     goToStep(3);
+    return false;
   }
+
+  return false;
 }
 
-mainContinueBtn.onclick = handleMainContinue;
+meseroInput.addEventListener("change", ()=>{
+  meseroNombre = String(meseroInput.value || "").trim();
+  updateResumeViews();
+});
+
+mainContinueBtn.type = "button";
+mainContinueBtn.onclick = null;
+
+mainContinueBtn.addEventListener("click", handleMainContinue);
+mainContinueBtn.addEventListener("touchend", function(e){
+  e.preventDefault();
+  handleMainContinue(e);
+}, { passive:false });
 
 document.getElementById("backTo3").onclick = ()=> goToStep(3);
 
