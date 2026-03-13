@@ -852,6 +852,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -869,50 +871,50 @@ try{
 }
 
 /* =========================
-   CATÁLOGO
+   CATÁLOGO CON PRECIOS
    ========================= */
 const catalogo = [
-  {id:"taco_tripa",      cat:"TACOS",       name:"Taco de Tripa",         desc:"", requiereNota:false, cocina:true},
-  {id:"taco_pastor",     cat:"TACOS",       name:"Taco de Pastor",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_bistec",     cat:"TACOS",       name:"Taco de Bistec",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_chorizo",    cat:"TACOS",       name:"Taco de Chorizo",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_higado",     cat:"TACOS",       name:"Taco de Hígado",        desc:"", requiereNota:false, cocina:true},
-  {id:"taco_costilla",   cat:"TACOS",       name:"Taco de Costilla",      desc:"", requiereNota:false, cocina:true},
-  {id:"taco_barbacoa",   cat:"TACOS",       name:"Taco de Barbacoa",      desc:"", requiereNota:false, cocina:true},
-  {id:"taco_alambre",    cat:"TACOS",       name:"Taco de Alambre",       desc:"", requiereNota:false, cocina:true},
-  {id:"taco_combi",      cat:"TACOS",       name:"Taco Combinado",        desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"taco_tripa",      cat:"TACOS",       name:"Taco de Tripa",         price:38,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",     cat:"TACOS",       name:"Taco de Pastor",        price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",     cat:"TACOS",       name:"Taco de Bistec",        price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",    cat:"TACOS",       name:"Taco de Chorizo",       price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",     cat:"TACOS",       name:"Taco de Hígado",        price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_costilla",   cat:"TACOS",       name:"Taco de Costilla",      price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_barbacoa",   cat:"TACOS",       name:"Taco de Barbacoa",      price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_alambre",    cat:"TACOS",       name:"Taco de Alambre",       price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",      cat:"TACOS",       name:"Taco Combinado",        price:38,  desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",     cat:"QUESADILLAS", name:"Quesadilla de Tripa",    desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_pastor",    cat:"QUESADILLAS", name:"Quesadilla de Pastor",   desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_bistec",    cat:"QUESADILLAS", name:"Quesadilla de Bistec",   desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_chorizo",   cat:"QUESADILLAS", name:"Quesadilla de Chorizo",  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_higado",    cat:"QUESADILLAS", name:"Quesadilla de Hígado",   desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_costilla",  cat:"QUESADILLAS", name:"Quesadilla de Costilla", desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_barbacoa",  cat:"QUESADILLAS", name:"Quesadilla de Barbacoa", desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_alambre",   cat:"QUESADILLAS", name:"Quesadilla de Alambre",  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_tripa",     cat:"QUESADILLAS", name:"Quesadilla de Tripa",    price:100, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",    cat:"QUESADILLAS", name:"Quesadilla de Pastor",   price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",    cat:"QUESADILLAS", name:"Quesadilla de Bistec",   price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo",   cat:"QUESADILLAS", name:"Quesadilla de Chorizo",  price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",    cat:"QUESADILLAS", name:"Quesadilla de Hígado",   price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_costilla",  cat:"QUESADILLAS", name:"Quesadilla de Costilla", price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_barbacoa",  cat:"QUESADILLAS", name:"Quesadilla de Barbacoa", price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_alambre",   cat:"QUESADILLAS", name:"Quesadilla de Alambre",  price:90,  desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi",   cat:"CHAROLAS",    name:"Charola Combinada",     desc:"Escribe combinación", requiereNota:true, cocina:true},
-  {id:"charola_alam",    cat:"CHAROLAS",    name:"Charola de Alambre",    desc:"", requiereNota:false, cocina:true},
+  {id:"charola_combi",   cat:"CHAROLAS",    name:"Charola Combinada",     price:100, desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",    cat:"CHAROLAS",    name:"Charola de Alambre",    price:90,  desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",    cat:"VOLCANES",    name:"Volcán de Tripa",       desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_pastor",   cat:"VOLCANES",    name:"Volcán de Pastor",      desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_bistec",   cat:"VOLCANES",    name:"Volcán de Bistec",      desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_chorizo",  cat:"VOLCANES",    name:"Volcán de Chorizo",     desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_higado",   cat:"VOLCANES",    name:"Volcán de Hígado",      desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_tripa",    cat:"VOLCANES",    name:"Volcán de Tripa",       price:90, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",   cat:"VOLCANES",    name:"Volcán de Pastor",      price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",   cat:"VOLCANES",    name:"Volcán de Bistec",      price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo",  cat:"VOLCANES",    name:"Volcán de Chorizo",     price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",   cat:"VOLCANES",    name:"Volcán de Hígado",      price:85, desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS",     name:"Coca Light",            desc:"", requiereNota:false, cocina:false},
-  {id:"beb_coca",        cat:"BEBIDAS",     name:"Coca",                  desc:"", requiereNota:false, cocina:false},
-  {id:"beb_fresca",      cat:"BEBIDAS",     name:"Fresca",                desc:"", requiereNota:false, cocina:false},
-  {id:"beb_sprite",      cat:"BEBIDAS",     name:"Sprite",                desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua",        cat:"BEBIDAS",     name:"Agua fresca",           desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua_lt",     cat:"BEBIDAS",     name:"Agua fresca 1 Lt",      desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca_light",  cat:"BEBIDAS",     name:"Coca Light",            price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",        cat:"BEBIDAS",     name:"Coca",                  price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_fresca",      cat:"BEBIDAS",     name:"Fresca",                price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_sprite",      cat:"BEBIDAS",     name:"Sprite",                price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua",        cat:"BEBIDAS",     name:"Agua fresca",           price:30, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",     name:"Agua fresca 1 Lt",      price:60, desc:"", requiereNota:false, cocina:false},
 
-  {id:"pos_pay",         cat:"POSTRES",     name:"Pay de queso",          desc:"", requiereNota:false, cocina:false},
-  {id:"pos_rompope",     cat:"POSTRES",     name:"Gelatina vainilla con rompope", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_arroz",       cat:"POSTRES",     name:"Arroz con leche",       desc:"", requiereNota:false, cocina:false},
-  {id:"pos_flan",        cat:"POSTRES",     name:"Flan",                  desc:"", requiereNota:false, cocina:false},
-  {id:"pos_fresa",       cat:"POSTRES",     name:"Gelatina fresa con yoghurt", desc:"", requiereNota:false, cocina:false},
-  {id:"pos_napolitano",  cat:"POSTRES",     name:"Napolitano",            desc:"", requiereNota:false, cocina:false},
+  {id:"pos_pay",         cat:"POSTRES",     name:"Pay de queso",          price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",     cat:"POSTRES",     name:"Gelatina vainilla con rompope", price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",       cat:"POSTRES",     name:"Arroz con leche",       price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",        cat:"POSTRES",     name:"Flan",                  price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",       cat:"POSTRES",     name:"Gelatina fresa con yoghurt", price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano",  cat:"POSTRES",     name:"Napolitano",            price:60, desc:"", requiereNota:false, cocina:false},
 ];
 
 const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
@@ -933,7 +935,6 @@ let comandaIdActual = null;
 let syncing = false;
 let syncQueued = false;
 
-/* memoria de última configuración por plato + producto */
 const lastConfigByPlateProduct = {};
 
 const steps = {
@@ -979,9 +980,6 @@ const fixedContinue = document.getElementById("fixedContinue");
 const toastMsg = document.getElementById("toastMsg");
 const syncStatus = document.getElementById("syncStatus");
 
-/* =========================
-   HELPERS
-   ========================= */
 function escapeHtml(s){
   return String(s || "")
     .replaceAll("&","&amp;")
@@ -1195,7 +1193,8 @@ async function cargarComandaDeMesa(mesa){
     note: it.nota || "",
     qty: Number(it.qty || 0),
     cat: it.categoria || "",
-    cocina: !!it.cocina
+    cocina: !!it.cocina,
+    price: Number(it.precio_unitario || 0)
   }));
 
   Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
@@ -1265,7 +1264,8 @@ async function syncComandaToSupabase(){
         plato: line.persona,
         nota: line.note || "",
         qty: line.qty,
-        cocina: !!line.cocina
+        cocina: !!line.cocina,
+        precio_unitario: Number(line.price || 0)
       }));
 
       const { error: errInsert } = await supabase
@@ -1525,7 +1525,8 @@ async function agregarLinea(item, persona, note, cardEl=null){
       note:cleanNote,
       qty:1,
       cat:item.cat,
-      cocina:!!item.cocina
+      cocina:!!item.cocina,
+      price:Number(item.price || 0)
     });
   }
 
