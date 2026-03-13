@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <title>Comandas Cocina — Guadalupe Victoria</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{
   --bg:#f6f8fc;
@@ -545,6 +547,32 @@ input:focus, select:focus{
   line-height:1.35;
 }
 
+.syncStatus{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  font-size:12px;
+  font-weight:900;
+  border:1px solid rgba(21,101,192,.14);
+  background:#f4f9ff;
+  color:#0b4f93;
+}
+.syncStatus.ok{
+  background:#edf9ef;
+  color:#1f6a24;
+  border-color:rgba(46,125,50,.22);
+}
+.syncStatus.warn{
+  background:#fff7e8;
+  color:#8a5a00;
+  border-color:rgba(251,192,45,.35);
+}
+.syncStatus.bad{
+  background:#fff1f1;
+  color:#8e1d1d;
+  border-color:rgba(198,40,40,.25);
+}
+
 .backdrop{
   position:fixed;
   inset:0;
@@ -707,6 +735,7 @@ input:focus, select:focus{
     <div class="cardHead">
       <h2 id="screenTitle">Paso 1 — Mesero</h2>
       <p id="screenSub">Primero selecciona quién está tomando el pedido.</p>
+      <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
     </div>
 
     <div class="cardBody">
@@ -817,6 +846,23 @@ input:focus, select:focus{
 <div class="print-area" id="printArea"></div>
 
 <script>
+/* =========================
+   CONFIG SUPABASE
+   ========================= */
+const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
+
+let supabase = null;
+let supabaseReady = false;
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  supabaseReady = true;
+}
+
+/* =========================
+   CATÁLOGO
+   ========================= */
 const catalogo = [
   {id:"taco_tripa",      cat:"TACOS",       name:"Taco de Tripa",         desc:"", requiereNota:false, cocina:true},
   {id:"taco_pastor",     cat:"TACOS",       name:"Taco de Pastor",        desc:"", requiereNota:false, cocina:true},
@@ -875,6 +921,10 @@ let draftItem = null;
 const openGroups = new Set();
 let toastTimer = null;
 
+let comandaIdActual = null;
+let syncing = false;
+let syncQueued = false;
+
 /* memoria de última configuración por plato + producto */
 const lastConfigByPlateProduct = {};
 
@@ -919,7 +969,11 @@ const btnGuardarModal = document.getElementById("btnGuardarModal");
 const mainContinueBtn = document.getElementById("mainContinueBtn");
 const fixedContinue = document.getElementById("fixedContinue");
 const toastMsg = document.getElementById("toastMsg");
+const syncStatus = document.getElementById("syncStatus");
 
+/* =========================
+   HELPERS
+   ========================= */
 function escapeHtml(s){
   return String(s || "")
     .replaceAll("&","&amp;")
@@ -983,6 +1037,11 @@ function updateContinueButton(){
   }
 }
 
+function setSyncStatus(text, type="warn"){
+  syncStatus.textContent = text;
+  syncStatus.className = `syncStatus ${type}`;
+}
+
 function goToStep(n){
   currentStep = n;
   Object.keys(steps).forEach(k=>{
@@ -1002,6 +1061,257 @@ function goToStep(n){
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
+/* =========================
+   SUPABASE
+   ========================= */
+async function ensureComandaAbierta(){
+  if(!supabaseReady || !mesaActiva) return null;
+
+  const { data: existente, error: errFind } = await supabase
+    .from("comandas")
+    .select("*")
+    .eq("mesa", mesaActiva)
+    .eq("estado", "abierta")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if(errFind){
+    console.error("Error buscando comanda abierta:", errFind);
+    throw errFind;
+  }
+
+  if(existente){
+    comandaIdActual = existente.id;
+    return existente.id;
+  }
+
+  const { data: creada, error: errCreate } = await supabase
+    .from("comandas")
+    .insert([{
+      mesa: mesaActiva,
+      mesero: meseroNombre || null,
+      estado: "abierta",
+      total_productos: totalProductos()
+    }])
+    .select()
+    .single();
+
+  if(errCreate){
+    console.error("Error creando comanda:", errCreate);
+    throw errCreate;
+  }
+
+  comandaIdActual = creada.id;
+  return creada.id;
+}
+
+async function cargarComandaDeMesa(mesa){
+  if(!supabaseReady){
+    cart = [];
+    comandaIdActual = null;
+    openGroups.clear();
+    updateHeaderPill();
+    renderCart();
+    renderItems();
+    return;
+  }
+
+  if(!mesa) return;
+
+  setSyncStatus(`Cargando ${mesa}...`, "warn");
+
+  const { data: comanda, error: errComanda } = await supabase
+    .from("comandas")
+    .select("*")
+    .eq("mesa", mesa)
+    .eq("estado", "abierta")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if(errComanda){
+    console.error("Error cargando comanda:", errComanda);
+    setSyncStatus("Error al cargar comanda de la mesa", "bad");
+    alert("No se pudo cargar la comanda de la mesa.");
+    return;
+  }
+
+  if(!comanda){
+    cart = [];
+    comandaIdActual = null;
+    openGroups.clear();
+    Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
+    updateHeaderPill();
+    renderCart();
+    renderItems();
+    setSyncStatus(`Mesa ${mesa} sin comanda abierta`, "ok");
+    return;
+  }
+
+  comandaIdActual = comanda.id;
+  meseroNombre = comanda.mesero || meseroNombre || "";
+  if (meseroNombre) meseroInput.value = meseroNombre;
+
+  const { data: items, error: errItems } = await supabase
+    .from("comandas_items")
+    .select("*")
+    .eq("comanda_id", comanda.id)
+    .order("created_at", { ascending: true });
+
+  if(errItems){
+    console.error("Error cargando items:", errItems);
+    setSyncStatus("Error al cargar productos de la comanda", "bad");
+    alert("No se pudieron cargar los productos de la comanda.");
+    return;
+  }
+
+  cart = (items || []).map(it => ({
+    key: [it.producto_id, it.plato, it.nota || ""].join("|"),
+    id: it.producto_id,
+    name: it.producto_nombre,
+    persona: it.plato,
+    note: it.nota || "",
+    qty: Number(it.qty || 0),
+    cat: it.categoria || "",
+    cocina: !!it.cocina
+  }));
+
+  Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
+  openGroups.clear();
+
+  cart.forEach(line=>{
+    saveLastConfig(line.id, line.persona, line.note || "");
+    openGroups.add(line.persona);
+  });
+
+  updateResumeViews();
+  updateHeaderPill();
+  renderCart();
+  renderItems();
+  setSyncStatus(`Mesa ${mesa} cargada desde Supabase`, "ok");
+}
+
+async function syncComandaToSupabase(){
+  if(!supabaseReady || !mesaActiva) return;
+
+  if(syncing){
+    syncQueued = true;
+    return;
+  }
+
+  syncing = true;
+  setSyncStatus(`Guardando ${mesaActiva}...`, "warn");
+
+  try {
+    const comandaId = await ensureComandaAbierta();
+    if(!comandaId){
+      setSyncStatus("No se pudo identificar la comanda", "bad");
+      return;
+    }
+
+    const { error: errUpdate } = await supabase
+      .from("comandas")
+      .update({
+        mesa: mesaActiva,
+        mesero: meseroNombre || null,
+        total_productos: totalProductos(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", comandaId);
+
+    if(errUpdate){
+      console.error("Error actualizando comanda:", errUpdate);
+      throw errUpdate;
+    }
+
+    const { error: errDelete } = await supabase
+      .from("comandas_items")
+      .delete()
+      .eq("comanda_id", comandaId);
+
+    if(errDelete){
+      console.error("Error borrando items:", errDelete);
+      throw errDelete;
+    }
+
+    if(cart.length){
+      const payload = cart.map(line => ({
+        comanda_id: comandaId,
+        producto_id: line.id,
+        producto_nombre: line.name,
+        categoria: line.cat || "",
+        plato: line.persona,
+        nota: line.note || "",
+        qty: line.qty,
+        cocina: !!line.cocina
+      }));
+
+      const { error: errInsert } = await supabase
+        .from("comandas_items")
+        .insert(payload);
+
+      if(errInsert){
+        console.error("Error insertando items:", errInsert);
+        throw errInsert;
+      }
+    }
+
+    setSyncStatus(`Mesa ${mesaActiva} guardada`, "ok");
+  } catch (e) {
+    console.error("Error general de sync:", e);
+    setSyncStatus("Error al guardar en Supabase", "bad");
+  } finally {
+    syncing = false;
+
+    if(syncQueued){
+      syncQueued = false;
+      await syncComandaToSupabase();
+    }
+  }
+}
+
+async function vaciarComandaSupabase(){
+  if(!supabaseReady) return;
+  if(!comandaIdActual) return;
+
+  try{
+    setSyncStatus(`Vaciando ${mesaActiva}...`, "warn");
+
+    const { error: errItems } = await supabase
+      .from("comandas_items")
+      .delete()
+      .eq("comanda_id", comandaIdActual);
+
+    if(errItems){
+      console.error("Error vaciando items:", errItems);
+      throw errItems;
+    }
+
+    const { error: errComanda } = await supabase
+      .from("comandas")
+      .update({
+        total_productos: 0,
+        mesero: meseroNombre || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", comandaIdActual);
+
+    if(errComanda){
+      console.error("Error actualizando comanda vacía:", errComanda);
+      throw errComanda;
+    }
+
+    setSyncStatus(`Mesa ${mesaActiva} vaciada`, "ok");
+  }catch(e){
+    console.error(e);
+    setSyncStatus("Error al vaciar en Supabase", "bad");
+  }
+}
+
+/* =========================
+   UI
+   ========================= */
 function renderMesas(){
   mesasGrid.innerHTML = "";
   MESAS.forEach(mesa=>{
@@ -1015,10 +1325,11 @@ function renderMesas(){
         <div class="mesaText">${mesa}</div>
       </div>
     `;
-    btn.onclick = ()=>{
+    btn.onclick = async ()=>{
       mesaActiva = mesa;
       renderMesas();
       updateResumeViews();
+      await cargarComandaDeMesa(mesaActiva);
     };
     mesasGrid.appendChild(btn);
   });
@@ -1131,10 +1442,10 @@ function renderItems(){
       abrirProducto(item, card, true);
     });
 
-    decBtn.addEventListener("click", function(e){
+    decBtn.addEventListener("click", async function(e){
       e.preventDefault();
       e.stopPropagation();
-      quitarUnoDelPaso3(item.id, personaActiva);
+      await quitarUnoDelPaso3(item.id, personaActiva);
     });
 
     itemsBox.appendChild(card);
@@ -1171,7 +1482,7 @@ function abrirProducto(item, cardEl, sumaRapida=false){
   agregarLinea(item, personaActiva, "", cardEl);
 }
 
-function agregarLinea(item, persona, note, cardEl=null){
+async function agregarLinea(item, persona, note, cardEl=null){
   const cleanNote = (note || "").trim();
   const key = makeKey(item, persona, cleanNote);
   const existing = cart.find(x=>x.key===key);
@@ -1207,9 +1518,11 @@ function agregarLinea(item, persona, note, cardEl=null){
 
   const extra = cleanNote ? ` (${cleanNote})` : "";
   showToast(`${nombreSimple} añadido a ${persona}${extra}`);
+
+  await syncComandaToSupabase();
 }
 
-function quitarUnoDelPaso3(itemId, persona){
+async function quitarUnoDelPaso3(itemId, persona){
   const candidates = cart
     .map((x, idx) => ({...x, idx}))
     .filter(x => x.id === itemId && x.persona === persona);
@@ -1239,6 +1552,7 @@ function quitarUnoDelPaso3(itemId, persona){
   updateHeaderPill();
   renderCart();
   renderItems();
+  await syncComandaToSupabase();
 }
 
 function agruparCart(){
@@ -1315,7 +1629,7 @@ function renderCart(){
   });
 
   cartBox.querySelectorAll('[data-a="dec"]').forEach(btn=>{
-    btn.onclick = ()=>{
+    btn.onclick = async ()=>{
       const idx = Number(btn.dataset.idx);
       if(!cart[idx]) return;
 
@@ -1328,11 +1642,12 @@ function renderCart(){
       updateHeaderPill();
       renderCart();
       renderItems();
+      await syncComandaToSupabase();
     };
   });
 
   cartBox.querySelectorAll('[data-a="inc"]').forEach(btn=>{
-    btn.onclick = ()=>{
+    btn.onclick = async ()=>{
       const idx = Number(btn.dataset.idx);
       if(!cart[idx]) return;
       cart[idx].qty += 1;
@@ -1340,17 +1655,19 @@ function renderCart(){
       updateHeaderPill();
       renderCart();
       renderItems();
+      await syncComandaToSupabase();
     };
   });
 
   cartBox.querySelectorAll('[data-a="del"]').forEach(btn=>{
-    btn.onclick = ()=>{
+    btn.onclick = async ()=>{
       const idx = Number(btn.dataset.idx);
       if(Number.isNaN(idx) || !cart[idx]) return;
       cart.splice(idx,1);
       updateHeaderPill();
       renderCart();
       renderItems();
+      await syncComandaToSupabase();
     };
   });
 }
@@ -1419,14 +1736,14 @@ backdrop.addEventListener("click", (e)=>{
   if(e.target === backdrop) cerrarModal();
 });
 
-btnGuardarModal.onclick = ()=>{
+btnGuardarModal.onclick = async ()=>{
   if(!draftItem) return;
 
   const modsText = Array.from(draftItem.selectedMods).join(" • ");
   const freeText = notaRapida.value.trim();
   const finalNote = [modsText, freeText].filter(Boolean).join(" • ");
 
-  agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.cardEl);
+  await agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.cardEl);
   cerrarModal();
 };
 
@@ -1511,6 +1828,9 @@ function handleMainContinue(){
     if(!nombre) return alert("Selecciona un mesero.");
     meseroNombre = nombre;
     updateResumeViews();
+    if(supabaseReady && mesaActiva){
+      syncComandaToSupabase();
+    }
     goToStep(2);
     return;
   }
@@ -1548,7 +1868,7 @@ document.getElementById("collapseAll").onclick = ()=>{
   renderCart();
 };
 
-document.getElementById("btnVaciar").onclick = ()=>{
+document.getElementById("btnVaciar").onclick = async ()=>{
   if(confirm("¿Vaciar comanda?")){
     cart = [];
     Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
@@ -1556,6 +1876,7 @@ document.getElementById("btnVaciar").onclick = ()=>{
     updateHeaderPill();
     renderCart();
     renderItems();
+    await vaciarComandaSupabase();
     goToStep(3);
   }
 };
@@ -1563,7 +1884,9 @@ document.getElementById("btnVaciar").onclick = ()=>{
 document.getElementById("btnResumen").onclick = verResumen;
 document.getElementById("btnImprimir").onclick = imprimirCocina;
 
-// Inicial
+/* =========================
+   INIT
+   ========================= */
 renderMesas();
 renderPersonas();
 renderCats();
@@ -1572,6 +1895,12 @@ renderCart();
 updateHeaderPill();
 updateResumeViews();
 updateContinueButton();
+
+if(supabaseReady){
+  setSyncStatus("Supabase conectado. Listo para guardar comandas.", "ok");
+}else{
+  setSyncStatus("Supabase pendiente de configurar", "warn");
+}
 </script>
 </body>
 </html>
