@@ -517,23 +517,25 @@ input:focus, select:focus{
   border:1px solid rgba(251,192,45,.45);
   font-weight:900;
 }
-.rightBtns{
+.rightInfo{
   display:flex;
-  flex-direction:column;
-  gap:6px;
-  min-width:92px;
+  align-items:center;
+  justify-content:center;
+  min-width:82px;
 }
-.mini{
-  border:none;
-  cursor:pointer;
-  height:36px;
-  border-radius:12px;
-  font-weight:1000;
-  background:#fff;
+.qtyBadge{
+  min-width:52px;
+  height:40px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f7fbff;
+  border:2px solid rgba(21,101,192,.14);
   color:#0b4f93;
-  border:2px solid rgba(21,101,192,.16);
+  font-weight:1000;
+  font-size:16px;
 }
-.mini.qty{ cursor:default; }
 
 .noteBox{
   margin-top:12px;
@@ -810,7 +812,6 @@ input:focus, select:focus{
         <div class="comandaCompacta" id="cart"></div>
 
         <div class="btnRow">
-          <button class="btn btnRed" id="btnVaciar" type="button">Vaciar comanda</button>
           <button class="btn btnYellow" id="btnResumen" type="button">Resumen</button>
           <button class="btn btnBlue" id="btnImprimir" type="button">Imprimir cocina</button>
         </div>
@@ -859,6 +860,7 @@ input:focus, select:focus{
    ========================= */
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
+
 
 
 try{
@@ -1307,44 +1309,6 @@ async function syncComandaToSupabase(){
   }
 }
 
-async function vaciarComandaSupabase(){
-  if(!supabaseReady) return;
-  if(!comandaIdActual) return;
-
-  try{
-    setSyncStatus(`Vaciando ${mesaActiva}...`, "warn");
-
-    const { error: errItems } = await supabase
-      .from("comandas_items")
-      .delete()
-      .eq("comanda_id", comandaIdActual);
-
-    if(errItems){
-      console.error("Error vaciando items:", errItems);
-      throw errItems;
-    }
-
-    const { error: errComanda } = await supabase
-      .from("comandas")
-      .update({
-        total_productos: 0,
-        mesero: meseroNombre || null,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", comandaIdActual);
-
-    if(errComanda){
-      console.error("Error actualizando comanda vacía:", errComanda);
-      throw errComanda;
-    }
-
-    setSyncStatus(`Mesa ${mesaActiva} vaciada`, "ok");
-  }catch(e){
-    console.error(e);
-    setSyncStatus("Error al vaciar en Supabase", "bad");
-  }
-}
-
 /* =========================
    UI
    ========================= */
@@ -1463,14 +1427,12 @@ function renderItems(){
         ${lastCfg ? `<div class="itemLastCfg">Última config: ${escapeHtml(lastCfg)}</div>` : ``}
       </button>
       <div class="qtyMiniBar">
-        <button type="button" class="qtyMiniBtn" data-act="dec">−</button>
         <div class="qtyMiniVal">${qty}</div>
         <button type="button" class="qtyMiniBtn" data-act="inc">+</button>
       </div>
     `;
 
     const mainBtn = card.querySelector(".itemMain");
-    const decBtn = card.querySelector('[data-act="dec"]');
     const incBtn = card.querySelector('[data-act="inc"]');
 
     mainBtn.addEventListener("click", function(e){
@@ -1482,12 +1444,6 @@ function renderItems(){
       e.preventDefault();
       e.stopPropagation();
       abrirProducto(item, card, true);
-    });
-
-    decBtn.addEventListener("click", async function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      await quitarUnoDelPaso3(item.id, personaActiva);
     });
 
     itemsBox.appendChild(card);
@@ -1565,39 +1521,6 @@ async function agregarLinea(item, persona, note, cardEl=null){
   await syncComandaToSupabase();
 }
 
-async function quitarUnoDelPaso3(itemId, persona){
-  const candidates = cart
-    .map((x, idx) => ({...x, idx}))
-    .filter(x => x.id === itemId && x.persona === persona);
-
-  if(!candidates.length) return;
-
-  const lastNote = getLastConfig(itemId, persona);
-  let target = null;
-
-  if(lastNote){
-    target = candidates.find(x => x.note === lastNote);
-  }
-
-  if(!target){
-    const sinNota = candidates.find(x => !x.note);
-    target = sinNota || candidates[candidates.length - 1];
-  }
-
-  if(!target) return;
-
-  if(cart[target.idx].qty > 1){
-    cart[target.idx].qty -= 1;
-  }else{
-    cart.splice(target.idx, 1);
-  }
-
-  updateHeaderPill();
-  renderCart();
-  renderItems();
-  await syncComandaToSupabase();
-}
-
 function agruparCart(){
   const grupos = {};
   cart.forEach(line=>{
@@ -1633,7 +1556,6 @@ function renderCart(){
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
 
     const bodyRows = group.lines.map((line)=>{
-      const idx = cart.indexOf(line);
       return `
         <div class="line">
           <div>
@@ -1641,11 +1563,8 @@ function renderCart(){
             ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
             <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
           </div>
-          <div class="rightBtns">
-            <button class="mini" data-a="dec" data-idx="${idx}">−</button>
-            <button class="mini qty">${line.qty}</button>
-            <button class="mini" data-a="inc" data-idx="${idx}">+</button>
-            <button class="mini" data-a="del" data-idx="${idx}">✕</button>
+          <div class="rightInfo">
+            <div class="qtyBadge">${line.qty}</div>
           </div>
         </div>
       `;
@@ -1669,49 +1588,6 @@ function renderCart(){
 
   cartBox.querySelectorAll("[data-toggle]").forEach(btn=>{
     btn.onclick = ()=> toggleGroup(btn.getAttribute("data-toggle"));
-  });
-
-  cartBox.querySelectorAll('[data-a="dec"]').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const idx = Number(btn.dataset.idx);
-      if(!cart[idx]) return;
-
-      if(cart[idx].qty > 1){
-        cart[idx].qty -= 1;
-      }else{
-        cart.splice(idx,1);
-      }
-
-      updateHeaderPill();
-      renderCart();
-      renderItems();
-      await syncComandaToSupabase();
-    };
-  });
-
-  cartBox.querySelectorAll('[data-a="inc"]').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const idx = Number(btn.dataset.idx);
-      if(!cart[idx]) return;
-      cart[idx].qty += 1;
-      saveLastConfig(cart[idx].id, cart[idx].persona, cart[idx].note || "");
-      updateHeaderPill();
-      renderCart();
-      renderItems();
-      await syncComandaToSupabase();
-    };
-  });
-
-  cartBox.querySelectorAll('[data-a="del"]').forEach(btn=>{
-    btn.onclick = async ()=>{
-      const idx = Number(btn.dataset.idx);
-      if(Number.isNaN(idx) || !cart[idx]) return;
-      cart.splice(idx,1);
-      updateHeaderPill();
-      renderCart();
-      renderItems();
-      await syncComandaToSupabase();
-    };
   });
 }
 
@@ -1941,19 +1817,6 @@ document.getElementById("expandAll").onclick = ()=>{
 document.getElementById("collapseAll").onclick = ()=>{
   openGroups.clear();
   renderCart();
-};
-
-document.getElementById("btnVaciar").onclick = async ()=>{
-  if(confirm("¿Vaciar comanda?")){
-    cart = [];
-    Object.keys(lastConfigByPlateProduct).forEach(k=>delete lastConfigByPlateProduct[k]);
-    openGroups.clear();
-    updateHeaderPill();
-    renderCart();
-    renderItems();
-    await vaciarComandaSupabase();
-    goToStep(3);
-  }
 };
 
 document.getElementById("btnResumen").onclick = verResumen;
