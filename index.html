@@ -783,7 +783,7 @@ input:focus, select:focus{
         <div class="items" id="items"></div>
 
         <div class="noteBox">
-          Toca el producto para configurarlo. Después puedes usar <b>+</b> y seguirá agregando la última configuración usada de ese mismo producto en ese plato.
+          Toca el producto para configurarlo. Después puedes usar <b>+</b> y seguirá agregando la última configuración usada de ese mismo producto en ese plato. Si nunca tuvo configuración, el <b>+</b> lo agrega normal.
         </div>
       </section>
 
@@ -861,7 +861,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -1460,11 +1461,6 @@ function abrirProducto(item, cardEl, sumaRapida=false){
 
     if(lastNote){
       agregarLinea(item, personaActiva, lastNote, cardEl);
-      return;
-    }
-
-    if(shouldOpenModal(item)){
-      abrirModal(item, cardEl);
       return;
     }
 
