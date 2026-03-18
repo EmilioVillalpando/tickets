@@ -199,6 +199,29 @@ input:focus, select:focus{
   color:#0b4f93;
   border:2px solid rgba(21,101,192,.16);
 }
+.btnMini{
+  border:none;
+  border-radius:12px;
+  padding:8px 10px;
+  font-size:12px;
+  font-weight:1000;
+  cursor:pointer;
+}
+.btnMiniBlue{
+  background:#eef6ff;
+  color:#0b4f93;
+  border:1px solid rgba(21,101,192,.18);
+}
+.btnMiniRed{
+  background:#fff2f2;
+  color:#8e1d1d;
+  border:1px solid rgba(198,40,40,.18);
+}
+.btnMiniYellow{
+  background:#fff8dd;
+  color:#7a5100;
+  border:1px solid rgba(251,192,45,.35);
+}
 
 .fixedContinue{
   position:fixed;
@@ -213,9 +236,7 @@ input:focus, select:focus{
   box-shadow:0 18px 40px rgba(2,6,23,.14);
   padding:10px;
 }
-.fixedContinue .btn{
-  width:100%;
-}
+.fixedContinue .btn{ width:100%; }
 
 .ubicacionesWrap{
   display:grid;
@@ -245,7 +266,6 @@ input:focus, select:focus{
   padding:0;
 }
 .mesaCard{
-  position:relative;
   min-height:116px;
   border-radius:22px;
   border:2px solid rgba(21,101,192,.16);
@@ -263,7 +283,6 @@ input:focus, select:focus{
   border-radius:50%;
   background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
   border:3px solid rgba(90,59,0,.12);
-  box-shadow:inset 0 2px 8px rgba(255,255,255,.35);
 }
 .mesaLegs{
   display:flex;
@@ -286,9 +305,7 @@ input:focus, select:focus{
   background:linear-gradient(180deg,#fff1f1,#ffe2e2);
   box-shadow:0 14px 30px rgba(198,40,40,.18);
 }
-.mesaBtn.active .mesaText{
-  color:var(--red-dark);
-}
+.mesaBtn.active .mesaText{ color:var(--red-dark); }
 
 .destinosGrid{
   display:grid;
@@ -318,10 +335,7 @@ input:focus, select:focus{
   padding:14px;
   text-align:center;
 }
-.destinoIcon{
-  font-size:30px;
-  line-height:1;
-}
+.destinoIcon{ font-size:30px; line-height:1; }
 .destinoName{
   font-size:18px;
   font-weight:1000;
@@ -337,9 +351,7 @@ input:focus, select:focus{
   background:linear-gradient(180deg,#f5e8ff,#ead0ff);
   box-shadow:0 14px 30px rgba(123,31,162,.18);
 }
-.destinoBtn.active .destinoName{
-  color:var(--purple);
-}
+.destinoBtn.active .destinoName{ color:var(--purple); }
 
 .stickyTop{
   position:sticky;
@@ -564,6 +576,7 @@ input:focus, select:focus{
   padding:10px 12px;
   border-top:1px dashed rgba(16,32,51,.12);
 }
+.lineLeft{ flex:1; min-width:0; }
 .lineTitle{
   font-weight:1000;
   line-height:1.2;
@@ -588,9 +601,10 @@ input:focus, select:focus{
 }
 .rightInfo{
   display:flex;
-  align-items:center;
-  justify-content:center;
-  min-width:82px;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:8px;
+  min-width:118px;
 }
 .qtyBadge{
   min-width:52px;
@@ -604,6 +618,12 @@ input:focus, select:focus{
   color:#0b4f93;
   font-weight:1000;
   font-size:16px;
+}
+.lineActions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .noteBox{
@@ -898,9 +918,9 @@ input:focus, select:focus{
         </div>
 
         <div class="noteBox">
-          Aquí revisas e imprimes. Las bebidas y postres se ven en la comanda, pero no salen en el ticket de cocina.  
           <b>Imprimir cocina</b> manda solo lo nuevo pendiente.  
-          <b>Reimprimir todo cocina</b> manda todo lo de cocina otra vez.
+          <b>Reimprimir todo cocina</b> manda toda la cocina otra vez.  
+          Las bebidas no salen en cocina.
         </div>
       </section>
     </div>
@@ -931,6 +951,21 @@ input:focus, select:focus{
   </div>
 </div>
 
+<div class="backdrop" id="drinkBackdrop">
+  <div class="modal">
+    <div class="modalHead">
+      <h3 id="drinkModalTitle">Selecciona presentación</h3>
+      <button class="closeX" id="btnCerrarDrinkModal" type="button">✕</button>
+    </div>
+    <div class="modalBody">
+      <div class="quickMods" id="drinkOptions"></div>
+    </div>
+    <div class="modalFoot">
+      <button class="btn btnRed" id="btnCancelarDrinkModal" type="button">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toastWrap">
   <div class="toast" id="toastMsg">Producto añadido</div>
 </div>
@@ -944,6 +979,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -961,27 +998,27 @@ try{
 }
 
 /* =========================
-   CATÁLOGO CON PRECIOS
+   CATÁLOGO
    ========================= */
 const catalogo = [
-  {id:"taco_tripa",      cat:"TACOS",              name:"Taco de Tripa",                   price:38,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_pastor",     cat:"TACOS",              name:"Taco de Pastor",                  price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_bistec",     cat:"TACOS",              name:"Taco de Bistec",                  price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_chorizo",    cat:"TACOS",              name:"Taco de Chorizo",                 price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_higado",     cat:"TACOS",              name:"Taco de Hígado",                  price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_costilla",   cat:"TACOS",              name:"Taco de Costilla",                price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_barbacoa",   cat:"TACOS",              name:"Taco de Barbacoa",                price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_alambre",    cat:"TACOS",              name:"Taco de Alambre",                 price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_combi",      cat:"TACOS",              name:"Taco Combinado",                  price:38,  desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"taco_tripa",      cat:"TACOS",              name:"Taco de Tripa",             price:38,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",     cat:"TACOS",              name:"Taco de Pastor",            price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",     cat:"TACOS",              name:"Taco de Bistec",            price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",    cat:"TACOS",              name:"Taco de Chorizo",           price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",     cat:"TACOS",              name:"Taco de Hígado",            price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_costilla",   cat:"TACOS",              name:"Taco de Costilla",          price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_barbacoa",   cat:"TACOS",              name:"Taco de Barbacoa",          price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_alambre",    cat:"TACOS",              name:"Taco de Alambre",           price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",      cat:"TACOS",              name:"Taco Combinado",            price:38,  desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",     cat:"QUESADILLAS",        name:"Quesadilla de Tripa",             price:100, desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_pastor",    cat:"QUESADILLAS",        name:"Quesadilla de Pastor",            price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_bistec",    cat:"QUESADILLAS",        name:"Quesadilla de Bistec",            price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_chorizo",   cat:"QUESADILLAS",        name:"Quesadilla de Chorizo",           price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_higado",    cat:"QUESADILLAS",        name:"Quesadilla de Hígado",            price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_costilla",  cat:"QUESADILLAS",        name:"Quesadilla de Costilla",          price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_barbacoa",  cat:"QUESADILLAS",        name:"Quesadilla de Barbacoa",          price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_alambre",   cat:"QUESADILLAS",        name:"Quesadilla de Alambre",           price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_tripa",     cat:"QUESADILLAS",        name:"Quesadilla de Tripa",       price:100, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",    cat:"QUESADILLAS",        name:"Quesadilla de Pastor",      price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",    cat:"QUESADILLAS",        name:"Quesadilla de Bistec",      price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo",   cat:"QUESADILLAS",        name:"Quesadilla de Chorizo",     price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",    cat:"QUESADILLAS",        name:"Quesadilla de Hígado",      price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_costilla",  cat:"QUESADILLAS",        name:"Quesadilla de Costilla",    price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_barbacoa",  cat:"QUESADILLAS",        name:"Quesadilla de Barbacoa",    price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_alambre",   cat:"QUESADILLAS",        name:"Quesadilla de Alambre",     price:90,  desc:"", requiereNota:false, cocina:true},
 
   {id:"quesa_chica_tripa",    cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Tripa",    price:70, desc:"", requiereNota:false, cocina:true},
   {id:"quesa_chica_pastor",   cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Pastor",   price:50, desc:"", requiereNota:false, cocina:true},
@@ -992,31 +1029,31 @@ const catalogo = [
   {id:"quesa_chica_barbacoa", cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Barbacoa", price:50, desc:"", requiereNota:false, cocina:true},
   {id:"quesa_chica_alambre",  cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Alambre",  price:50, desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi",   cat:"CHAROLAS",           name:"Charola Combinada",               price:100, desc:"Escribe combinación", requiereNota:true, cocina:true},
-  {id:"charola_alam",    cat:"CHAROLAS",           name:"Charola de Alambre",              price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"charola_combi",   cat:"CHAROLAS",           name:"Charola Combinada",         price:100, desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",    cat:"CHAROLAS",           name:"Charola de Alambre",        price:90,  desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",    cat:"VOLCANES",           name:"Volcán de Tripa",                 price:90, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_pastor",   cat:"VOLCANES",           name:"Volcán de Pastor",                price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_bistec",   cat:"VOLCANES",           name:"Volcán de Bistec",                price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_chorizo",  cat:"VOLCANES",           name:"Volcán de Chorizo",               price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_higado",   cat:"VOLCANES",           name:"Volcán de Hígado",                price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_costilla", cat:"VOLCANES",           name:"Volcán de Costilla",              price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_barbacoa", cat:"VOLCANES",           name:"Volcán de Barbacoa",              price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_alambre",  cat:"VOLCANES",           name:"Volcán de Alambre",               price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_tripa",    cat:"VOLCANES",           name:"Volcán de Tripa",           price:90, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",   cat:"VOLCANES",           name:"Volcán de Pastor",          price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",   cat:"VOLCANES",           name:"Volcán de Bistec",          price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo",  cat:"VOLCANES",           name:"Volcán de Chorizo",         price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",   cat:"VOLCANES",           name:"Volcán de Hígado",          price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_costilla", cat:"VOLCANES",           name:"Volcán de Costilla",        price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_barbacoa", cat:"VOLCANES",           name:"Volcán de Barbacoa",        price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_alambre",  cat:"VOLCANES",           name:"Volcán de Alambre",         price:85, desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS",            name:"Coca Light",                      price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_coca",        cat:"BEBIDAS",            name:"Coca",                            price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_fresca",      cat:"BEBIDAS",            name:"Fresca",                          price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_sprite",      cat:"BEBIDAS",            name:"Sprite",                          price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua",        cat:"BEBIDAS",            name:"Agua fresca",                     price:30, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua_lt",     cat:"BEBIDAS",            name:"Agua fresca 1 Lt",                price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",        cat:"BEBIDAS",            name:"Coca",                      price:0, desc:"Elegir presentación", requiereNota:false, cocina:false, bebidaConPresentacion:true},
+  {id:"beb_coca_light",  cat:"BEBIDAS",            name:"Coca Light",                price:0, desc:"Elegir presentación", requiereNota:false, cocina:false, bebidaConPresentacion:true},
+  {id:"beb_fresca",      cat:"BEBIDAS",            name:"Fresca",                    price:0, desc:"Elegir presentación", requiereNota:false, cocina:false, bebidaConPresentacion:true},
+  {id:"beb_sprite",      cat:"BEBIDAS",            name:"Sprite",                    price:0, desc:"Elegir presentación", requiereNota:false, cocina:false, bebidaConPresentacion:true},
+  {id:"beb_agua",        cat:"BEBIDAS",            name:"Agua fresca",               price:30, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",            name:"Agua fresca 1 Lt",          price:60, desc:"", requiereNota:false, cocina:false},
 
-  {id:"pos_pay",         cat:"POSTRES",            name:"Pay de queso",                    price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_rompope",     cat:"POSTRES",            name:"Gelatina vainilla con rompope",   price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_arroz",       cat:"POSTRES",            name:"Arroz con leche",                 price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_flan",        cat:"POSTRES",            name:"Flan",                            price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_fresa",       cat:"POSTRES",            name:"Gelatina fresa con yoghurt",      price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_napolitano",  cat:"POSTRES",            name:"Napolitano",                      price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_pay",         cat:"POSTRES",            name:"Pay de queso",              price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",     cat:"POSTRES",            name:"Gelatina vainilla con rompope", price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",       cat:"POSTRES",            name:"Arroz con leche",           price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",        cat:"POSTRES",            name:"Flan",                      price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",       cat:"POSTRES",            name:"Gelatina fresa con yoghurt", price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano",  cat:"POSTRES",            name:"Napolitano",                price:60, desc:"", requiereNota:false, cocina:false},
 ];
 
 const CATS = ["TACOS","QUESADILLAS","QUESADILLAS CHICAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
@@ -1027,6 +1064,11 @@ const DESTINOS_EXTRA = [
   {id:"para_llevar", nombre:"Para llevar", icono:"🥡", desc:"Pedido sin mesa"}
 ];
 
+const PRECIO_REFRESCO = {
+  taparosca: 30,
+  vidrio: 35
+};
+
 let currentStep = 1;
 let meseroNombre = "";
 let mesaActiva = "";
@@ -1034,6 +1076,8 @@ let personaActiva = "Plato 1";
 let activeCat = "TACOS";
 let cart = [];
 let draftItem = null;
+let drinkDraft = null;
+let editTarget = null;
 const openGroups = new Set();
 let toastTimer = null;
 
@@ -1082,6 +1126,12 @@ const btnCerrarModal = document.getElementById("btnCerrarModal");
 const btnCancelarModal = document.getElementById("btnCancelarModal");
 const btnGuardarModal = document.getElementById("btnGuardarModal");
 
+const drinkBackdrop = document.getElementById("drinkBackdrop");
+const drinkModalTitle = document.getElementById("drinkModalTitle");
+const drinkOptions = document.getElementById("drinkOptions");
+const btnCerrarDrinkModal = document.getElementById("btnCerrarDrinkModal");
+const btnCancelarDrinkModal = document.getElementById("btnCancelarDrinkModal");
+
 const mainContinueBtn = document.getElementById("mainContinueBtn");
 const fixedContinue = document.getElementById("fixedContinue");
 const toastMsg = document.getElementById("toastMsg");
@@ -1095,11 +1145,11 @@ function escapeHtml(s){
 }
 
 function totalProductos(){
-  return cart.reduce((a,x)=>a + x.qty, 0);
+  return cart.reduce((a,x)=>a + Number(x.qty || 0), 0);
 }
 
-function makeKey(item, persona, note){
-  return [item.id, persona, note || ""].join("|");
+function makeKey(itemOrLine, persona, note){
+  return [itemOrLine.id, persona, note || ""].join("|");
 }
 
 function getConfigMemoryKey(productId, persona){
@@ -1174,8 +1224,8 @@ function goToStep(n){
     if(i === currentStep) dot.classList.add("active");
   });
 
-  if(screenTitle) screenTitle.textContent = titles[currentStep][0];
-  if(screenSub) screenSub.textContent = titles[currentStep][1];
+  screenTitle.textContent = titles[currentStep][0];
+  screenSub.textContent = titles[currentStep][1];
 
   updateContinueButton();
 
@@ -1194,6 +1244,53 @@ function regresarASeleccionMesa(){
 }
 
 /* =========================
+   REFRESCOS
+   ========================= */
+function getPrecioRefresco(presentacion){
+  return Number(PRECIO_REFRESCO[presentacion] || 0);
+}
+
+function construirRefresco(nombreBase, presentacion){
+  const precio = getPrecioRefresco(presentacion);
+  return {
+    id: `refresco_${nombreBase.toLowerCase().replaceAll(" ","_")}_${presentacion}`,
+    cat: "BEBIDAS",
+    name: `${nombreBase} (${presentacion})`,
+    price: precio,
+    requiereNota: false,
+    cocina: false
+  };
+}
+
+function abrirDrinkModal(item, cardEl, sumaRapida=false){
+  drinkDraft = { item, cardEl, sumaRapida };
+  drinkModalTitle.textContent = item.name;
+  drinkOptions.innerHTML = `
+    <button type="button" class="modBtn" data-pres="taparosca">Taparosca — $30</button>
+    <button type="button" class="modBtn" data-pres="vidrio">Vidrio — $35</button>
+  `;
+
+  drinkOptions.querySelectorAll("[data-pres]").forEach(btn=>{
+    btn.onclick = async ()=>{
+      const presentacion = btn.getAttribute("data-pres");
+      const productoFinal = construirRefresco(item.name, presentacion);
+      await agregarLinea(productoFinal, personaActiva, "", cardEl);
+      cerrarDrinkModal();
+    };
+  });
+
+  drinkBackdrop.style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+
+function cerrarDrinkModal(){
+  drinkDraft = null;
+  drinkOptions.innerHTML = "";
+  drinkBackdrop.style.display = "none";
+  document.body.style.overflow = "";
+}
+
+/* =========================
    SUPABASE
    ========================= */
 async function ensureComandaAbierta(){
@@ -1208,10 +1305,7 @@ async function ensureComandaAbierta(){
     .limit(1)
     .maybeSingle();
 
-  if(errFind){
-    console.error("Error buscando comanda abierta:", errFind);
-    throw errFind;
-  }
+  if(errFind) throw errFind;
 
   if(existente){
     comandaIdActual = existente.id;
@@ -1229,10 +1323,7 @@ async function ensureComandaAbierta(){
     .select()
     .single();
 
-  if(errCreate){
-    console.error("Error creando comanda:", errCreate);
-    throw errCreate;
-  }
+  if(errCreate) throw errCreate;
 
   comandaIdActual = creada.id;
   return creada.id;
@@ -1264,7 +1355,7 @@ async function cargarComandaDeMesa(mesa){
     .maybeSingle();
 
   if(errComanda){
-    console.error("Error cargando comanda:", errComanda);
+    console.error(errComanda);
     setSyncStatus("Error al cargar comanda de la ubicación", "bad");
     alert("No se pudo cargar la comanda.");
     return;
@@ -1296,7 +1387,7 @@ async function cargarComandaDeMesa(mesa){
     .order("created_at", { ascending: true });
 
   if(errItems){
-    console.error("Error cargando items:", errItems);
+    console.error(errItems);
     setSyncStatus("Error al cargar productos de la comanda", "bad");
     alert("No se pudieron cargar los productos de la comanda.");
     return;
@@ -1341,7 +1432,7 @@ async function syncComandaToSupabase(){
   syncing = true;
   setSyncStatus(`Guardando ${mesaActiva}...`, "warn");
 
-  try {
+  try{
     const comandaId = await ensureComandaAbierta();
     if(!comandaId){
       setSyncStatus("No se pudo identificar la comanda", "bad");
@@ -1358,20 +1449,14 @@ async function syncComandaToSupabase(){
       })
       .eq("id", comandaId);
 
-    if(errUpdate){
-      console.error("Error actualizando comanda:", errUpdate);
-      throw errUpdate;
-    }
+    if(errUpdate) throw errUpdate;
 
     const { error: errDelete } = await supabase
       .from("comandas_items")
       .delete()
       .eq("comanda_id", comandaId);
 
-    if(errDelete){
-      console.error("Error borrando items:", errDelete);
-      throw errDelete;
-    }
+    if(errDelete) throw errDelete;
 
     if(cart.length){
       const payload = cart.map(line => ({
@@ -1381,7 +1466,7 @@ async function syncComandaToSupabase(){
         categoria: line.cat || "",
         plato: line.persona,
         nota: line.note || "",
-        qty: line.qty,
+        qty: Number(line.qty || 0),
         qty_enviada_cocina: Number(line.sentQty || 0),
         cocina: !!line.cocina,
         precio_unitario: Number(line.price || 0)
@@ -1391,19 +1476,15 @@ async function syncComandaToSupabase(){
         .from("comandas_items")
         .insert(payload);
 
-      if(errInsert){
-        console.error("Error insertando items:", errInsert);
-        throw errInsert;
-      }
+      if(errInsert) throw errInsert;
     }
 
     setSyncStatus(`${mesaActiva} guardado`, "ok");
-  } catch (e) {
-    console.error("Error general de sync:", e);
+  }catch(e){
+    console.error(e);
     setSyncStatus("Error al guardar en Supabase", "bad");
-  } finally {
+  }finally{
     syncing = false;
-
     if(syncQueued){
       syncQueued = false;
       await syncComandaToSupabase();
@@ -1446,7 +1527,6 @@ function renderMesas(){
 
 function renderDestinosExtra(){
   destinosGrid.innerHTML = "";
-
   DESTINOS_EXTRA.forEach(destino=>{
     const btn = document.createElement("button");
     btn.type = "button";
@@ -1525,10 +1605,14 @@ function getQuickMods(item){
   return mods;
 }
 
+function shouldOpenModal(item){
+  return item.requiereNota || getQuickMods(item).length > 0;
+}
+
 function getQtyForItemOnActivePlate(itemId){
   return cart
     .filter(x => x.id === itemId && x.persona === personaActiva)
-    .reduce((sum, x) => sum + x.qty, 0);
+    .reduce((sum, x) => sum + Number(x.qty || 0), 0);
 }
 
 function renderItems(){
@@ -1572,32 +1656,31 @@ function renderItems(){
   });
 }
 
-function shouldOpenModal(item){
-  return item.requiereNota || getQuickMods(item).length > 0;
-}
-
 function abrirProducto(item, cardEl, sumaRapida=false){
+  if(item.bebidaConPresentacion){
+    abrirDrinkModal(item, cardEl, sumaRapida);
+    return;
+  }
+
   if(sumaRapida){
     const lastNote = getLastConfig(item.id, personaActiva);
-
-    if(lastNote){
-      agregarLinea(item, personaActiva, lastNote, cardEl);
-      return;
-    }
-
-    agregarLinea(item, personaActiva, "", cardEl);
+    agregarLinea(item, personaActiva, lastNote || "", cardEl);
     return;
   }
 
   if(shouldOpenModal(item)){
-    abrirModal(item, cardEl);
+    abrirModal(item, cardEl, null);
     return;
   }
 
   agregarLinea(item, personaActiva, "", cardEl);
 }
 
-async function agregarLinea(item, persona, note, cardEl=null){
+function getLineByKey(key){
+  return cart.find(x => x.key === key) || null;
+}
+
+async function agregarLinea(item, persona, note, cardEl=null, sentQty=0){
   const cleanNote = (note || "").trim();
   const key = makeKey(item, persona, cleanNote);
   const existing = cart.find(x=>x.key===key);
@@ -1612,7 +1695,7 @@ async function agregarLinea(item, persona, note, cardEl=null){
       persona,
       note:cleanNote,
       qty:1,
-      sentQty:0,
+      sentQty:Number(sentQty || 0),
       cat:item.cat,
       cocina:!!item.cocina,
       price:Number(item.price || 0)
@@ -1627,16 +1710,40 @@ async function agregarLinea(item, persona, note, cardEl=null){
   renderItems();
   flashAddedCard(cardEl);
 
-  const nombreSimple = item.cat === "TACOS" ? "Taco" :
-                       item.cat === "QUESADILLAS" ? "Quesadilla" :
-                       item.cat === "QUESADILLAS CHICAS" ? "Quesadilla chica" :
-                       item.cat === "VOLCANES" ? "Volcán" :
-                       item.cat === "CHAROLAS" ? "Charola" :
-                       "Producto";
+  showToast(`${item.name} añadido`);
 
-  const extra = cleanNote ? ` (${cleanNote})` : "";
-  showToast(`${nombreSimple} añadido a ${persona}${extra}`);
+  await syncComandaToSupabase();
+}
 
+async function incrementarLineaPorKey(key){
+  const line = getLineByKey(key);
+  if(!line) return;
+
+  line.qty += 1;
+  updateHeaderPill();
+  renderCart();
+  renderItems();
+  await syncComandaToSupabase();
+}
+
+async function decrementarLineaPorKey(key){
+  const idx = cart.findIndex(x => x.key === key);
+  if(idx < 0) return;
+
+  const line = cart[idx];
+
+  if(line.qty > 1){
+    line.qty -= 1;
+    if(line.sentQty > line.qty){
+      line.sentQty = line.qty;
+    }
+  }else{
+    cart.splice(idx, 1);
+  }
+
+  updateHeaderPill();
+  renderCart();
+  renderItems();
   await syncComandaToSupabase();
 }
 
@@ -1658,82 +1765,27 @@ function toggleGroup(persona){
   renderCart();
 }
 
-function renderCart(){
-  if(!cart.length){
-    cartBox.innerHTML = `<div class="noteBox" style="margin-top:0">Aún no agregas productos a la comanda.</div>`;
-    return;
-  }
+function abrirModal(item, cardEl, editLine=null){
+  editTarget = editLine ? { ...editLine } : null;
+  draftItem = { item, cardEl, selectedMods: new Set(), mode: editLine ? "edit" : "add" };
 
-  cartBox.innerHTML = "";
-
-  agruparCart().forEach(group=>{
-    const g = document.createElement("div");
-    const isOpen = openGroups.has(group.persona);
-    g.className = "group" + (isOpen ? " open":"");
-
-    const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+x.qty,0);
-    const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
-
-    const bodyRows = group.lines.map((line)=>{
-      const pendiente = line.cocina ? Math.max(0, Number(line.qty || 0) - Number(line.sentQty || 0)) : 0;
-      return `
-        <div class="line">
-          <div>
-            <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
-            ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
-            <div class="lineCat">
-              ${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}
-              ${line.cocina ? ` • pendiente: ${pendiente}` : ``}
-            </div>
-          </div>
-          <div class="rightInfo">
-            <div class="qtyBadge">${line.qty}</div>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    g.innerHTML = `
-      <div class="groupHead">
-        <div class="groupTitle">${escapeHtml(group.persona)}</div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
-          <button class="toggleBtn" data-toggle="${escapeHtml(group.persona)}">
-            ${isOpen ? "▼ Ocultar pedidos" : "▶ Ver pedidos"}
-          </button>
-        </div>
-      </div>
-      <div class="groupBody">${bodyRows}</div>
-    `;
-
-    cartBox.appendChild(g);
-  });
-
-  cartBox.querySelectorAll("[data-toggle]").forEach(btn=>{
-    btn.onclick = ()=> toggleGroup(btn.getAttribute("data-toggle"));
-  });
-}
-
-function abrirModal(item, cardEl){
-  draftItem = { item, cardEl, selectedMods: new Set() };
-  modalTitle.textContent = item.name;
+  modalTitle.textContent = editLine ? `Editar ${item.name}` : item.name;
   modalPersonaLabel.textContent = `Indicaciones para ${personaActiva}`;
   notaRapida.value = "";
 
-  const lastCfg = getLastConfig(item.id, personaActiva);
+  const sourceNote = editLine ? (editLine.note || "") : getLastConfig(item.id, personaActiva);
+  const mods = getQuickMods(item);
 
   quickMods.innerHTML = "";
-  const mods = getQuickMods(item);
 
   let rememberedMods = [];
   let rememberedText = "";
 
-  if(lastCfg){
-    const parts = lastCfg.split("•").map(x=>x.trim()).filter(Boolean);
+  if(sourceNote){
+    const parts = sourceNote.split("•").map(x=>x.trim()).filter(Boolean);
     parts.forEach(p=>{
       if(mods.includes(p)) rememberedMods.push(p);
     });
-
     const freeParts = parts.filter(p => !mods.includes(p));
     rememberedText = freeParts.join(" • ");
   }
@@ -1765,12 +1817,192 @@ function abrirModal(item, cardEl){
 
 function cerrarModal(){
   draftItem = null;
+  editTarget = null;
   notaRapida.value = "";
   quickMods.innerHTML = "";
   backdrop.style.display = "none";
   document.body.style.overflow = "";
 }
 
+async function editarLineaExistente(lineKey, newNote){
+  const line = getLineByKey(lineKey);
+  if(!line) return;
+
+  const newCleanNote = (newNote || "").trim();
+
+  if(newCleanNote === (line.note || "").trim()){
+    cerrarModal();
+    return;
+  }
+
+  const itemBase = {
+    id: line.id,
+    name: line.name,
+    cat: line.cat,
+    cocina: line.cocina,
+    price: line.price
+  };
+
+  if(line.qty <= 1){
+    const oldSent = Number(line.sentQty || 0);
+    const idx = cart.findIndex(x => x.key === line.key);
+    if(idx >= 0){
+      cart.splice(idx, 1);
+    }
+
+    const newKey = makeKey(itemBase, line.persona, newCleanNote);
+    const existing = cart.find(x => x.key === newKey);
+
+    if(existing){
+      existing.qty += 1;
+      existing.sentQty += oldSent;
+    }else{
+      cart.push({
+        key:newKey,
+        id:line.id,
+        name:line.name,
+        persona:line.persona,
+        note:newCleanNote,
+        qty:1,
+        sentQty:oldSent,
+        cat:line.cat,
+        cocina:!!line.cocina,
+        price:Number(line.price || 0)
+      });
+    }
+  }else{
+    line.qty -= 1;
+    const sentFromThisPiece = Number(line.sentQty || 0) > 0 ? 1 : 0;
+    if(line.sentQty > line.qty){
+      line.sentQty = line.qty;
+    }
+
+    const newKey = makeKey(itemBase, line.persona, newCleanNote);
+    const existing = cart.find(x => x.key === newKey);
+
+    if(existing){
+      existing.qty += 1;
+      existing.sentQty += sentFromThisPiece;
+    }else{
+      cart.push({
+        key:newKey,
+        id:line.id,
+        name:line.name,
+        persona:line.persona,
+        note:newCleanNote,
+        qty:1,
+        sentQty:sentFromThisPiece,
+        cat:line.cat,
+        cocina:!!line.cocina,
+        price:Number(line.price || 0)
+      });
+    }
+  }
+
+  saveLastConfig(line.id, line.persona, newCleanNote);
+
+  updateHeaderPill();
+  renderCart();
+  renderItems();
+  await syncComandaToSupabase();
+  cerrarModal();
+  showToast("Producto editado");
+}
+
+function renderCart(){
+  if(!cart.length){
+    cartBox.innerHTML = `<div class="noteBox" style="margin-top:0">Aún no agregas productos a la comanda.</div>`;
+    return;
+  }
+
+  cartBox.innerHTML = "";
+
+  agruparCart().forEach(group=>{
+    const g = document.createElement("div");
+    const isOpen = openGroups.has(group.persona);
+    g.className = "group" + (isOpen ? " open":"");
+
+    const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+Number(x.qty||0),0);
+    const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+Number(x.qty||0),0);
+
+    const bodyRows = group.lines.map((line)=>{
+      const pendiente = line.cocina ? Math.max(0, Number(line.qty || 0) - Number(line.sentQty || 0)) : 0;
+      return `
+        <div class="line">
+          <div class="lineLeft">
+            <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
+            ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
+            <div class="lineCat">
+              ${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}
+              ${line.cocina ? ` • pendiente: ${pendiente}` : ``}
+            </div>
+          </div>
+          <div class="rightInfo">
+            <div class="qtyBadge">${line.qty}</div>
+            <div class="lineActions">
+              <button type="button" class="btnMini btnMiniBlue" data-act="plus" data-key="${escapeHtml(line.key)}">+</button>
+              <button type="button" class="btnMini btnMiniRed" data-act="minus" data-key="${escapeHtml(line.key)}">−</button>
+              <button type="button" class="btnMini btnMiniYellow" data-act="edit" data-key="${escapeHtml(line.key)}">Editar</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    g.innerHTML = `
+      <div class="groupHead">
+        <div class="groupTitle">${escapeHtml(group.persona)}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
+          <button class="toggleBtn" data-toggle="${escapeHtml(group.persona)}">
+            ${isOpen ? "▼ Ocultar pedidos" : "▶ Ver pedidos"}
+          </button>
+        </div>
+      </div>
+      <div class="groupBody">${bodyRows}</div>
+    `;
+
+    cartBox.appendChild(g);
+  });
+
+  cartBox.querySelectorAll("[data-toggle]").forEach(btn=>{
+    btn.onclick = ()=> toggleGroup(btn.getAttribute("data-toggle"));
+  });
+
+  cartBox.querySelectorAll('[data-act="plus"]').forEach(btn=>{
+    btn.onclick = ()=> incrementarLineaPorKey(btn.getAttribute("data-key"));
+  });
+
+  cartBox.querySelectorAll('[data-act="minus"]').forEach(btn=>{
+    btn.onclick = ()=> decrementarLineaPorKey(btn.getAttribute("data-key"));
+  });
+
+  cartBox.querySelectorAll('[data-act="edit"]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const line = getLineByKey(btn.getAttribute("data-key"));
+      if(!line) return;
+      const itemBase = {
+        id: line.id,
+        name: line.name,
+        cat: line.cat,
+        cocina: line.cocina,
+        price: line.price,
+        requiereNota: false
+      };
+
+      if(line.cat === "BEBIDAS" || line.cat === "POSTRES"){
+        alert("Este botón de edición está pensado principalmente para cambiar indicaciones como: sin verdura, solo cebolla, etc.");
+        return;
+      }
+
+      abrirModal(itemBase, null, line);
+    };
+  });
+}
+
+/* =========================
+   MODAL EDICIÓN / ALTA
+   ========================= */
 btnCerrarModal.onclick = cerrarModal;
 btnCancelarModal.onclick = cerrarModal;
 
@@ -1785,19 +2017,34 @@ btnGuardarModal.onclick = async ()=>{
   const freeText = notaRapida.value.trim();
   const finalNote = [modsText, freeText].filter(Boolean).join(" • ");
 
+  if(draftItem.mode === "edit" && editTarget){
+    await editarLineaExistente(editTarget.key, finalNote);
+    return;
+  }
+
   await agregarLinea(draftItem.item, personaActiva, finalNote, draftItem.cardEl);
   cerrarModal();
 };
 
+/* =========================
+   MODAL REFRESCOS
+   ========================= */
+btnCerrarDrinkModal.onclick = cerrarDrinkModal;
+btnCancelarDrinkModal.onclick = cerrarDrinkModal;
+
+drinkBackdrop.addEventListener("click", (e)=>{
+  if(e.target === drinkBackdrop) cerrarDrinkModal();
+});
+
+/* =========================
+   IMPRESIÓN COCINA
+   ========================= */
 function getPendientesCocina(){
   return cart
     .filter(x => x.cocina)
     .map(x => {
       const pendiente = Number(x.qty || 0) - Number(x.sentQty || 0);
-      return {
-        ...x,
-        pendiente
-      };
+      return { ...x, pendiente };
     })
     .filter(x => x.pendiente > 0);
 }
@@ -1898,7 +2145,6 @@ async function marcarPendientesComoEnviados(){
 
   cart.forEach(line => {
     if(!line.cocina) return;
-
     const pendiente = Number(line.qty || 0) - Number(line.sentQty || 0);
     if(pendiente > 0){
       line.sentQty = Number(line.qty || 0);
@@ -1943,6 +2189,9 @@ function verResumen(){
   setTimeout(()=>window.print(),100);
 }
 
+/* =========================
+   FLUJO PASOS
+   ========================= */
 function handleMainContinue(e){
   if(e) e.preventDefault();
 
@@ -1997,9 +2246,6 @@ meseroInput.addEventListener("change", ()=>{
   meseroNombre = String(meseroInput.value || "").trim();
   updateResumeViews();
 });
-
-mainContinueBtn.type = "button";
-mainContinueBtn.onclick = null;
 
 mainContinueBtn.addEventListener("click", handleMainContinue);
 mainContinueBtn.addEventListener("touchend", function(e){
