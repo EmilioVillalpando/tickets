@@ -25,6 +25,8 @@
   --green-dark:#1f6a24;
   --purple:#7b1fa2;
   --purple-dark:#5e1680;
+  --gray:#eceff4;
+  --gray-dark:#607080;
 
   --shadow:0 16px 40px rgba(2,6,23,.10);
   --r:20px;
@@ -211,11 +213,6 @@ input:focus, select:focus{
   background:#eef6ff;
   color:#0b4f93;
   border:1px solid rgba(21,101,192,.18);
-}
-.btnMiniRed{
-  background:#fff2f2;
-  color:#8e1d1d;
-  border:1px solid rgba(198,40,40,.18);
 }
 .btnMiniYellow{
   background:#fff8dd;
@@ -569,6 +566,7 @@ input:focus, select:focus{
   color:#0b4f93;
   border:1px solid rgba(21,101,192,.16);
 }
+
 .line{
   display:flex;
   justify-content:space-between;
@@ -604,7 +602,7 @@ input:focus, select:focus{
   flex-direction:column;
   align-items:flex-end;
   gap:8px;
-  min-width:118px;
+  min-width:130px;
 }
 .qtyBadge{
   min-width:52px;
@@ -624,6 +622,33 @@ input:focus, select:focus{
   gap:6px;
   flex-wrap:wrap;
   justify-content:flex-end;
+}
+.stateBadge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  padding:5px 10px;
+  font-size:11px;
+  font-weight:1000;
+  border:1px solid transparent;
+}
+.stateBadge.pending{
+  background:#fff4cf;
+  color:#8a5a00;
+  border-color:rgba(251,192,45,.45);
+}
+.stateBadge.sent{
+  background:#edf3f8;
+  color:#5c6c7f;
+  border-color:rgba(96,112,128,.24);
+}
+.line.pendingLine{
+  background:linear-gradient(180deg,#fffdf3,#fff7dc);
+}
+.line.sentLine{
+  background:linear-gradient(180deg,#fafbfd,#f2f5f8);
+  opacity:.92;
 }
 
 .noteBox{
@@ -768,38 +793,11 @@ input:focus, select:focus{
 }
 
 .print-area{display:none}
-@media print{
-  body *{visibility:hidden!important}
-  .print-area,.print-area *{visibility:visible!important}
-  .print-area{
-    display:block!important;
-    position:absolute;
-    inset:0;
-    background:#fff;
-  }
-  @page{
-    size:80mm auto;
-    margin:1mm;
-  }
+
+@page{
+  size:58mm auto;
+  margin:1mm;
 }
-.ticket{
-  width:76mm;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
-  color:#000;
-  background:#fff;
-  padding:2mm;
-  font-size:16px;
-  line-height:1.24;
-}
-.ticket .c{text-align:center}
-.ticket .b{font-weight:900}
-.ticket .lg{font-size:25px}
-.ticket .hr{border-top:1px dashed #000;margin:6px 0}
-.ticket .g{font-weight:900;margin-top:7px;font-size:18px;text-transform:uppercase}
-.ticket .it{margin:5px 0}
-.ticket .itn{font-weight:900;font-size:22px;line-height:1.15}
-.ticket .sub{padding-left:8px;font-size:18px;white-space:pre-wrap}
-.ticket .small{font-size:18px}
 </style>
 </head>
 <body>
@@ -918,14 +916,13 @@ input:focus, select:focus{
         </div>
 
         <div class="noteBox">
-          <b>Imprimir cocina</b> manda solo lo nuevo pendiente.  
-          <b>Reimprimir todo cocina</b> manda toda la cocina otra vez.  
-          Las bebidas no salen en cocina.
+          <b>Amarillo = nuevo / pendiente por imprimir.</b><br>
+          <b>Gris = ya impreso anteriormente.</b><br>
+          Las bebidas y postres no salen en cocina.
         </div>
 
         <div class="noteBox">
-          El taquero <b>no puede eliminar productos</b> desde esta pantalla.  
-          Solo puede <b>agregar más</b> o <b>editar indicaciones</b> como cebolla, cilantro, verdura o notas.
+          El taquero <b>no puede eliminar productos</b>. Solo puede <b>agregar más</b> o <b>editar indicaciones</b>.
         </div>
       </section>
     </div>
@@ -984,6 +981,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -1738,7 +1737,18 @@ function agruparCart(){
 
   return PLATOS
     .filter(p => grupos[p] && grupos[p].length)
-    .map(p => ({ persona:p, lines:grupos[p] }));
+    .map(p => {
+      const ordenadas = [...grupos[p]].sort((a,b)=>{
+        const pendA = a.cocina ? Math.max(0, Number(a.qty||0) - Number(a.sentQty||0)) : 0;
+        const pendB = b.cocina ? Math.max(0, Number(b.qty||0) - Number(b.sentQty||0)) : 0;
+
+        if(pendA > 0 && pendB <= 0) return -1;
+        if(pendA <= 0 && pendB > 0) return 1;
+        return 0;
+      });
+
+      return { persona:p, lines:ordenadas };
+    });
 }
 
 function toggleGroup(persona){
@@ -1906,11 +1916,17 @@ function renderCart(){
 
     const cocinaCount = group.lines.filter(x=>x.cocina).reduce((a,x)=>a+Number(x.qty||0),0);
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+Number(x.qty||0),0);
+    const nuevosCount = group.lines
+      .filter(x => x.cocina && (Number(x.qty||0) - Number(x.sentQty||0) > 0))
+      .reduce((a,x)=>a + Math.max(0, Number(x.qty||0) - Number(x.sentQty||0)), 0);
 
     const bodyRows = group.lines.map((line)=>{
       const pendiente = line.cocina ? Math.max(0, Number(line.qty || 0) - Number(line.sentQty || 0)) : 0;
+      const isPending = line.cocina && pendiente > 0;
+      const isSent = line.cocina && pendiente <= 0;
+
       return `
-        <div class="line">
+        <div class="line ${isPending ? "pendingLine" : ""} ${isSent ? "sentLine" : ""}">
           <div class="lineLeft">
             <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
             ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
@@ -1921,6 +1937,11 @@ function renderCart(){
           </div>
           <div class="rightInfo">
             <div class="qtyBadge">${line.qty}</div>
+            ${
+              line.cocina
+                ? `<div class="stateBadge ${isPending ? "pending" : "sent"}">${isPending ? "NUEVO" : "YA IMPRESO"}</div>`
+                : `<div class="stateBadge sent">EXTRA</div>`
+            }
             <div class="lineActions">
               <button type="button" class="btnMini btnMiniBlue" data-act="plus" data-key="${escapeHtml(line.key)}">+</button>
               <button type="button" class="btnMini btnMiniYellow" data-act="edit" data-key="${escapeHtml(line.key)}">Editar</button>
@@ -1934,7 +1955,7 @@ function renderCart(){
       <div class="groupHead">
         <div class="groupTitle">${escapeHtml(group.persona)}</div>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span class="groupTag">${cocinaCount} cocina • ${extraCount} extra</span>
+          <span class="groupTag">${nuevosCount} nuevos • ${cocinaCount} cocina • ${extraCount} extra</span>
           <button class="toggleBtn" data-toggle="${escapeHtml(group.persona)}">
             ${isOpen ? "▼ Ocultar pedidos" : "▶ Ver pedidos"}
           </button>
@@ -2017,6 +2038,86 @@ drinkBackdrop.addEventListener("click", (e)=>{
 });
 
 /* =========================
+   IMPRESIÓN LIMPIA 58MM
+   ========================= */
+function imprimirHtmlTicket(htmlContenido){
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  iframe.style.opacity = "0";
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow.document;
+
+  doc.open();
+  doc.write(`
+    <!doctype html>
+    <html lang="es">
+    <head>
+      <meta charset="utf-8">
+      <title>Impresión</title>
+      <style>
+        @page{
+          size:58mm auto;
+          margin:1mm;
+        }
+
+        html,body{
+          margin:0;
+          padding:0;
+          background:#fff;
+          width:58mm;
+        }
+
+        body{
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          color:#000;
+        }
+
+        .ticket{
+          width:54mm;
+          box-sizing:border-box;
+          padding:1.5mm;
+          font-size:11px;
+          line-height:1.2;
+          color:#000;
+          background:#fff;
+        }
+        .ticket .c{text-align:center}
+        .ticket .b{font-weight:900}
+        .ticket .lg{font-size:17px}
+        .ticket .hr{border-top:1px dashed #000;margin:4px 0}
+        .ticket .g{font-weight:900;margin-top:5px;font-size:12px;text-transform:uppercase}
+        .ticket .it{margin:4px 0}
+        .ticket .itn{font-weight:900;font-size:13px;line-height:1.15}
+        .ticket .sub{padding-left:6px;font-size:11px;white-space:pre-wrap}
+        .ticket .small{font-size:10px}
+      </style>
+    </head>
+    <body>
+      ${htmlContenido}
+    </body>
+    </html>
+  `);
+  doc.close();
+
+  iframe.onload = function(){
+    setTimeout(() => {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 800);
+    }, 250);
+  };
+}
+
+/* =========================
    IMPRESIÓN COCINA
    ========================= */
 function getPendientesCocina(){
@@ -2036,6 +2137,7 @@ function buildTicketCocinaPendiente(){
     <div class="ticket">
       <div class="c b lg">COMANDA COCINA</div>
       <div class="c b">${escapeHtml(mesaActiva)}</div>
+      <div class="small c">Solo nuevos</div>
       <div class="hr"></div>
   `;
 
@@ -2063,8 +2165,9 @@ function buildTicketCocinaPendiente(){
 function buildTicketCocinaCompleto(){
   let html = `
     <div class="ticket">
-      <div class="c b lg">REIMPRESIÓN COCINA</div>
+      <div class="c b lg">REIMPRESIÓN</div>
       <div class="c b">${escapeHtml(mesaActiva)}</div>
+      <div class="small c">Toda la cocina</div>
       <div class="hr"></div>
   `;
 
@@ -2092,7 +2195,7 @@ function buildTicketCocinaCompleto(){
 function buildResumenComanda(){
   let html = `
     <div class="ticket">
-      <div class="c b lg">RESUMEN COMANDA</div>
+      <div class="c b lg">RESUMEN</div>
       <div class="c b">${escapeHtml(mesaActiva)}</div>
       <div class="small c">Mesero: ${escapeHtml(meseroNombre || "—")}</div>
       <div class="hr"></div>
@@ -2105,10 +2208,11 @@ function buildResumenComanda(){
     html += `<div class="g">${escapeHtml(persona)}</div>`;
 
     lines.forEach(l=>{
+      const pendiente = l.cocina ? Math.max(0, Number(l.qty||0) - Number(l.sentQty||0)) : 0;
       html += `
         <div class="it">
           <div class="itn">${escapeHtml(l.qty)} x ${escapeHtml(l.name)}</div>
-          <div class="sub">${escapeHtml(l.cat)}</div>
+          <div class="sub">${escapeHtml(l.cat)}${l.cocina ? (pendiente > 0 ? " • NUEVO" : " • YA IMPRESO") : " • EXTRA"}</div>
           ${l.note ? `<div class="sub">• ${escapeHtml(l.note)}</div>` : ``}
         </div>
       `;
@@ -2144,29 +2248,26 @@ async function imprimirCocina(){
   const pendientes = getPendientesCocina();
   if(!pendientes.length) return alert("No hay productos nuevos pendientes para cocina.");
 
-  const area = document.getElementById("printArea");
-  area.innerHTML = buildTicketCocinaPendiente();
+  const html = buildTicketCocinaPendiente();
+  imprimirHtmlTicket(html);
 
   setTimeout(async ()=>{
-    window.print();
     await marcarPendientesComoEnviados();
-  }, 100);
+  }, 900);
 }
 
 function reimprimirTodoCocina(){
   if(!cart.length) return alert("No hay productos en la comanda.");
   if(!cart.some(x => x.cocina)) return alert("No hay productos de cocina para imprimir.");
 
-  const area = document.getElementById("printArea");
-  area.innerHTML = buildTicketCocinaCompleto();
-  setTimeout(()=>window.print(),100);
+  const html = buildTicketCocinaCompleto();
+  imprimirHtmlTicket(html);
 }
 
 function verResumen(){
   if(!cart.length) return alert("No hay productos en la comanda.");
-  const area = document.getElementById("printArea");
-  area.innerHTML = buildResumenComanda();
-  setTimeout(()=>window.print(),100);
+  const html = buildResumenComanda();
+  imprimirHtmlTicket(html);
 }
 
 /* =========================
