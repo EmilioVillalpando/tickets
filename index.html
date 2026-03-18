@@ -922,6 +922,11 @@ input:focus, select:focus{
           <b>Reimprimir todo cocina</b> manda toda la cocina otra vez.  
           Las bebidas no salen en cocina.
         </div>
+
+        <div class="noteBox">
+          El taquero <b>no puede eliminar productos</b> desde esta pantalla.  
+          Solo puede <b>agregar más</b> o <b>editar indicaciones</b> como cebolla, cilantro, verdura o notas.
+        </div>
       </section>
     </div>
   </div>
@@ -979,6 +984,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -1675,7 +1682,7 @@ function abrirProducto(item, cardEl, sumaRapida=false){
 }
 
 function getLineByKey(key){
-  return cart.find(x => x.key === key) || null;
+  return cart.find(x=>x.key===key) || null;
 }
 
 async function agregarLinea(item, persona, note, cardEl=null, sentQty=0){
@@ -1718,27 +1725,6 @@ async function incrementarLineaPorKey(key){
   if(!line) return;
 
   line.qty += 1;
-  updateHeaderPill();
-  renderCart();
-  renderItems();
-  await syncComandaToSupabase();
-}
-
-async function decrementarLineaPorKey(key){
-  const idx = cart.findIndex(x => x.key === key);
-  if(idx < 0) return;
-
-  const line = cart[idx];
-
-  if(line.qty > 1){
-    line.qty -= 1;
-    if(line.sentQty > line.qty){
-      line.sentQty = line.qty;
-    }
-  }else{
-    cart.splice(idx, 1);
-  }
-
   updateHeaderPill();
   renderCart();
   renderItems();
@@ -1939,7 +1925,6 @@ function renderCart(){
             <div class="qtyBadge">${line.qty}</div>
             <div class="lineActions">
               <button type="button" class="btnMini btnMiniBlue" data-act="plus" data-key="${escapeHtml(line.key)}">+</button>
-              <button type="button" class="btnMini btnMiniRed" data-act="minus" data-key="${escapeHtml(line.key)}">−</button>
               <button type="button" class="btnMini btnMiniYellow" data-act="edit" data-key="${escapeHtml(line.key)}">Editar</button>
             </div>
           </div>
@@ -1971,14 +1956,11 @@ function renderCart(){
     btn.onclick = ()=> incrementarLineaPorKey(btn.getAttribute("data-key"));
   });
 
-  cartBox.querySelectorAll('[data-act="minus"]').forEach(btn=>{
-    btn.onclick = ()=> decrementarLineaPorKey(btn.getAttribute("data-key"));
-  });
-
   cartBox.querySelectorAll('[data-act="edit"]').forEach(btn=>{
     btn.onclick = ()=>{
       const line = getLineByKey(btn.getAttribute("data-key"));
       if(!line) return;
+
       const itemBase = {
         id: line.id,
         name: line.name,
@@ -1993,6 +1975,8 @@ function renderCart(){
         return;
       }
 
+      personaActiva = line.persona;
+      renderPersonas();
       abrirModal(itemBase, null, line);
     };
   });
