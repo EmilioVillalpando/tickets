@@ -23,6 +23,8 @@
   --yellow-dark:#e0a800;
   --green:#2e7d32;
   --green-dark:#1f6a24;
+  --purple:#7b1fa2;
+  --purple-dark:#5e1680;
 
   --shadow:0 16px 40px rgba(2,6,23,.10);
   --r:20px;
@@ -215,6 +217,22 @@ input:focus, select:focus{
   width:100%;
 }
 
+.ubicacionesWrap{
+  display:grid;
+  gap:18px;
+}
+.ubicacionSection{
+  display:grid;
+  gap:10px;
+}
+.sectionTitle{
+  font-size:13px;
+  font-weight:1000;
+  color:#355070;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
 .mesasGrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -270,6 +288,57 @@ input:focus, select:focus{
 }
 .mesaBtn.active .mesaText{
   color:var(--red-dark);
+}
+
+.destinosGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media (max-width:640px){
+  .destinosGrid{grid-template-columns:1fr}
+}
+.destinoBtn{
+  border:none;
+  cursor:pointer;
+  background:transparent;
+  padding:0;
+}
+.destinoCard{
+  min-height:106px;
+  border-radius:22px;
+  border:2px solid rgba(123,31,162,.16);
+  background:linear-gradient(180deg,#fff,#f8efff);
+  box-shadow:0 10px 24px rgba(123,31,162,.10);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px;
+  text-align:center;
+}
+.destinoIcon{
+  font-size:30px;
+  line-height:1;
+}
+.destinoName{
+  font-size:18px;
+  font-weight:1000;
+  color:var(--purple-dark);
+}
+.destinoDesc{
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+}
+.destinoBtn.active .destinoCard{
+  border-color:var(--purple);
+  background:linear-gradient(180deg,#f5e8ff,#ead0ff);
+  box-shadow:0 14px 30px rgba(123,31,162,.18);
+}
+.destinoBtn.active .destinoName{
+  color:var(--purple);
 }
 
 .stickyTop{
@@ -728,7 +797,7 @@ input:focus, select:focus{
 <div class="wrap">
   <div class="stepDots">
     <div class="stepDot active" id="dot1">1. Mesero</div>
-    <div class="stepDot" id="dot2">2. Mesa</div>
+    <div class="stepDot" id="dot2">2. Ubicación</div>
     <div class="stepDot" id="dot3">3. Pedido</div>
     <div class="stepDot" id="dot4">4. Comanda</div>
   </div>
@@ -752,9 +821,20 @@ input:focus, select:focus{
 
       <section class="step" id="step2">
         <div class="noteBox" style="margin-top:0">
-          Elige la mesa tocando un botón grande. Pensado para usar rápido en celular o tablet.
+          Elige el destino del pedido: mesa, carrito afuera o para llevar.
         </div>
-        <div class="mesasGrid" id="mesasGrid" style="margin-top:12px"></div>
+
+        <div class="ubicacionesWrap" style="margin-top:12px">
+          <div class="ubicacionSection">
+            <div class="sectionTitle">Mesas</div>
+            <div class="mesasGrid" id="mesasGrid"></div>
+          </div>
+
+          <div class="ubicacionSection">
+            <div class="sectionTitle">Otros destinos</div>
+            <div class="destinosGrid" id="destinosGrid"></div>
+          </div>
+        </div>
       </section>
 
       <section class="step" id="step3">
@@ -765,13 +845,13 @@ input:focus, select:focus{
               <span id="meseroView">—</span>
             </div>
             <div class="resumeBox">
-              <b>Mesa</b>
+              <b>Ubicación</b>
               <span id="mesaView">—</span>
             </div>
           </div>
 
           <div class="btnRow" style="margin-top:10px">
-            <button class="btn btnLight" id="btnCambiarMesaPaso3" type="button">Cambiar mesa</button>
+            <button class="btn btnLight" id="btnCambiarMesaPaso3" type="button">Cambiar ubicación</button>
           </div>
 
           <label style="margin-top:12px">Plato</label>
@@ -794,13 +874,13 @@ input:focus, select:focus{
             <span id="meseroView4">—</span>
           </div>
           <div class="resumeBox">
-            <b>Mesa</b>
+            <b>Ubicación</b>
             <span id="mesaView4">—</span>
           </div>
         </div>
 
         <div class="btnRow" style="margin-top:10px">
-          <button class="btn btnLight" id="btnCambiarMesaPaso4" type="button">Cambiar mesa</button>
+          <button class="btn btnLight" id="btnCambiarMesaPaso4" type="button">Cambiar ubicación</button>
         </div>
 
         <div class="btnRow">
@@ -814,10 +894,13 @@ input:focus, select:focus{
         <div class="btnRow">
           <button class="btn btnYellow" id="btnResumen" type="button">Resumen</button>
           <button class="btn btnBlue" id="btnImprimir" type="button">Imprimir cocina</button>
+          <button class="btn btnLight" id="btnReimprimirTodo" type="button">Reimprimir todo cocina</button>
         </div>
 
         <div class="noteBox">
-          Aquí revisas e imprimes. Las bebidas y postres se ven en la comanda, pero no salen en el ticket de cocina.
+          Aquí revisas e imprimes. Las bebidas y postres se ven en la comanda, pero no salen en el ticket de cocina.  
+          <b>Imprimir cocina</b> manda solo lo nuevo pendiente.  
+          <b>Reimprimir todo cocina</b> manda todo lo de cocina otra vez.
         </div>
       </section>
     </div>
@@ -881,52 +964,68 @@ try{
    CATÁLOGO CON PRECIOS
    ========================= */
 const catalogo = [
-  {id:"taco_tripa",      cat:"TACOS",       name:"Taco de Tripa",         price:38,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_pastor",     cat:"TACOS",       name:"Taco de Pastor",        price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_bistec",     cat:"TACOS",       name:"Taco de Bistec",        price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_chorizo",    cat:"TACOS",       name:"Taco de Chorizo",       price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_higado",     cat:"TACOS",       name:"Taco de Hígado",        price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_costilla",   cat:"TACOS",       name:"Taco de Costilla",      price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_barbacoa",   cat:"TACOS",       name:"Taco de Barbacoa",      price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_alambre",    cat:"TACOS",       name:"Taco de Alambre",       price:28,  desc:"", requiereNota:false, cocina:true},
-  {id:"taco_combi",      cat:"TACOS",       name:"Taco Combinado",        price:38,  desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"taco_tripa",      cat:"TACOS",              name:"Taco de Tripa",                   price:38,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_pastor",     cat:"TACOS",              name:"Taco de Pastor",                  price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_bistec",     cat:"TACOS",              name:"Taco de Bistec",                  price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_chorizo",    cat:"TACOS",              name:"Taco de Chorizo",                 price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_higado",     cat:"TACOS",              name:"Taco de Hígado",                  price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_costilla",   cat:"TACOS",              name:"Taco de Costilla",                price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_barbacoa",   cat:"TACOS",              name:"Taco de Barbacoa",                price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_alambre",    cat:"TACOS",              name:"Taco de Alambre",                 price:28,  desc:"", requiereNota:false, cocina:true},
+  {id:"taco_combi",      cat:"TACOS",              name:"Taco Combinado",                  price:38,  desc:"Escribe combinación", requiereNota:true, cocina:true},
 
-  {id:"quesa_tripa",     cat:"QUESADILLAS", name:"Quesadilla de Tripa",    price:100, desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_pastor",    cat:"QUESADILLAS", name:"Quesadilla de Pastor",   price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_bistec",    cat:"QUESADILLAS", name:"Quesadilla de Bistec",   price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_chorizo",   cat:"QUESADILLAS", name:"Quesadilla de Chorizo",  price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_higado",    cat:"QUESADILLAS", name:"Quesadilla de Hígado",   price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_costilla",  cat:"QUESADILLAS", name:"Quesadilla de Costilla", price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_barbacoa",  cat:"QUESADILLAS", name:"Quesadilla de Barbacoa", price:90,  desc:"", requiereNota:false, cocina:true},
-  {id:"quesa_alambre",   cat:"QUESADILLAS", name:"Quesadilla de Alambre",  price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_tripa",     cat:"QUESADILLAS",        name:"Quesadilla de Tripa",             price:100, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_pastor",    cat:"QUESADILLAS",        name:"Quesadilla de Pastor",            price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_bistec",    cat:"QUESADILLAS",        name:"Quesadilla de Bistec",            price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chorizo",   cat:"QUESADILLAS",        name:"Quesadilla de Chorizo",           price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_higado",    cat:"QUESADILLAS",        name:"Quesadilla de Hígado",            price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_costilla",  cat:"QUESADILLAS",        name:"Quesadilla de Costilla",          price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_barbacoa",  cat:"QUESADILLAS",        name:"Quesadilla de Barbacoa",          price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_alambre",   cat:"QUESADILLAS",        name:"Quesadilla de Alambre",           price:90,  desc:"", requiereNota:false, cocina:true},
 
-  {id:"charola_combi",   cat:"CHAROLAS",    name:"Charola Combinada",     price:100, desc:"Escribe combinación", requiereNota:true, cocina:true},
-  {id:"charola_alam",    cat:"CHAROLAS",    name:"Charola de Alambre",    price:90,  desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_tripa",    cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Tripa",    price:70, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_pastor",   cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Pastor",   price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_bistec",   cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Bistec",   price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_chorizo",  cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Chorizo",  price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_higado",   cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Hígado",   price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_costilla", cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Costilla", price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_barbacoa", cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Barbacoa", price:50, desc:"", requiereNota:false, cocina:true},
+  {id:"quesa_chica_alambre",  cat:"QUESADILLAS CHICAS", name:"Quesadilla chica de Alambre",  price:50, desc:"", requiereNota:false, cocina:true},
 
-  {id:"volcan_tripa",    cat:"VOLCANES",    name:"Volcán de Tripa",       price:90, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_pastor",   cat:"VOLCANES",    name:"Volcán de Pastor",      price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_bistec",   cat:"VOLCANES",    name:"Volcán de Bistec",      price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_chorizo",  cat:"VOLCANES",    name:"Volcán de Chorizo",     price:85, desc:"", requiereNota:false, cocina:true},
-  {id:"volcan_higado",   cat:"VOLCANES",    name:"Volcán de Hígado",      price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"charola_combi",   cat:"CHAROLAS",           name:"Charola Combinada",               price:100, desc:"Escribe combinación", requiereNota:true, cocina:true},
+  {id:"charola_alam",    cat:"CHAROLAS",           name:"Charola de Alambre",              price:90,  desc:"", requiereNota:false, cocina:true},
 
-  {id:"beb_coca_light",  cat:"BEBIDAS",     name:"Coca Light",            price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_coca",        cat:"BEBIDAS",     name:"Coca",                  price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_fresca",      cat:"BEBIDAS",     name:"Fresca",                price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_sprite",      cat:"BEBIDAS",     name:"Sprite",                price:35, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua",        cat:"BEBIDAS",     name:"Agua fresca",           price:30, desc:"", requiereNota:false, cocina:false},
-  {id:"beb_agua_lt",     cat:"BEBIDAS",     name:"Agua fresca 1 Lt",      price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"volcan_tripa",    cat:"VOLCANES",           name:"Volcán de Tripa",                 price:90, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_pastor",   cat:"VOLCANES",           name:"Volcán de Pastor",                price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_bistec",   cat:"VOLCANES",           name:"Volcán de Bistec",                price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_chorizo",  cat:"VOLCANES",           name:"Volcán de Chorizo",               price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_higado",   cat:"VOLCANES",           name:"Volcán de Hígado",                price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_costilla", cat:"VOLCANES",           name:"Volcán de Costilla",              price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_barbacoa", cat:"VOLCANES",           name:"Volcán de Barbacoa",              price:85, desc:"", requiereNota:false, cocina:true},
+  {id:"volcan_alambre",  cat:"VOLCANES",           name:"Volcán de Alambre",               price:85, desc:"", requiereNota:false, cocina:true},
 
-  {id:"pos_pay",         cat:"POSTRES",     name:"Pay de queso",          price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_rompope",     cat:"POSTRES",     name:"Gelatina vainilla con rompope", price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_arroz",       cat:"POSTRES",     name:"Arroz con leche",       price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_flan",        cat:"POSTRES",     name:"Flan",                  price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_fresa",       cat:"POSTRES",     name:"Gelatina fresa con yoghurt", price:60, desc:"", requiereNota:false, cocina:false},
-  {id:"pos_napolitano",  cat:"POSTRES",     name:"Napolitano",            price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca_light",  cat:"BEBIDAS",            name:"Coca Light",                      price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_coca",        cat:"BEBIDAS",            name:"Coca",                            price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_fresca",      cat:"BEBIDAS",            name:"Fresca",                          price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_sprite",      cat:"BEBIDAS",            name:"Sprite",                          price:35, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua",        cat:"BEBIDAS",            name:"Agua fresca",                     price:30, desc:"", requiereNota:false, cocina:false},
+  {id:"beb_agua_lt",     cat:"BEBIDAS",            name:"Agua fresca 1 Lt",                price:60, desc:"", requiereNota:false, cocina:false},
+
+  {id:"pos_pay",         cat:"POSTRES",            name:"Pay de queso",                    price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_rompope",     cat:"POSTRES",            name:"Gelatina vainilla con rompope",   price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_arroz",       cat:"POSTRES",            name:"Arroz con leche",                 price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_flan",        cat:"POSTRES",            name:"Flan",                            price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_fresa",       cat:"POSTRES",            name:"Gelatina fresa con yoghurt",      price:60, desc:"", requiereNota:false, cocina:false},
+  {id:"pos_napolitano",  cat:"POSTRES",            name:"Napolitano",                      price:60, desc:"", requiereNota:false, cocina:false},
 ];
 
-const CATS = ["TACOS","QUESADILLAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
+const CATS = ["TACOS","QUESADILLAS","QUESADILLAS CHICAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
 const MESAS = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"];
+const DESTINOS_EXTRA = [
+  {id:"carrito_afuera", nombre:"Carrito afuera", icono:"🛒", desc:"Clientes sentados afuera"},
+  {id:"para_llevar", nombre:"Para llevar", icono:"🥡", desc:"Pedido sin mesa"}
+];
 
 let currentStep = 1;
 let meseroNombre = "";
@@ -953,13 +1052,14 @@ const steps = {
 
 const titles = {
   1: ["Paso 1 — Mesero","Primero selecciona quién está tomando el pedido."],
-  2: ["Paso 2 — Elegir mesa","Toca la mesa donde se está levantando la orden."],
+  2: ["Paso 2 — Elegir ubicación","Toca la mesa, carrito afuera o para llevar."],
   3: ["Paso 3 — Capturar pedido","Elige plato y agrega productos sin bajar hasta la comanda."],
   4: ["Paso 4 — Revisar e imprimir","Confirma la comanda y manda a imprimir cocina."],
 };
 
 const meseroInput = document.getElementById("mesero");
 const mesasGrid = document.getElementById("mesasGrid");
+const destinosGrid = document.getElementById("destinosGrid");
 const personasBox = document.getElementById("personas");
 const catsBox = document.getElementById("cats");
 const itemsBox = document.getElementById("items");
@@ -1029,7 +1129,7 @@ function updateContinueButton(){
   fixedContinue.style.display = "block";
 
   if(currentStep === 1){
-    mainContinueBtn.textContent = "Continuar a mesas";
+    mainContinueBtn.textContent = "Continuar a ubicación";
     mainContinueBtn.className = "btn btnBlue";
     return;
   }
@@ -1165,8 +1265,8 @@ async function cargarComandaDeMesa(mesa){
 
   if(errComanda){
     console.error("Error cargando comanda:", errComanda);
-    setSyncStatus("Error al cargar comanda de la mesa", "bad");
-    alert("No se pudo cargar la comanda de la mesa.");
+    setSyncStatus("Error al cargar comanda de la ubicación", "bad");
+    alert("No se pudo cargar la comanda.");
     return;
   }
 
@@ -1178,11 +1278,12 @@ async function cargarComandaDeMesa(mesa){
     updateHeaderPill();
     renderCart();
     renderItems();
-    setSyncStatus(`Mesa ${mesa} sin comanda abierta`, "ok");
+    setSyncStatus(`${mesa} sin comanda abierta`, "ok");
     return;
   }
 
   comandaIdActual = comanda.id;
+
   if (comanda.mesero) {
     meseroNombre = comanda.mesero;
     meseroInput.value = comanda.mesero;
@@ -1208,6 +1309,7 @@ async function cargarComandaDeMesa(mesa){
     persona: it.plato,
     note: it.nota || "",
     qty: Number(it.qty || 0),
+    sentQty: Number(it.qty_enviada_cocina || 0),
     cat: it.categoria || "",
     cocina: !!it.cocina,
     price: Number(it.precio_unitario || 0)
@@ -1225,7 +1327,7 @@ async function cargarComandaDeMesa(mesa){
   updateHeaderPill();
   renderCart();
   renderItems();
-  setSyncStatus(`Mesa ${mesa} cargada desde Supabase`, "ok");
+  setSyncStatus(`${mesa} cargada desde Supabase`, "ok");
 }
 
 async function syncComandaToSupabase(){
@@ -1280,6 +1382,7 @@ async function syncComandaToSupabase(){
         plato: line.persona,
         nota: line.note || "",
         qty: line.qty,
+        qty_enviada_cocina: Number(line.sentQty || 0),
         cocina: !!line.cocina,
         precio_unitario: Number(line.price || 0)
       }));
@@ -1294,7 +1397,7 @@ async function syncComandaToSupabase(){
       }
     }
 
-    setSyncStatus(`Mesa ${mesaActiva} guardada`, "ok");
+    setSyncStatus(`${mesaActiva} guardado`, "ok");
   } catch (e) {
     console.error("Error general de sync:", e);
     setSyncStatus("Error al guardar en Supabase", "bad");
@@ -1311,6 +1414,18 @@ async function syncComandaToSupabase(){
 /* =========================
    UI
    ========================= */
+function selectUbicacion(ubicacion){
+  mesaActiva = ubicacion;
+  renderMesas();
+  renderDestinosExtra();
+  updateResumeViews();
+
+  cargarComandaDeMesa(mesaActiva).catch(err=>{
+    console.error(err);
+    setSyncStatus("No se pudo cargar la ubicación desde Supabase", "bad");
+  });
+}
+
 function renderMesas(){
   mesasGrid.innerHTML = "";
   MESAS.forEach(mesa=>{
@@ -1324,19 +1439,27 @@ function renderMesas(){
         <div class="mesaText">${mesa}</div>
       </div>
     `;
-    btn.onclick = async ()=>{
-      mesaActiva = mesa;
-      renderMesas();
-      updateResumeViews();
-
-      try{
-        await cargarComandaDeMesa(mesaActiva);
-      }catch(err){
-        console.error(err);
-        setSyncStatus("No se pudo cargar la mesa desde Supabase", "bad");
-      }
-    };
+    btn.onclick = ()=> selectUbicacion(mesa);
     mesasGrid.appendChild(btn);
+  });
+}
+
+function renderDestinosExtra(){
+  destinosGrid.innerHTML = "";
+
+  DESTINOS_EXTRA.forEach(destino=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "destinoBtn" + (mesaActiva===destino.nombre ? " active":"");
+    btn.innerHTML = `
+      <div class="destinoCard">
+        <div class="destinoIcon">${destino.icono}</div>
+        <div class="destinoName">${escapeHtml(destino.nombre)}</div>
+        <div class="destinoDesc">${escapeHtml(destino.desc)}</div>
+      </div>
+    `;
+    btn.onclick = ()=> selectUbicacion(destino.nombre);
+    destinosGrid.appendChild(btn);
   });
 }
 
@@ -1393,7 +1516,7 @@ function getQuickMods(item){
   if(["TACOS","VOLCANES"].includes(item.cat)){
     mods.push("Sin verdura", "Solo cebolla", "Solo cilantro");
   }
-  if(item.cat === "QUESADILLAS"){
+  if(item.cat === "QUESADILLAS" || item.cat === "QUESADILLAS CHICAS"){
     mods.push("Sin frijoles", "Sin verdura", "Solo cebolla", "Solo cilantro");
   }
   if(item.cat === "CHAROLAS"){
@@ -1489,6 +1612,7 @@ async function agregarLinea(item, persona, note, cardEl=null){
       persona,
       note:cleanNote,
       qty:1,
+      sentQty:0,
       cat:item.cat,
       cocina:!!item.cocina,
       price:Number(item.price || 0)
@@ -1505,6 +1629,7 @@ async function agregarLinea(item, persona, note, cardEl=null){
 
   const nombreSimple = item.cat === "TACOS" ? "Taco" :
                        item.cat === "QUESADILLAS" ? "Quesadilla" :
+                       item.cat === "QUESADILLAS CHICAS" ? "Quesadilla chica" :
                        item.cat === "VOLCANES" ? "Volcán" :
                        item.cat === "CHAROLAS" ? "Charola" :
                        "Producto";
@@ -1550,12 +1675,16 @@ function renderCart(){
     const extraCount = group.lines.filter(x=>!x.cocina).reduce((a,x)=>a+x.qty,0);
 
     const bodyRows = group.lines.map((line)=>{
+      const pendiente = line.cocina ? Math.max(0, Number(line.qty || 0) - Number(line.sentQty || 0)) : 0;
       return `
         <div class="line">
           <div>
             <div class="lineTitle">${escapeHtml(line.qty)} x ${escapeHtml(line.name)}</div>
             ${line.note ? `<div class="lineMeta">${escapeHtml(line.note)}</div>` : ``}
-            <div class="lineCat">${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}</div>
+            <div class="lineCat">
+              ${escapeHtml(line.cat)} ${line.cocina ? "• cocina" : "• no imprimir cocina"}
+              ${line.cocina ? ` • pendiente: ${pendiente}` : ``}
+            </div>
           </div>
           <div class="rightInfo">
             <div class="qtyBadge">${line.qty}</div>
@@ -1660,10 +1789,54 @@ btnGuardarModal.onclick = async ()=>{
   cerrarModal();
 };
 
-function buildTicketCocina(){
+function getPendientesCocina(){
+  return cart
+    .filter(x => x.cocina)
+    .map(x => {
+      const pendiente = Number(x.qty || 0) - Number(x.sentQty || 0);
+      return {
+        ...x,
+        pendiente
+      };
+    })
+    .filter(x => x.pendiente > 0);
+}
+
+function buildTicketCocinaPendiente(){
+  const pendientes = getPendientesCocina();
+
   let html = `
     <div class="ticket">
       <div class="c b lg">COMANDA COCINA</div>
+      <div class="c b">${escapeHtml(mesaActiva)}</div>
+      <div class="hr"></div>
+  `;
+
+  PLATOS.forEach(persona=>{
+    const lines = pendientes.filter(x => x.persona===persona);
+    if(!lines.length) return;
+
+    html += `<div class="g">${escapeHtml(persona)}</div>`;
+
+    lines.forEach(l=>{
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(l.pendiente)} x ${escapeHtml(l.name)}</div>
+          ${l.note ? `<div class="sub">• ${escapeHtml(l.note)}</div>` : ``}
+        </div>
+      `;
+    });
+
+    html += `<div class="hr"></div>`;
+  });
+
+  return html + `</div>`;
+}
+
+function buildTicketCocinaCompleto(){
+  let html = `
+    <div class="ticket">
+      <div class="c b lg">REIMPRESIÓN COCINA</div>
       <div class="c b">${escapeHtml(mesaActiva)}</div>
       <div class="hr"></div>
   `;
@@ -1720,11 +1893,46 @@ function buildResumenComanda(){
   return html + `</div>`;
 }
 
-function imprimirCocina(){
+async function marcarPendientesComoEnviados(){
+  let huboCambios = false;
+
+  cart.forEach(line => {
+    if(!line.cocina) return;
+
+    const pendiente = Number(line.qty || 0) - Number(line.sentQty || 0);
+    if(pendiente > 0){
+      line.sentQty = Number(line.qty || 0);
+      huboCambios = true;
+    }
+  });
+
+  if(huboCambios){
+    await syncComandaToSupabase();
+    renderCart();
+  }
+}
+
+async function imprimirCocina(){
   if(!cart.length) return alert("No hay productos en la comanda.");
-  if(!cart.some(x=>x.cocina)) return alert("No hay productos de cocina para imprimir.");
+
+  const pendientes = getPendientesCocina();
+  if(!pendientes.length) return alert("No hay productos nuevos pendientes para cocina.");
+
   const area = document.getElementById("printArea");
-  area.innerHTML = buildTicketCocina();
+  area.innerHTML = buildTicketCocinaPendiente();
+
+  setTimeout(async ()=>{
+    window.print();
+    await marcarPendientesComoEnviados();
+  }, 100);
+}
+
+function reimprimirTodoCocina(){
+  if(!cart.length) return alert("No hay productos en la comanda.");
+  if(!cart.some(x => x.cocina)) return alert("No hay productos de cocina para imprimir.");
+
+  const area = document.getElementById("printArea");
+  area.innerHTML = buildTicketCocinaCompleto();
   setTimeout(()=>window.print(),100);
 }
 
@@ -1757,7 +1965,7 @@ function handleMainContinue(e){
 
   if(currentStep === 2){
     if(!mesaActiva){
-      alert("Selecciona una mesa.");
+      alert("Selecciona una ubicación.");
       return false;
     }
 
@@ -1815,11 +2023,13 @@ document.getElementById("collapseAll").onclick = ()=>{
 
 document.getElementById("btnResumen").onclick = verResumen;
 document.getElementById("btnImprimir").onclick = imprimirCocina;
+document.getElementById("btnReimprimirTodo").onclick = reimprimirTodoCocina;
 
 /* =========================
    INIT
    ========================= */
 renderMesas();
+renderDestinosExtra();
 renderPersonas();
 renderCats();
 renderItems();
