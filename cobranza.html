@@ -733,7 +733,7 @@ header{
 
       <div class="modalHelp">
         Operador: consulta, imprime y cierra.<br>
-        Admin: además puede editar precios, borrar productos  hacer ajustes.
+        Admin: además puede editar precios, borrar productos y hacer ajustes.
       </div>
     </div>
     <div class="modalFoot">
@@ -768,7 +768,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const ADMIN_PIN = "1234";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
