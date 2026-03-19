@@ -209,6 +209,16 @@ header{
   color:var(--red-dark);
 }
 
+.actionsSticky{
+  position:sticky;
+  top:0;
+  z-index:12;
+  background:linear-gradient(180deg,#ffffff 0%, rgba(255,255,255,.96) 100%);
+  padding-top:10px;
+  padding-bottom:10px;
+  margin-top:12px;
+}
+
 .mesasGrid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -321,7 +331,7 @@ header{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
-  margin-top:14px;
+  margin-top:0;
 }
 .actions .btn:nth-child(5){
   grid-column:1 / -1;
@@ -641,15 +651,17 @@ header{
           <button class="tipoBtn" id="btnTipoCarrito" type="button">🛒 Carrito afuera</button>
         </div>
 
-        <div class="mesasGrid" id="mesasGrid"></div>
-
-        <div class="actions">
-          <button class="btn btnYellow" id="btnResumen" type="button">Mandar resumen por WhatsApp</button>
-          <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
-          <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
-          <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
-          <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">Ajuste admin</button>
+        <div class="actionsSticky">
+          <div class="actions">
+            <button class="btn btnYellow" id="btnResumen" type="button">Mandar resumen por WhatsApp</button>
+            <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
+            <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
+            <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
+            <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">Ajuste admin</button>
+          </div>
         </div>
+
+        <div class="mesasGrid" id="mesasGrid"></div>
       </div>
     </section>
 
