@@ -296,8 +296,6 @@ input:focus, select:focus{
   font-weight:1000;
   color:#0b3d6e;
   font-size:16px;
-  text-align:center;
-  line-height:1.15;
 }
 .mesaBtn.active .mesaCard{
   border-color:var(--red);
@@ -387,8 +385,7 @@ input:focus, select:focus{
 .resumeBox span{
   font-size:22px;
   font-weight:1000;
-  line-height:1.1;
-  word-break:break-word;
+  line-height:1;
 }
 
 .personasGrid{
@@ -795,10 +792,11 @@ input:focus, select:focus{
   transform:translateY(0) scale(1);
 }
 
-@media (max-width:640px){
-  .modalFoot{
-    flex-direction:column;
-  }
+.print-area{display:none}
+
+@page{
+  size:58mm auto;
+  margin:1mm;
 }
 </style>
 </head>
@@ -841,7 +839,7 @@ input:focus, select:focus{
 
       <section class="step" id="step2">
         <div class="noteBox" style="margin-top:0">
-          Elige el destino del pedido: mesa, barra, carrito afuera o para llevar.
+          Elige la ubicación del pedido: mesa, carrito o para llevar.
         </div>
 
         <div class="ubicacionesWrap" style="margin-top:12px">
@@ -851,20 +849,13 @@ input:focus, select:focus{
           </div>
 
           <div class="ubicacionSection">
-            <div class="sectionTitle">Otros destinos</div>
-            <div class="destinosGrid" id="destinosGrid"></div>
+            <div class="sectionTitle">Carrito</div>
+            <div class="destinosGrid" id="carritosGrid"></div>
           </div>
-        </div>
 
-        <div id="cuentaRefWrap" style="display:none; margin-top:14px;">
-          <label>Nombre, folio o número de cuenta</label>
-          <input id="cuentaRefInput" type="text" placeholder="Ej. Juan / 1 / Azul / Familia 2">
-          <div class="noteBox" style="margin-top:10px">
-            Para <b>Barra</b>, <b>Para llevar</b> y <b>Carrito afuera</b>, usa una referencia para separar cuentas.
-            <br>Ejemplos:
-            <br><b>Barra — 1</b>
-            <br><b>Para llevar — Juan</b>
-            <br><b>Carrito afuera — 3</b>
+          <div class="ubicacionSection">
+            <div class="sectionTitle">Para llevar</div>
+            <div class="destinosGrid" id="llevarGrid"></div>
           </div>
         </div>
       </section>
@@ -986,6 +977,8 @@ input:focus, select:focus{
   <div class="toast" id="toastMsg">Producto añadido</div>
 </div>
 
+<div class="print-area" id="printArea"></div>
+
 <script>
 /* =========================
    CONFIG SUPABASE
@@ -993,15 +986,16 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 try{
-  if (
+  if(
     SUPABASE_URL &&
     SUPABASE_ANON_KEY &&
     window.supabase &&
     typeof window.supabase.createClient === "function"
-  ) {
+  ){
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseReady = true;
   }
@@ -1077,12 +1071,10 @@ const catalogo = [
 
 const CATS = ["TACOS","QUESADILLAS","QUESADILLAS CHICAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
+
 const MESAS = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"];
-const DESTINOS_EXTRA = [
-  {id:"barra", nombre:"Barra", icono:"🥢", desc:"Clientes en barra"},
-  {id:"carrito_afuera", nombre:"Carrito afuera", icono:"🛒", desc:"Clientes sentados afuera"},
-  {id:"para_llevar", nombre:"Para llevar", icono:"🥡", desc:"Pedido sin mesa"}
-];
+const CARRITOS = ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"];
+const PARA_LLEVAR = ["Para llevar 1","Para llevar 2","Para llevar 3","Para llevar 4","Para llevar 5"];
 
 const PRECIO_REFRESCO = {
   taparosca: 35,
@@ -1092,8 +1084,6 @@ const PRECIO_REFRESCO = {
 let currentStep = 1;
 let meseroNombre = "";
 let mesaActiva = "";
-let ubicacionBaseActiva = "";
-let cuentaReferencia = "";
 let personaActiva = "Plato 1";
 let activeCat = "TACOS";
 let cart = [];
@@ -1118,14 +1108,15 @@ const steps = {
 
 const titles = {
   1: ["Paso 1 — Mesero","Primero selecciona quién está tomando el pedido."],
-  2: ["Paso 2 — Elegir ubicación","Toca la mesa, barra, carrito afuera o para llevar."],
+  2: ["Paso 2 — Elegir ubicación","Toca la mesa, carrito o el pedido para llevar."],
   3: ["Paso 3 — Capturar pedido","Elige plato y agrega productos sin bajar hasta la comanda."],
   4: ["Paso 4 — Revisar e imprimir","Confirma la comanda y manda a imprimir cocina."],
 };
 
 const meseroInput = document.getElementById("mesero");
 const mesasGrid = document.getElementById("mesasGrid");
-const destinosGrid = document.getElementById("destinosGrid");
+const carritosGrid = document.getElementById("carritosGrid");
+const llevarGrid = document.getElementById("llevarGrid");
 const personasBox = document.getElementById("personas");
 const catsBox = document.getElementById("cats");
 const itemsBox = document.getElementById("items");
@@ -1158,8 +1149,6 @@ const mainContinueBtn = document.getElementById("mainContinueBtn");
 const fixedContinue = document.getElementById("fixedContinue");
 const toastMsg = document.getElementById("toastMsg");
 const syncStatus = document.getElementById("syncStatus");
-const cuentaRefWrap = document.getElementById("cuentaRefWrap");
-const cuentaRefInput = document.getElementById("cuentaRefInput");
 
 function escapeHtml(s){
   return String(s || "")
@@ -1265,40 +1254,6 @@ function regresarASeleccionMesa(){
     return;
   }
   goToStep(2);
-}
-
-function requiereReferenciaCuenta(base){
-  return base === "Barra" || base === "Para llevar" || base === "Carrito afuera";
-}
-
-function actualizarMesaActivaFinal(){
-  const ref = String(cuentaReferencia || "").trim();
-
-  if(!ubicacionBaseActiva){
-    mesaActiva = "";
-    return;
-  }
-
-  if(requiereReferenciaCuenta(ubicacionBaseActiva)){
-    mesaActiva = ref ? `${ubicacionBaseActiva} — ${ref}` : ubicacionBaseActiva;
-  }else{
-    mesaActiva = ubicacionBaseActiva;
-  }
-}
-
-function actualizarUIReferenciaCuenta(){
-  if(!cuentaRefWrap) return;
-
-  const mostrar = requiereReferenciaCuenta(ubicacionBaseActiva);
-  cuentaRefWrap.style.display = mostrar ? "block" : "none";
-
-  if(!mostrar){
-    cuentaReferencia = "";
-    if(cuentaRefInput) cuentaRefInput.value = "";
-  }
-
-  actualizarMesaActivaFinal();
-  updateResumeViews();
 }
 
 /* =========================
@@ -1433,7 +1388,7 @@ async function cargarComandaDeMesa(mesa){
 
   comandaIdActual = comanda.id;
 
-  if (comanda.mesero) {
+  if(comanda.mesero){
     meseroNombre = comanda.mesero;
     meseroInput.value = comanda.mesero;
   }
@@ -1554,32 +1509,16 @@ async function syncComandaToSupabase(){
    UI
    ========================= */
 function selectUbicacion(ubicacion){
-  ubicacionBaseActiva = ubicacion;
-
-  if(!requiereReferenciaCuenta(ubicacionBaseActiva)){
-    cuentaReferencia = "";
-    if(cuentaRefInput) cuentaRefInput.value = "";
-  }
-
-  actualizarUIReferenciaCuenta();
+  mesaActiva = ubicacion;
   renderMesas();
-  renderDestinosExtra();
+  renderCarritos();
+  renderParaLlevar();
   updateResumeViews();
 
-  if(!requiereReferenciaCuenta(ubicacionBaseActiva)){
-    cargarComandaDeMesa(mesaActiva).catch(err=>{
-      console.error(err);
-      setSyncStatus("No se pudo cargar la ubicación desde Supabase", "bad");
-    });
-  }else{
-    cart = [];
-    comandaIdActual = null;
-    openGroups.clear();
-    updateHeaderPill();
-    renderCart();
-    renderItems();
-    setSyncStatus(`Define una referencia para ${ubicacionBaseActiva}`, "warn");
-  }
+  cargarComandaDeMesa(mesaActiva).catch(err=>{
+    console.error(err);
+    setSyncStatus("No se pudo cargar la ubicación desde Supabase", "bad");
+  });
 }
 
 function renderMesas(){
@@ -1587,7 +1526,7 @@ function renderMesas(){
   MESAS.forEach(mesa=>{
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "mesaBtn" + (ubicacionBaseActiva===mesa ? " active":"");
+    btn.className = "mesaBtn" + (mesaActiva===mesa ? " active":"");
     btn.innerHTML = `
       <div class="mesaCard">
         <div class="mesaTop"></div>
@@ -1600,21 +1539,39 @@ function renderMesas(){
   });
 }
 
-function renderDestinosExtra(){
-  destinosGrid.innerHTML = "";
-  DESTINOS_EXTRA.forEach(destino=>{
+function renderCarritos(){
+  carritosGrid.innerHTML = "";
+  CARRITOS.forEach(nombre=>{
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "destinoBtn" + (ubicacionBaseActiva===destino.nombre ? " active":"");
+    btn.className = "destinoBtn" + (mesaActiva===nombre ? " active":"");
     btn.innerHTML = `
       <div class="destinoCard">
-        <div class="destinoIcon">${destino.icono}</div>
-        <div class="destinoName">${escapeHtml(destino.nombre)}</div>
-        <div class="destinoDesc">${escapeHtml(destino.desc)}</div>
+        <div class="destinoIcon">🛒</div>
+        <div class="destinoName">${escapeHtml(nombre)}</div>
+        <div class="destinoDesc">Clientes sentados afuera</div>
       </div>
     `;
-    btn.onclick = ()=> selectUbicacion(destino.nombre);
-    destinosGrid.appendChild(btn);
+    btn.onclick = ()=> selectUbicacion(nombre);
+    carritosGrid.appendChild(btn);
+  });
+}
+
+function renderParaLlevar(){
+  llevarGrid.innerHTML = "";
+  PARA_LLEVAR.forEach(nombre=>{
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "destinoBtn" + (mesaActiva===nombre ? " active":"");
+    btn.innerHTML = `
+      <div class="destinoCard">
+        <div class="destinoIcon">🥡</div>
+        <div class="destinoName">${escapeHtml(nombre)}</div>
+        <div class="destinoDesc">Pedido sin mesa</div>
+      </div>
+    `;
+    btn.onclick = ()=> selectUbicacion(nombre);
+    llevarGrid.appendChild(btn);
   });
 }
 
@@ -2459,24 +2416,12 @@ function handleMainContinue(e){
   }
 
   if(currentStep === 2){
-    if(!ubicacionBaseActiva){
+    if(!mesaActiva){
       alert("Selecciona una ubicación.");
       return false;
     }
 
-    if(requiereReferenciaCuenta(ubicacionBaseActiva) && !String(cuentaReferencia || "").trim()){
-      alert(`Escribe una referencia para ${ubicacionBaseActiva}. Ejemplo: 1, Juan, Azul, etc.`);
-      return false;
-    }
-
-    actualizarMesaActivaFinal();
     updateResumeViews();
-
-    cargarComandaDeMesa(mesaActiva).catch(err=>{
-      console.error(err);
-      setSyncStatus("No se pudo cargar la cuenta seleccionada", "bad");
-    });
-
     goToStep(3);
     return false;
   }
@@ -2502,12 +2447,6 @@ function handleMainContinue(e){
 
 meseroInput.addEventListener("change", ()=>{
   meseroNombre = String(meseroInput.value || "").trim();
-  updateResumeViews();
-});
-
-cuentaRefInput?.addEventListener("input", ()=>{
-  cuentaReferencia = String(cuentaRefInput.value || "").trim();
-  actualizarMesaActivaFinal();
   updateResumeViews();
 });
 
@@ -2539,7 +2478,8 @@ document.getElementById("btnReimprimirTodo").onclick = reimprimirTodoCocina;
    INIT
    ========================= */
 renderMesas();
-renderDestinosExtra();
+renderCarritos();
+renderParaLlevar();
 renderPersonas();
 renderCats();
 renderItems();
