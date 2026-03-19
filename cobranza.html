@@ -794,6 +794,19 @@ const PRECIOS = {
   quesa_costilla:90,
   quesa_barbacoa:90,
   quesa_alambre:90,
+  quesa_sencilla:30,
+  quesa_combi:100,
+
+  quesa_chica_tripa:70,
+  quesa_chica_pastor:50,
+  quesa_chica_bistec:50,
+  quesa_chica_chorizo:50,
+  quesa_chica_higado:50,
+  quesa_chica_costilla:50,
+  quesa_chica_barbacoa:50,
+  quesa_chica_alambre:50,
+  quesa_chica_sencilla:25,
+  quesa_chica_combi:70,
 
   charola_combi:100,
   charola_alam:90,
@@ -803,6 +816,11 @@ const PRECIOS = {
   volcan_bistec:85,
   volcan_chorizo:85,
   volcan_higado:85,
+  volcan_costilla:85,
+  volcan_barbacoa:85,
+  volcan_alambre:85,
+  volcan_combi:90,
+  volcan_sencillo:35,
 
   beb_coca_light:35,
   beb_coca:35,
@@ -821,8 +839,8 @@ const PRECIOS = {
 
 const CUENTAS_FIJAS = {
   mesas: ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"],
-  llevar: ["Para llevar"],
-  carrito: ["Carrito afuera"]
+  llevar: ["Para llevar 1","Para llevar 2","Para llevar 3","Para llevar 4","Para llevar 5"],
+  carrito: ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"]
 };
 
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
@@ -955,6 +973,16 @@ function resetVista(){
   detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
 }
 
+function getCuentaIconHtml(){
+  if(tipoVista === "mesas"){
+    return `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`;
+  }
+  if(tipoVista === "llevar"){
+    return `<div style="font-size:44px;">🥡</div>`;
+  }
+  return `<div style="font-size:44px;">🛒</div>`;
+}
+
 function renderMesas(){
   mesasGrid.innerHTML = "";
 
@@ -971,15 +999,9 @@ function renderMesas(){
     const estadoTexto = mesasConCuenta.has(mesa) ? "Cuenta activa" : "Sin cuenta";
     const totalMesa = mesasConCuenta.has(mesa) ? money(info.total || 0) : "";
 
-    const iconHtml = tipoVista === "mesas"
-      ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
-      : tipoVista === "llevar"
-      ? `<div style="font-size:44px;">🥡</div>`
-      : `<div style="font-size:44px;">🛒</div>`;
-
     btn.innerHTML = `
       <div class="mesaCard">
-        ${iconHtml}
+        ${getCuentaIconHtml()}
         <div class="mesaText">${escapeHtml(mesa)}</div>
         ${totalMesa ? `<div class="mesaAmount">${totalMesa}</div>` : ``}
         <div class="mesaState">${estadoTexto}</div>
@@ -1005,10 +1027,13 @@ async function cargarEstadoMesas(){
     return;
   }
 
+  const cuentasVisibles = getCuentasVisibles();
+
   const { data: comandas, error: errComandas } = await supabase
     .from("comandas")
     .select("id, mesa, estado")
-    .eq("estado", "abierta");
+    .eq("estado", "abierta")
+    .in("mesa", cuentasVisibles);
 
   if(errComandas){
     console.error(errComandas);
@@ -1475,7 +1500,7 @@ function imprimirResumen(){
   imprimirHtmlTicket(buildResumenPrint());
 }
 
-function cambiarTipoVista(nuevoTipo){
+async function cambiarTipoVista(nuevoTipo){
   tipoVista = nuevoTipo;
   mesaActual = "";
   comandaActual = null;
@@ -1485,6 +1510,7 @@ function cambiarTipoVista(nuevoTipo){
   kpiMesero.textContent = "—";
   detalleCuenta.innerHTML = `<div class="emptyState">Selecciona una cuenta.</div>`;
   updateTipoUI();
+  await cargarEstadoMesas();
   renderMesas();
 }
 
