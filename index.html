@@ -839,7 +839,7 @@ input:focus, select:focus{
 
       <section class="step" id="step2">
         <div class="noteBox" style="margin-top:0">
-          Elige la ubicación del pedido: mesa, carrito o para llevar.
+          Elige el destino del pedido: mesa, carrito o para llevar.
         </div>
 
         <div class="ubicacionesWrap" style="margin-top:12px">
@@ -986,15 +986,16 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 try{
-  if(
+  if (
     SUPABASE_URL &&
     SUPABASE_ANON_KEY &&
     window.supabase &&
     typeof window.supabase.createClient === "function"
-  ){
+  ) {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     supabaseReady = true;
   }
@@ -1070,7 +1071,6 @@ const catalogo = [
 
 const CATS = ["TACOS","QUESADILLAS","QUESADILLAS CHICAS","CHAROLAS","VOLCANES","BEBIDAS","POSTRES"];
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
-
 const MESAS = ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"];
 const CARRITOS = ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"];
 const PARA_LLEVAR = ["Para llevar 1","Para llevar 2","Para llevar 3","Para llevar 4","Para llevar 5"];
@@ -1107,7 +1107,7 @@ const steps = {
 
 const titles = {
   1: ["Paso 1 — Mesero","Primero selecciona quién está tomando el pedido."],
-  2: ["Paso 2 — Elegir ubicación","Toca la mesa, carrito o el pedido para llevar."],
+  2: ["Paso 2 — Elegir ubicación","Toca la mesa, carrito o para llevar."],
   3: ["Paso 3 — Capturar pedido","Elige plato y agrega productos sin bajar hasta la comanda."],
   4: ["Paso 4 — Revisar e imprimir","Confirma la comanda y manda a imprimir cocina."],
 };
@@ -1387,7 +1387,7 @@ async function cargarComandaDeMesa(mesa){
 
   comandaIdActual = comanda.id;
 
-  if(comanda.mesero){
+  if (comanda.mesero) {
     meseroNombre = comanda.mesero;
     meseroInput.value = comanda.mesero;
   }
