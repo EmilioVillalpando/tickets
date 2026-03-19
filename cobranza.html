@@ -564,81 +564,6 @@ header{
   font-weight:800;
   font-size:14px;
 }
-
-/* ========= ZONA DE IMPRESIÓN ========= */
-.print-area{
-  display:none;
-}
-
-.print-ticket{
-  width:58mm;
-  background:#fff;
-  color:#000;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size:11px;
-  line-height:1.2;
-  padding:1.5mm;
-  box-sizing:border-box;
-}
-.print-ticket .c{text-align:center}
-.print-ticket .b{font-weight:900}
-.print-ticket .lg{font-size:17px}
-.print-ticket .hr{border-top:1px dashed #000;margin:4px 0}
-.print-ticket .g{font-weight:900;margin-top:5px;font-size:12px;text-transform:uppercase}
-.print-ticket .it{margin:4px 0}
-.print-ticket .itn{font-weight:900;font-size:13px;line-height:1.15}
-.print-ticket .sub{padding-left:6px;font-size:11px;white-space:pre-wrap}
-.print-ticket .priceRow{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  font-size:11px;
-  margin-top:2px;
-}
-.print-ticket .totalRowPrint{
-  display:flex;
-  justify-content:space-between;
-  gap:8px;
-  font-size:16px;
-  font-weight:900;
-  margin-top:8px;
-}
-
-/* ========= IMPRESIÓN REAL ========= */
-@page{
-  size:58mm auto;
-  margin:1mm;
-}
-
-@media print{
-  html, body{
-    width:58mm !important;
-    min-width:58mm !important;
-    max-width:58mm !important;
-    background:#fff !important;
-    margin:0 !important;
-    padding:0 !important;
-  }
-
-  body.printing-ticket > *:not(#printArea){
-    display:none !important;
-  }
-
-  body.printing-ticket #printArea{
-    display:block !important;
-    position:static !important;
-    width:58mm !important;
-    min-width:58mm !important;
-    max-width:58mm !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-  }
-
-  body.printing-ticket #printArea *{
-    visibility:visible !important;
-  }
-}
 </style>
 </head>
 <body>
@@ -678,7 +603,7 @@ header{
         <div class="mesasGrid" id="mesasGrid"></div>
 
         <div class="actions">
-          <button class="btn btnYellow" id="btnResumen" type="button">Imprimir resumen</button>
+          <button class="btn btnYellow" id="btnResumen" type="button">Mandar resumen por WhatsApp</button>
           <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
           <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
           <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
@@ -760,16 +685,13 @@ header{
   </div>
 </div>
 
-<div class="print-area" id="printArea"></div>
-
 <script>
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
 const ADMIN_PIN = "1234";
+const WHATSAPP_RESUMEN = "524622527782";
 
-let supabase = null;
-let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -795,19 +717,6 @@ const PRECIOS = {
   quesa_costilla:90,
   quesa_barbacoa:90,
   quesa_alambre:90,
-  quesa_sencilla:30,
-  quesa_combi:100,
-
-  quesa_chica_tripa:70,
-  quesa_chica_pastor:50,
-  quesa_chica_bistec:50,
-  quesa_chica_chorizo:50,
-  quesa_chica_higado:50,
-  quesa_chica_costilla:50,
-  quesa_chica_barbacoa:50,
-  quesa_chica_alambre:50,
-  quesa_chica_sencilla:25,
-  quesa_chica_combi:70,
 
   charola_combi:100,
   charola_alam:90,
@@ -817,11 +726,6 @@ const PRECIOS = {
   volcan_bistec:85,
   volcan_chorizo:85,
   volcan_higado:85,
-  volcan_costilla:85,
-  volcan_barbacoa:85,
-  volcan_alambre:85,
-  volcan_combi:90,
-  volcan_sencillo:35,
 
   beb_coca_light:35,
   beb_coca:35,
@@ -855,7 +759,6 @@ let userRole = "operador";
 let currentEditAction = null;
 let currentEditItem = null;
 let tipoVista = "mesas";
-let printingNow = false;
 
 const syncStatus = document.getElementById("syncStatus");
 const pillMesa = document.getElementById("pillMesa");
@@ -879,7 +782,6 @@ const editHelp = document.getElementById("editHelp");
 const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
 const btnTipoCarrito = document.getElementById("btnTipoCarrito");
-const printArea = document.getElementById("printArea");
 
 function money(n){
   return "$" + Number(n || 0).toFixed(2);
@@ -974,16 +876,6 @@ function resetVista(){
   detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
 }
 
-function getCuentaIconHtml(){
-  if(tipoVista === "mesas"){
-    return `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`;
-  }
-  if(tipoVista === "llevar"){
-    return `<div style="font-size:44px;">🥡</div>`;
-  }
-  return `<div style="font-size:44px;">🛒</div>`;
-}
-
 function renderMesas(){
   mesasGrid.innerHTML = "";
 
@@ -1000,9 +892,15 @@ function renderMesas(){
     const estadoTexto = mesasConCuenta.has(mesa) ? "Cuenta activa" : "Sin cuenta";
     const totalMesa = mesasConCuenta.has(mesa) ? money(info.total || 0) : "";
 
+    const iconHtml = tipoVista === "mesas"
+      ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
+      : tipoVista === "llevar"
+      ? `<div style="font-size:44px;">🥡</div>`
+      : `<div style="font-size:44px;">🛒</div>`;
+
     btn.innerHTML = `
       <div class="mesaCard">
-        ${getCuentaIconHtml()}
+        ${iconHtml}
         <div class="mesaText">${escapeHtml(mesa)}</div>
         ${totalMesa ? `<div class="mesaAmount">${totalMesa}</div>` : ``}
         <div class="mesaState">${estadoTexto}</div>
@@ -1378,7 +1276,7 @@ function buildCuentaPrint(){
   const grupos = agruparItemsPorPlato(itemsActuales);
 
   let html = `
-    <div class="print-ticket">
+    <div class="ticket">
       <div class="c b lg">CUENTA</div>
       <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
       <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
@@ -1418,71 +1316,160 @@ function buildCuentaPrint(){
   return html;
 }
 
-function buildResumenPrint(){
+function buildResumenWhatsappText(){
   if(!comandaActual) return "";
 
   const grupos = agruparItemsPorPlato(itemsActuales);
-
-  let html = `
-    <div class="print-ticket">
-      <div class="c b lg">RESUMEN</div>
-      <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
-      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
-      <div class="hr"></div>
-  `;
+  let texto = `*RESUMEN*\n`;
+  texto += `*${comandaActual.mesa || "Cuenta"}*\n`;
+  texto += `Mesero: ${comandaActual.mesero || "—"}\n\n`;
 
   grupos.forEach(group => {
-    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
+    texto += `*${group.plato}*\n`;
 
     group.items.forEach(item => {
-      html += `
-        <div class="it">
-          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
-          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
-        </div>
-      `;
+      texto += `• ${item.qty} x ${item.producto_nombre || "Producto"}\n`;
+      if(item.nota){
+        texto += `   - ${item.nota}\n`;
+      }
     });
 
-    html += `<div class="hr"></div>`;
+    texto += `\n`;
   });
 
-  html += `</div>`;
-  return html;
+  return texto;
 }
 
-function limpiarZonaImpresion(){
-  printArea.innerHTML = "";
-  document.body.classList.remove("printing-ticket");
-  printingNow = false;
-}
+function mandarResumenWhatsapp(){
+  if(!comandaActual){
+    alert("Primero selecciona una cuenta.");
+    return;
+  }
 
-window.addEventListener("afterprint", () => {
-  limpiarZonaImpresion();
-});
+  const texto = buildResumenWhatsappText();
+  const url = `https://wa.me/${WHATSAPP_RESUMEN}?text=${encodeURIComponent(texto)}`;
+  window.open(url, "_blank");
+}
 
 function imprimirHtmlTicket(htmlContenido){
   if(!htmlContenido) return;
 
-  printArea.innerHTML = htmlContenido;
-  document.body.classList.add("printing-ticket");
-  printingNow = true;
+  const ticketDoc = `
+    <!doctype html>
+    <html lang="es">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+      <title>Ticket</title>
+      <style>
+        @page{
+          size:80mm auto;
+          margin:0;
+        }
 
-  const cerrarSeguro = () => {
-    setTimeout(() => {
-      if (printingNow) limpiarZonaImpresion();
-    }, 1500);
-  };
+        html, body{
+          margin:0;
+          padding:0;
+          width:80mm;
+          max-width:80mm;
+          background:#fff;
+          overflow-x:hidden;
+        }
 
-  setTimeout(() => {
-    try{
-      window.print();
-      cerrarSeguro();
-    }catch(err){
-      console.error(err);
-      limpiarZonaImpresion();
-      alert("No se pudo abrir la impresión.");
-    }
-  }, 120);
+        body{
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          color:#000;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .ticket{
+          width:72mm;
+          margin:0 auto;
+          box-sizing:border-box;
+          padding:2mm 1.5mm 3mm;
+          font-size:16px;
+          line-height:1.25;
+          color:#000;
+          background:#fff;
+        }
+
+        .c{text-align:center}
+        .b{font-weight:900}
+        .lg{font-size:18px}
+        .hr{border-top:1px dashed #000;margin:5px 0}
+        .g{
+          font-weight:900;
+          margin-top:6px;
+          font-size:16px;
+          text-transform:uppercase;
+        }
+        .it{margin:5px 0}
+        .itn{
+          font-weight:900;
+          font-size:18px;
+          line-height:1.15;
+        }
+        .sub{
+          padding-left:6px;
+          font-size:15px;
+          white-space:pre-wrap;
+        }
+        .priceRow{
+          display:flex;
+          justify-content:space-between;
+          gap:8px;
+          font-size:15px;
+          margin-top:2px;
+        }
+        .totalRowPrint{
+          display:flex;
+          justify-content:space-between;
+          gap:8px;
+          font-size:26px;
+          font-weight:900;
+          margin-top:8px;
+        }
+
+        .screen-bar{
+          position:sticky;
+          top:0;
+          background:#fff;
+          padding:8px;
+          border-bottom:1px solid #ddd;
+          text-align:center;
+          font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+        }
+        .screen-bar button{
+          border:none;
+          border-radius:10px;
+          padding:10px 14px;
+          font-weight:800;
+          font-size:14px;
+          background:#1565c0;
+          color:#fff;
+          margin:0 4px;
+        }
+
+        @media print{
+          .screen-bar{ display:none !important; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="screen-bar">
+        <button onclick="window.print()">Imprimir</button>
+        <button onclick="history.back()">Regresar</button>
+      </div>
+      ${htmlContenido}
+    </body>
+    </html>
+  `;
+
+  sessionStorage.setItem("vdc_ticket_return", location.href);
+  document.open();
+  document.write(ticketDoc);
+  document.close();
 }
 
 function imprimirCuenta(){
@@ -1491,14 +1478,6 @@ function imprimirCuenta(){
     return;
   }
   imprimirHtmlTicket(buildCuentaPrint());
-}
-
-function imprimirResumen(){
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
-  imprimirHtmlTicket(buildResumenPrint());
 }
 
 async function cambiarTipoVista(nuevoTipo){
@@ -1540,7 +1519,7 @@ document.getElementById("btnEditSave").onclick = guardarEdicion;
 
 document.getElementById("btnCerrar").onclick = cerrarCuenta;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
-document.getElementById("btnResumen").onclick = imprimirResumen;
+document.getElementById("btnResumen").onclick = mandarResumenWhatsapp;
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
   await cargarEstadoMesas();
   if (mesaActual) await cargarCuenta();
