@@ -565,11 +565,79 @@ header{
   font-size:14px;
 }
 
-.print-area{display:none}
+/* ========= ZONA DE IMPRESIÓN ========= */
+.print-area{
+  display:none;
+}
 
+.print-ticket{
+  width:58mm;
+  background:#fff;
+  color:#000;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size:11px;
+  line-height:1.2;
+  padding:1.5mm;
+  box-sizing:border-box;
+}
+.print-ticket .c{text-align:center}
+.print-ticket .b{font-weight:900}
+.print-ticket .lg{font-size:17px}
+.print-ticket .hr{border-top:1px dashed #000;margin:4px 0}
+.print-ticket .g{font-weight:900;margin-top:5px;font-size:12px;text-transform:uppercase}
+.print-ticket .it{margin:4px 0}
+.print-ticket .itn{font-weight:900;font-size:13px;line-height:1.15}
+.print-ticket .sub{padding-left:6px;font-size:11px;white-space:pre-wrap}
+.print-ticket .priceRow{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:11px;
+  margin-top:2px;
+}
+.print-ticket .totalRowPrint{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  font-size:16px;
+  font-weight:900;
+  margin-top:8px;
+}
+
+/* ========= IMPRESIÓN REAL ========= */
 @page{
   size:58mm auto;
   margin:1mm;
+}
+
+@media print{
+  html, body{
+    width:58mm !important;
+    min-width:58mm !important;
+    max-width:58mm !important;
+    background:#fff !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  body.printing-ticket > *:not(#printArea){
+    display:none !important;
+  }
+
+  body.printing-ticket #printArea{
+    display:block !important;
+    position:static !important;
+    width:58mm !important;
+    min-width:58mm !important;
+    max-width:58mm !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:#fff !important;
+  }
+
+  body.printing-ticket #printArea *{
+    visibility:visible !important;
+  }
 }
 </style>
 </head>
@@ -610,7 +678,7 @@ header{
         <div class="mesasGrid" id="mesasGrid"></div>
 
         <div class="actions">
-          <button class="btn btnYellow" id="btnWhatsappResumen" type="button">Enviar resumen a WhatsApp</button>
+          <button class="btn btnYellow" id="btnResumen" type="button">Imprimir resumen</button>
           <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
           <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
           <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
@@ -698,10 +766,8 @@ header{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-/* solo operativo */
 const ADMIN_PIN = "1234";
 
-const WHATSAPP_NUMERO = "4622527782";
 
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
@@ -755,8 +821,8 @@ const PRECIOS = {
 
 const CUENTAS_FIJAS = {
   mesas: ["Mesa 1","Mesa 2","Mesa 3","Mesa 4","Mesa 5"],
-  llevar: ["Para llevar 1","Para llevar 2","Para llevar 3","Para llevar 4","Para llevar 5"],
-  carrito: ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"]
+  llevar: ["Para llevar"],
+  carrito: ["Carrito afuera"]
 };
 
 const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
@@ -770,6 +836,7 @@ let userRole = "operador";
 let currentEditAction = null;
 let currentEditItem = null;
 let tipoVista = "mesas";
+let printingNow = false;
 
 const syncStatus = document.getElementById("syncStatus");
 const pillMesa = document.getElementById("pillMesa");
@@ -793,13 +860,10 @@ const editHelp = document.getElementById("editHelp");
 const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
 const btnTipoCarrito = document.getElementById("btnTipoCarrito");
+const printArea = document.getElementById("printArea");
 
 function money(n){
   return "$" + Number(n || 0).toFixed(2);
-}
-
-function moneyPlain(n){
-  return Number(n || 0).toFixed(2);
 }
 
 function escapeHtml(s){
@@ -931,24 +995,6 @@ function renderMesas(){
 
     mesasGrid.appendChild(btn);
   });
-}
-
-function sanitizarTelefonoMX(valor){
-  const solo = String(valor || "").replace(/\D/g, "");
-  if(!solo) return "";
-  if(solo.startsWith("52")) return solo;
-  return "52" + solo;
-}
-
-function getHoyRangeLocalISO(){
-  const now = new Date();
-  const inicio = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const fin = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-  return {
-    inicioISO: inicio.toISOString(),
-    finISO: fin.toISOString(),
-    etiqueta: `${String(now.getDate()).padStart(2,"0")}/${String(now.getMonth()+1).padStart(2,"0")}/${now.getFullYear()}`
-  };
 }
 
 async function cargarEstadoMesas(){
@@ -1306,7 +1352,7 @@ function buildCuentaPrint(){
   const grupos = agruparItemsPorPlato(itemsActuales);
 
   let html = `
-    <div class="ticket">
+    <div class="print-ticket">
       <div class="c b lg">CUENTA</div>
       <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
       <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
@@ -1324,7 +1370,7 @@ function buildCuentaPrint(){
         <div class="it">
           <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
           ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
-          <div class="priceRow" style="display:flex;justify-content:space-between;gap:8px;font-size:11px;margin-top:2px;">
+          <div class="priceRow">
             <span>${money(precio)} c/u</span>
             <span>${money(importe)}</span>
           </div>
@@ -1336,7 +1382,7 @@ function buildCuentaPrint(){
   });
 
   html += `
-      <div class="totalRowPrint" style="display:flex;justify-content:space-between;gap:8px;font-size:16px;font-weight:900;margin-top:8px;">
+      <div class="totalRowPrint">
         <span>TOTAL</span>
         <span>${money(total)}</span>
       </div>
@@ -1346,220 +1392,71 @@ function buildCuentaPrint(){
   return html;
 }
 
-async function obtenerResumenDelDia(){
-  const { inicioISO, finISO, etiqueta } = getHoyRangeLocalISO();
+function buildResumenPrint(){
+  if(!comandaActual) return "";
 
-  const { data: comandas, error: errComandas } = await supabase
-    .from("comandas")
-    .select("id, mesa, mesero, estado, created_at, updated_at")
-    .gte("created_at", inicioISO)
-    .lte("created_at", finISO)
-    .order("created_at", { ascending:true });
+  const grupos = agruparItemsPorPlato(itemsActuales);
 
-  if(errComandas){
-    throw errComandas;
-  }
+  let html = `
+    <div class="print-ticket">
+      <div class="c b lg">RESUMEN</div>
+      <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
+      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+      <div class="hr"></div>
+  `;
 
-  const listaComandas = comandas || [];
-  if(!listaComandas.length){
-    return {
-      texto: `*Resumen del día ${etiqueta}*\n\nNo hubo pedidos registrados hoy.`,
-      total: 0
-    };
-  }
+  grupos.forEach(group => {
+    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
 
-  const ids = listaComandas.map(c => c.id);
+    group.items.forEach(item => {
+      html += `
+        <div class="it">
+          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
+          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
+        </div>
+      `;
+    });
 
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("*")
-    .in("comanda_id", ids)
-    .order("created_at", { ascending:true });
-
-  if(errItems){
-    throw errItems;
-  }
-
-  const itemsLista = items || [];
-  const itemsPorComanda = {};
-  const resumenProductos = {};
-  let totalGeneral = 0;
-  let totalPiezas = 0;
-
-  itemsLista.forEach(it => {
-    if(!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
-    itemsPorComanda[it.comanda_id].push(it);
-
-    const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-      ? Number(it.precio_unitario || 0)
-      : Number(PRECIOS[it.producto_id] || 0);
-
-    const qty = Number(it.qty || 0);
-    const importe = qty * precio;
-    totalGeneral += importe;
-    totalPiezas += qty;
-
-    const nombre = it.producto_nombre || it.name || it.producto_id || "Producto";
-    if(!resumenProductos[nombre]){
-      resumenProductos[nombre] = {
-        qty: 0,
-        total: 0
-      };
-    }
-    resumenProductos[nombre].qty += qty;
-    resumenProductos[nombre].total += importe;
+    html += `<div class="hr"></div>`;
   });
 
-  let texto = `*Resumen del día ${etiqueta}*\n\n`;
-  texto += `*Cuentas registradas:* ${listaComandas.length}\n`;
-  texto += `*Productos vendidos:* ${totalPiezas}\n`;
-  texto += `*Total ganado:* $${moneyPlain(totalGeneral)}\n\n`;
-
-  texto += `*Pedidos del día*\n`;
-  listaComandas.forEach((com, idx) => {
-    const arr = itemsPorComanda[com.id] || [];
-    const totalCuenta = arr.reduce((acc, it) => {
-      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
-        : Number(PRECIOS[it.producto_id] || 0);
-      return acc + (Number(it.qty || 0) * precio);
-    }, 0);
-
-    texto += `\n${idx + 1}. *${com.mesa || "Cuenta"}*`;
-    if(com.mesero) texto += ` - ${com.mesero}`;
-    texto += `\n`;
-
-    if(!arr.length){
-      texto += `   • Sin productos\n`;
-    } else {
-      arr.forEach(it => {
-        const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-          ? Number(it.precio_unitario || 0)
-          : Number(PRECIOS[it.producto_id] || 0);
-        const importe = Number(it.qty || 0) * precio;
-        texto += `   • ${it.qty} x ${it.producto_nombre || it.name || "Producto"} = $${moneyPlain(importe)}\n`;
-        if(it.nota){
-          texto += `     Nota: ${String(it.nota).trim()}\n`;
-        }
-      });
-    }
-
-    texto += `   *Total cuenta:* $${moneyPlain(totalCuenta)}\n`;
-  });
-
-  const productosOrdenados = Object.entries(resumenProductos)
-    .sort((a,b) => b[1].total - a[1].total);
-
-  texto += `\n*Resumen por producto*\n`;
-  productosOrdenados.forEach(([nombre, info]) => {
-    texto += `• ${nombre}: ${info.qty} pzas / $${moneyPlain(info.total)}\n`;
-  });
-
-  texto += `\n*TOTAL DEL DÍA:* $${moneyPlain(totalGeneral)}`;
-
-  return {
-    texto,
-    total: totalGeneral
-  };
+  html += `</div>`;
+  return html;
 }
 
-async function enviarResumenWhatsapp(){
-  if(!supabaseReady){
-    setSyncStatus("Configura Supabase primero", "bad");
-    return;
-  }
-
-  try{
-    setSyncStatus("Generando resumen del día...", "warn");
-
-    const numero = sanitizarTelefonoMX(WHATSAPP_NUMERO);
-    if(!numero){
-      alert("Número de WhatsApp inválido.");
-      return;
-    }
-
-    const resumen = await obtenerResumenDelDia();
-    const url = `https://wa.me/${numero}?text=${encodeURIComponent(resumen.texto)}`;
-
-    window.open(url, "_blank");
-    setSyncStatus("Resumen enviado a WhatsApp", "ok");
-  }catch(err){
-    console.error(err);
-    setSyncStatus("Error al generar el resumen", "bad");
-    alert("No se pudo generar el resumen.");
-  }
+function limpiarZonaImpresion(){
+  printArea.innerHTML = "";
+  document.body.classList.remove("printing-ticket");
+  printingNow = false;
 }
+
+window.addEventListener("afterprint", () => {
+  limpiarZonaImpresion();
+});
 
 function imprimirHtmlTicket(htmlContenido){
-  const iframe = document.createElement("iframe");
-  iframe.style.position = "fixed";
-  iframe.style.right = "0";
-  iframe.style.bottom = "0";
-  iframe.style.width = "0";
-  iframe.style.height = "0";
-  iframe.style.border = "0";
-  iframe.style.opacity = "0";
-  document.body.appendChild(iframe);
+  if(!htmlContenido) return;
 
-  const doc = iframe.contentWindow.document;
+  printArea.innerHTML = htmlContenido;
+  document.body.classList.add("printing-ticket");
+  printingNow = true;
 
-  doc.open();
-  doc.write(`
-    <!doctype html>
-    <html lang="es">
-    <head>
-      <meta charset="utf-8">
-      <title>Impresión</title>
-      <style>
-        @page{
-          size:58mm auto;
-          margin:1mm;
-        }
-        html,body{
-          margin:0;
-          padding:0;
-          background:#fff;
-          width:58mm;
-        }
-        body{
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          color:#000;
-        }
-        .ticket{
-          width:54mm;
-          box-sizing:border-box;
-          padding:1.5mm;
-          font-size:11px;
-          line-height:1.2;
-          color:#000;
-          background:#fff;
-        }
-        .ticket .c{text-align:center}
-        .ticket .b{font-weight:900}
-        .ticket .lg{font-size:17px}
-        .ticket .hr{border-top:1px dashed #000;margin:4px 0}
-        .ticket .g{font-weight:900;margin-top:5px;font-size:12px;text-transform:uppercase}
-        .ticket .it{margin:4px 0}
-        .ticket .itn{font-weight:900;font-size:13px;line-height:1.15}
-        .ticket .sub{padding-left:6px;font-size:11px;white-space:pre-wrap}
-      </style>
-    </head>
-    <body>
-      ${htmlContenido}
-    </body>
-    </html>
-  `);
-  doc.close();
-
-  iframe.onload = function(){
+  const cerrarSeguro = () => {
     setTimeout(() => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      setTimeout(() => {
-        document.body.removeChild(iframe);
-      }, 800);
-    }, 250);
+      if (printingNow) limpiarZonaImpresion();
+    }, 1500);
   };
+
+  setTimeout(() => {
+    try{
+      window.print();
+      cerrarSeguro();
+    }catch(err){
+      console.error(err);
+      limpiarZonaImpresion();
+      alert("No se pudo abrir la impresión.");
+    }
+  }, 120);
 }
 
 function imprimirCuenta(){
@@ -1568,6 +1465,14 @@ function imprimirCuenta(){
     return;
   }
   imprimirHtmlTicket(buildCuentaPrint());
+}
+
+function imprimirResumen(){
+  if(!comandaActual){
+    alert("Primero selecciona una cuenta.");
+    return;
+  }
+  imprimirHtmlTicket(buildResumenPrint());
 }
 
 function cambiarTipoVista(nuevoTipo){
@@ -1608,7 +1513,7 @@ document.getElementById("btnEditSave").onclick = guardarEdicion;
 
 document.getElementById("btnCerrar").onclick = cerrarCuenta;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
-document.getElementById("btnWhatsappResumen").onclick = enviarResumenWhatsapp;
+document.getElementById("btnResumen").onclick = imprimirResumen;
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
   await cargarEstadoMesas();
   if (mesaActual) await cargarCuenta();
