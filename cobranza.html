@@ -81,6 +81,98 @@ header{
   font-size:16px;
 }
 
+.headerRight{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.headerActivas{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  max-width:760px;
+}
+
+.headerMesaItem{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(6px);
+}
+
+.headerMesaName{
+  border:none;
+  border-radius:999px;
+  padding:9px 12px;
+  font-size:14px;
+  font-weight:1000;
+  cursor:pointer;
+  background:#fff;
+  color:#14591b;
+  white-space:nowrap;
+}
+
+.headerMesaName.active{
+  background:linear-gradient(180deg,#effdf2,#d9f6df);
+  color:#14591b;
+  box-shadow:0 6px 14px rgba(46,125,50,.18);
+}
+
+.headerMiniBtn{
+  border:none;
+  border-radius:999px;
+  padding:8px 10px;
+  font-size:12px;
+  font-weight:1000;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.headerMiniPrint{
+  background:#fff7de;
+  color:#7a5400;
+}
+
+.headerMiniClose{
+  background:#fff1f1;
+  color:#8e1d1d;
+}
+
+.headerNoActivas{
+  padding:9px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.14);
+  border:1px solid rgba(255,255,255,.18);
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+}
+
+@media (max-width:900px){
+  .head{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .headerRight{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .headerActivas{
+    max-width:none;
+    justify-content:flex-start;
+  }
+}
+
 .wrap{
   max-width:1180px;
   margin:auto;
@@ -668,7 +760,11 @@ header{
       <h1>💳 Cuentas</h1>
       <div class="sub">Mesas, para llevar y carrito afuera</div>
     </div>
-    <div class="pill" id="pillMesa">Sin seleccionar</div>
+
+    <div class="headerRight">
+      <div class="pill" id="pillMesa">Sin seleccionar</div>
+      <div class="headerActivas" id="headerActivas"></div>
+    </div>
   </div>
 </header>
 
@@ -793,6 +889,9 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const ADMIN_PIN = "1234";
 const WHATSAPP_RESUMEN = "524622527782";
 
+let supabase = null;
+let supabaseReady = false;
+
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   supabaseReady = true;
@@ -867,6 +966,7 @@ const kpiMesero = document.getElementById("kpiMesero");
 const detalleCuenta = document.getElementById("detalleCuenta");
 const mesasGrid = document.getElementById("mesasGrid");
 const activasGrid = document.getElementById("activasGrid");
+const headerActivas = document.getElementById("headerActivas");
 const roleInfo = document.getElementById("roleInfo");
 const btnAjusteAdmin = document.getElementById("btnAjusteAdmin");
 
@@ -977,12 +1077,112 @@ function resetVista(){
   detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
 }
 
+async function seleccionarCuentaDesdeHeader(mesa){
+  mesaActual = mesa;
+  pillMesa.textContent = mesa;
+  renderMesas();
+  renderHeaderActivas();
+  await cargarCuenta();
+}
+
+async function imprimirCuentaDirecta(mesa){
+  const mesaAnterior = mesaActual;
+  const comandaAnterior = comandaActual;
+  const itemsAnteriores = [...itemsActuales];
+
+  mesaActual = mesa;
+  await cargarCuenta();
+
+  if(!comandaActual){
+    alert("No hay cuenta abierta en " + mesa);
+    mesaActual = mesaAnterior;
+    comandaActual = comandaAnterior;
+    itemsActuales = itemsAnteriores;
+    renderCuenta();
+    renderMesas();
+    renderHeaderActivas();
+    return;
+  }
+
+  imprimirCuenta();
+
+  mesaActual = mesa;
+  renderMesas();
+  renderHeaderActivas();
+}
+
+async function cerrarCuentaDirecta(mesa){
+  const mesaAnterior = mesaActual;
+  mesaActual = mesa;
+  await cargarCuenta();
+
+  if(!comandaActual){
+    alert("No hay cuenta abierta en " + mesa);
+    mesaActual = mesaAnterior;
+    renderMesas();
+    renderHeaderActivas();
+    return;
+  }
+
+  await cerrarCuenta();
+  renderHeaderActivas();
+}
+
+function renderHeaderActivas(){
+  headerActivas.innerHTML = "";
+
+  const cuentasVisibles = getCuentasVisibles();
+  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
+
+  if(!cuentasActivas.length){
+    headerActivas.innerHTML = `<div class="headerNoActivas">Sin cuentas activas</div>`;
+    return;
+  }
+
+  cuentasActivas.forEach(mesa=>{
+    const item = document.createElement("div");
+    item.className = "headerMesaItem";
+
+    const btnMesa = document.createElement("button");
+    btnMesa.type = "button";
+    btnMesa.className = "headerMesaName" + (mesaActual === mesa ? " active" : "");
+    btnMesa.textContent = mesa;
+    btnMesa.onclick = ()=> seleccionarCuentaDesdeHeader(mesa);
+
+    const btnPrint = document.createElement("button");
+    btnPrint.type = "button";
+    btnPrint.className = "headerMiniBtn headerMiniPrint";
+    btnPrint.textContent = "Imprimir";
+    btnPrint.onclick = (e)=>{
+      e.stopPropagation();
+      imprimirCuentaDirecta(mesa);
+    };
+
+    const btnClose = document.createElement("button");
+    btnClose.type = "button";
+    btnClose.className = "headerMiniBtn headerMiniClose";
+    btnClose.textContent = "Cerrar";
+    btnClose.onclick = (e)=>{
+      e.stopPropagation();
+      cerrarCuentaDirecta(mesa);
+    };
+
+    item.appendChild(btnMesa);
+    item.appendChild(btnPrint);
+    item.appendChild(btnClose);
+
+    headerActivas.appendChild(item);
+  });
+}
+
 function renderMesas(){
   mesasGrid.innerHTML = "";
   activasGrid.innerHTML = "";
 
   const cuentasVisibles = getCuentasVisibles();
   const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
+
+  renderHeaderActivas();
 
   if(!cuentasActivas.length){
     activasGrid.innerHTML = `
@@ -1648,6 +1848,7 @@ async function cambiarTipoVista(nuevoTipo){
   kpiMesa.textContent = "—";
   kpiMesero.textContent = "—";
   detalleCuenta.innerHTML = `<div class="emptyState">Selecciona una cuenta.</div>`;
+  headerActivas.innerHTML = "";
   updateTipoUI();
   await cargarEstadoMesas();
   renderMesas();
