@@ -356,18 +356,6 @@ header{
   border-color:rgba(46,125,50,.22);
 }
 
-.mesasGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
-  margin-top:10px;
-  max-height:340px;
-  overflow:auto;
-  padding-right:4px;
-}
-@media (max-width:520px){
-  .mesasGrid{grid-template-columns:1fr}
-}
 .mesaBtn{
   border:none;
   cursor:pointer;
@@ -795,11 +783,9 @@ header{
           <div class="activasGrid" id="activasGrid"></div>
         </div>
 
-        <div class="mesasGrid" id="mesasGrid"></div>
-
         <div class="actionsSticky">
           <div class="actions">
-            <button class="btn btnYellow" id="btnResumen" type="button">Mandar resumen por WhatsApp</button>
+            <button class="btn btnYellow" id="btnResumen" type="button">Resumen general de ventas</button>
             <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
             <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
             <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
@@ -963,7 +949,6 @@ const pillMesa = document.getElementById("pillMesa");
 const kpiMesa = document.getElementById("kpiMesa");
 const kpiMesero = document.getElementById("kpiMesero");
 const detalleCuenta = document.getElementById("detalleCuenta");
-const mesasGrid = document.getElementById("mesasGrid");
 const activasGrid = document.getElementById("activasGrid");
 const headerActivas = document.getElementById("headerActivas");
 const roleInfo = document.getElementById("roleInfo");
@@ -1175,7 +1160,6 @@ function renderHeaderActivas(){
 }
 
 function renderMesas(){
-  mesasGrid.innerHTML = "";
   activasGrid.innerHTML = "";
 
   const cuentasVisibles = getCuentasVisibles();
@@ -1199,56 +1183,19 @@ function renderMesas(){
         No hay cuentas activas en esta sección.
       </div>
     `;
-  } else {
-    cuentasActivas.forEach(mesa => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-
-      let cls = "mesaBtn activeMesa";
-      if (mesaActual === mesa) cls += " selected";
-      btn.className = cls;
-
-      const info = resumenMesas[mesa] || { total: 0, items: 0 };
-      const totalMesa = money(info.total || 0);
-
-      const iconHtml = tipoVista === "mesas"
-        ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
-        : tipoVista === "llevar"
-        ? `<div style="font-size:44px;">🥡</div>`
-        : `<div style="font-size:44px;">🛒</div>`;
-
-      btn.innerHTML = `
-        <div class="mesaCard">
-          ${iconHtml}
-          <div class="mesaText">${escapeHtml(mesa)}</div>
-          <div class="mesaAmount">${totalMesa}</div>
-          <div class="mesaState">Cuenta activa</div>
-        </div>
-      `;
-
-      btn.onclick = async () => {
-        mesaActual = mesa;
-        pillMesa.textContent = mesa;
-        renderMesas();
-        await cargarCuenta();
-      };
-
-      activasGrid.appendChild(btn);
-    });
+    return;
   }
 
-  cuentasVisibles.forEach(mesa => {
+  cuentasActivas.forEach(mesa => {
     const btn = document.createElement("button");
     btn.type = "button";
 
-    let cls = "mesaBtn";
+    let cls = "mesaBtn activeMesa";
     if (mesaActual === mesa) cls += " selected";
-    if (mesasConCuenta.has(mesa)) cls += " activeMesa";
     btn.className = cls;
 
     const info = resumenMesas[mesa] || { total: 0, items: 0 };
-    const estadoTexto = mesasConCuenta.has(mesa) ? "Cuenta activa" : "Sin cuenta";
-    const totalMesa = mesasConCuenta.has(mesa) ? money(info.total || 0) : "";
+    const totalMesa = money(info.total || 0);
 
     const iconHtml = tipoVista === "mesas"
       ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
@@ -1260,8 +1207,8 @@ function renderMesas(){
       <div class="mesaCard">
         ${iconHtml}
         <div class="mesaText">${escapeHtml(mesa)}</div>
-        ${totalMesa ? `<div class="mesaAmount">${totalMesa}</div>` : ``}
-        <div class="mesaState">${estadoTexto}</div>
+        <div class="mesaAmount">${totalMesa}</div>
+        <div class="mesaState">Cuenta activa</div>
       </div>
     `;
 
@@ -1272,7 +1219,7 @@ function renderMesas(){
       await cargarCuenta();
     };
 
-    mesasGrid.appendChild(btn);
+    activasGrid.appendChild(btn);
   });
 }
 
@@ -1674,43 +1621,113 @@ function buildCuentaPrint(){
   return html;
 }
 
-function buildResumenWhatsappText(){
-  if(!comandaActual) return "";
+async function buildResumenGeneralVentas(){
+  if(!supabaseReady) return "";
 
-  const grupos = agruparItemsPorPlato(itemsActuales);
-  let texto = `*RESUMEN*\n`;
-  texto += `*${comandaActual.mesa || "Cuenta"}*\n`;
-  texto += `Mesero: ${comandaActual.mesero || "—"}\n\n`;
+  const { data: comandas, error: errComandas } = await supabase
+    .from("comandas")
+    .select("id, mesa, mesero, estado, created_at, updated_at")
+    .order("created_at", { ascending: false });
 
-  grupos.forEach(group => {
-    texto += `*${group.plato}*\n`;
+  if(errComandas){
+    console.error(errComandas);
+    alert("No se pudo consultar el resumen general.");
+    return "";
+  }
 
-    group.items.forEach(item => {
-      texto += `• ${item.qty} x ${item.producto_nombre || "Producto"}\n`;
-      if(item.nota){
-        texto += `   - ${item.nota}\n`;
-      }
-    });
+  const { data: items, error: errItems } = await supabase
+    .from("comandas_items")
+    .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario");
 
-    texto += `\n`;
+  if(errItems){
+    console.error(errItems);
+    alert("No se pudieron consultar los productos del resumen general.");
+    return "";
+  }
+
+  const listaComandas = comandas || [];
+  const listaItems = items || [];
+
+  if(!listaComandas.length){
+    return "*RESUMEN GENERAL*\nNo hay ventas registradas.";
+  }
+
+  const itemsPorComanda = {};
+  listaItems.forEach(it=>{
+    if(!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
+    itemsPorComanda[it.comanda_id].push(it);
   });
+
+  let totalGeneral = 0;
+  let totalAbiertas = 0;
+  let totalCerradas = 0;
+  const productos = {};
+
+  listaComandas.forEach(com=>{
+    const arr = itemsPorComanda[com.id] || [];
+    const totalComanda = arr.reduce((acc, it)=>{
+      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
+        ? Number(it.precio_unitario || 0)
+        : Number(PRECIOS[it.producto_id] || 0);
+      return acc + (Number(it.qty || 0) * precio);
+    }, 0);
+
+    totalGeneral += totalComanda;
+    if(com.estado === "cerrada") totalCerradas += totalComanda;
+    else totalAbiertas += totalComanda;
+
+    arr.forEach(it=>{
+      const nombre = it.producto_nombre || "Producto";
+      if(!productos[nombre]) productos[nombre] = { qty:0, total:0 };
+      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
+        ? Number(it.precio_unitario || 0)
+        : Number(PRECIOS[it.producto_id] || 0);
+
+      productos[nombre].qty += Number(it.qty || 0);
+      productos[nombre].total += Number(it.qty || 0) * precio;
+    });
+  });
+
+  const topProductos = Object.entries(productos)
+    .sort((a,b)=> b[1].total - a[1].total)
+    .slice(0,10);
+
+  let texto = `*RESUMEN GENERAL DE VENTAS*\n\n`;
+  texto += `Total general: *${money(totalGeneral)}*\n`;
+  texto += `Ventas cerradas: *${money(totalCerradas)}*\n`;
+  texto += `Cuentas abiertas: *${money(totalAbiertas)}*\n`;
+  texto += `Total de comandas: *${listaComandas.length}*\n\n`;
+
+  texto += `*Top productos:*\n`;
+  if(!topProductos.length){
+    texto += `Sin productos registrados.\n`;
+  }else{
+    topProductos.forEach(([nombre, info])=>{
+      texto += `• ${nombre}: ${info.qty} pzas / ${money(info.total)}\n`;
+    });
+  }
 
   return texto;
 }
 
-function mandarResumenWhatsapp(){
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
+async function mandarResumenGeneralWhatsapp(){
+  const texto = await buildResumenGeneralVentas();
+  if(!texto) return;
 
-  const texto = buildResumenWhatsappText();
   const url = `https://wa.me/${WHATSAPP_RESUMEN}?text=${encodeURIComponent(texto)}`;
   window.open(url, "_blank");
 }
 
 function imprimirHtmlTicket(htmlContenido){
   if(!htmlContenido) return;
+
+  const returnUrl = location.href;
+  const win = window.open("", "_blank");
+
+  if(!win){
+    alert("El navegador bloqueó la ventana de impresión. Activa las ventanas emergentes.");
+    return;
+  }
 
   const ticketDoc = `
     <!doctype html>
@@ -1807,6 +1824,7 @@ function imprimirHtmlTicket(htmlContenido){
           background:#1565c0;
           color:#fff;
           margin:0 4px;
+          cursor:pointer;
         }
 
         @media print{
@@ -1817,17 +1835,16 @@ function imprimirHtmlTicket(htmlContenido){
     <body>
       <div class="screen-bar">
         <button onclick="window.print()">Imprimir</button>
-        <button onclick="history.back()">Regresar</button>
+        <button onclick="window.location.href='${returnUrl}'">Regresar</button>
       </div>
       ${htmlContenido}
     </body>
     </html>
   `;
 
-  sessionStorage.setItem("vdc_ticket_return", location.href);
-  document.open();
-  document.write(ticketDoc);
-  document.close();
+  win.document.open();
+  win.document.write(ticketDoc);
+  win.document.close();
 }
 
 function imprimirCuenta(){
@@ -1878,7 +1895,7 @@ document.getElementById("btnEditSave").onclick = guardarEdicion;
 
 document.getElementById("btnCerrar").onclick = cerrarCuenta;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
-document.getElementById("btnResumen").onclick = mandarResumenWhatsapp;
+document.getElementById("btnResumen").onclick = mandarResumenGeneralWhatsapp;
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
   await cargarEstadoMesas();
   if (mesaActual) await cargarCuenta();
