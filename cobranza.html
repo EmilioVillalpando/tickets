@@ -929,10 +929,32 @@ function resetVista(){
   detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
 }
 
+
 function renderMesas(){
   mesasGrid.innerHTML = "";
 
-  getCuentasVisibles().forEach(mesa => {
+  const cuentasActivas = getCuentasVisibles().filter(mesa => mesasConCuenta.has(mesa));
+
+  if(!cuentasActivas.length){
+    mesasGrid.innerHTML = `
+      <div style="
+        grid-column:1 / -1;
+        border-radius:18px;
+        padding:18px;
+        background:#fff;
+        border:2px dashed #d4e2f2;
+        color:#61758d;
+        font-weight:900;
+        text-align:center;
+        font-size:16px;
+      ">
+        No hay cuentas activas en esta sección.
+      </div>
+    `;
+    return;
+  }
+
+  cuentasActivas.forEach(mesa => {
     const btn = document.createElement("button");
     btn.type = "button";
 
@@ -942,8 +964,8 @@ function renderMesas(){
     btn.className = cls;
 
     const info = resumenMesas[mesa] || { total: 0, items: 0 };
-    const estadoTexto = mesasConCuenta.has(mesa) ? "Cuenta activa" : "Sin cuenta";
-    const totalMesa = mesasConCuenta.has(mesa) ? money(info.total || 0) : "";
+    const estadoTexto = "Cuenta activa";
+    const totalMesa = money(info.total || 0);
 
     const iconHtml = tipoVista === "mesas"
       ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
@@ -955,7 +977,7 @@ function renderMesas(){
       <div class="mesaCard">
         ${iconHtml}
         <div class="mesaText">${escapeHtml(mesa)}</div>
-        ${totalMesa ? `<div class="mesaAmount">${totalMesa}</div>` : ``}
+        <div class="mesaAmount">${totalMesa}</div>
         <div class="mesaState">${estadoTexto}</div>
       </div>
     `;
@@ -970,6 +992,7 @@ function renderMesas(){
     mesasGrid.appendChild(btn);
   });
 }
+
 
 async function cargarEstadoMesas(){
   if(!supabaseReady){
