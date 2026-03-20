@@ -219,6 +219,11 @@ input:focus, select:focus{
   color:#7a5100;
   border:1px solid rgba(251,192,45,.35);
 }
+.btnMiniRed{
+  background:#fff1f1;
+  color:#8e1d1d;
+  border:1px solid rgba(198,40,40,.28);
+}
 
 .fixedContinue{
   position:fixed;
@@ -602,7 +607,7 @@ input:focus, select:focus{
   flex-direction:column;
   align-items:flex-end;
   gap:8px;
-  min-width:130px;
+  min-width:168px;
 }
 .qtyBadge{
   min-width:52px;
@@ -927,7 +932,7 @@ input:focus, select:focus{
         </div>
 
         <div class="noteBox">
-          El taquero <b>no puede eliminar productos</b>. Solo puede <b>agregar más</b> o <b>editar indicaciones</b>.
+          El mesero ahora puede <b>agregar, restar, eliminar y editar</b> productos para corregir errores de captura.
         </div>
       </section>
     </div>
@@ -986,7 +991,8 @@ input:focus, select:focus{
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 try{
   if (
@@ -1756,6 +1762,48 @@ async function incrementarLineaPorKey(key){
   await syncComandaToSupabase();
 }
 
+async function decrementarLineaPorKey(key){
+  const line = getLineByKey(key);
+  if(!line) return;
+
+  if(line.qty <= 1){
+    await eliminarLineaPorKey(key, false);
+    return;
+  }
+
+  line.qty -= 1;
+
+  if(Number(line.sentQty || 0) > Number(line.qty || 0)){
+    line.sentQty = Number(line.qty || 0);
+  }
+
+  updateHeaderPill();
+  renderCart();
+  renderItems();
+  await syncComandaToSupabase();
+  showToast("Se quitó 1 producto");
+}
+
+async function eliminarLineaPorKey(key, askConfirm=true){
+  const idx = cart.findIndex(x => x.key === key);
+  if(idx < 0) return;
+
+  const line = cart[idx];
+
+  if(askConfirm){
+    const ok = confirm(`¿Eliminar "${line.name}" de ${line.persona}?`);
+    if(!ok) return;
+  }
+
+  cart.splice(idx, 1);
+
+  updateHeaderPill();
+  renderCart();
+  renderItems();
+  await syncComandaToSupabase();
+  showToast("Producto eliminado");
+}
+
 function agruparCart(){
   const grupos = {};
   cart.forEach(line=>{
@@ -1972,7 +2020,9 @@ function renderCart(){
             }
             <div class="lineActions">
               <button type="button" class="btnMini btnMiniBlue" data-act="plus" data-key="${escapeHtml(line.key)}">+</button>
+              <button type="button" class="btnMini btnMiniYellow" data-act="minus" data-key="${escapeHtml(line.key)}">-</button>
               <button type="button" class="btnMini btnMiniYellow" data-act="edit" data-key="${escapeHtml(line.key)}">Editar</button>
+              <button type="button" class="btnMini btnMiniRed" data-act="del" data-key="${escapeHtml(line.key)}">Eliminar</button>
             </div>
           </div>
         </div>
@@ -2001,6 +2051,14 @@ function renderCart(){
 
   cartBox.querySelectorAll('[data-act="plus"]').forEach(btn=>{
     btn.onclick = ()=> incrementarLineaPorKey(btn.getAttribute("data-key"));
+  });
+
+  cartBox.querySelectorAll('[data-act="minus"]').forEach(btn=>{
+    btn.onclick = ()=> decrementarLineaPorKey(btn.getAttribute("data-key"));
+  });
+
+  cartBox.querySelectorAll('[data-act="del"]').forEach(btn=>{
+    btn.onclick = ()=> eliminarLineaPorKey(btn.getAttribute("data-key"), true);
   });
 
   cartBox.querySelectorAll('[data-act="edit"]').forEach(btn=>{
@@ -2151,8 +2209,8 @@ function imprimirHtmlTicket(htmlContenido){
           min-width:58mm;
           box-sizing:border-box;
           padding:1.5mm;
-          font-size:11px;
-          line-height:1.2;
+          font-size:12px;
+          line-height:1.24;
           color:#000;
           background:#fff;
           box-shadow:0 8px 24px rgba(0,0,0,.10);
@@ -2160,13 +2218,13 @@ function imprimirHtmlTicket(htmlContenido){
 
         .ticket .c{text-align:center}
         .ticket .b{font-weight:900}
-        .ticket .lg{font-size:17px}
+        .ticket .lg{font-size:19px}
         .ticket .hr{border-top:1px dashed #000;margin:4px 0}
-        .ticket .g{font-weight:900;margin-top:5px;font-size:12px;text-transform:uppercase}
+        .ticket .g{font-weight:900;margin-top:5px;font-size:13px;text-transform:uppercase}
         .ticket .it{margin:4px 0}
-        .ticket .itn{font-weight:900;font-size:13px;line-height:1.15}
-        .ticket .sub{padding-left:6px;font-size:11px;white-space:pre-wrap}
-        .ticket .small{font-size:10px}
+        .ticket .itn{font-weight:900;font-size:14px;line-height:1.15}
+        .ticket .sub{padding-left:6px;font-size:12px;white-space:pre-wrap}
+        .ticket .small{font-size:11px}
 
         @media print{
           html,body{
