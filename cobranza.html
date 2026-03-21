@@ -908,8 +908,8 @@ header{
         </div>
 
         <div>
-          <label class="modalLabel">¿Con cuánto van a pagar?</label>
-          <input class="modalInput" id="cobroPago" type="number" min="0" step="0.01" placeholder="Ej. 500">
+          <label class="modalLabel">¿Con cuánto van a pagar? (opcional)</label>
+          <input class="modalInput" id="cobroPago" type="number" min="0" step="0.01" placeholder="Opcional, ej. 500">
         </div>
 
         <div class="cobroBox cobroCambio" id="cobroCambioBox">
@@ -917,7 +917,7 @@ header{
           <span id="cobroCambio">$0.00</span>
         </div>
 
-        <div class="modalHelp" id="cobroEstado">Captura el pago para calcular el cambio.</div>
+        <div class="modalHelp" id="cobroEstado">Puedes cerrar la cuenta sin capturar pago.</div>
       </div>
     </div>
     <div class="modalFoot">
@@ -933,6 +933,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const ADMIN_PIN = "1234";
 const WHATSAPP_RESUMEN = "524624672994";
+
 
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
@@ -1116,7 +1117,7 @@ function openCobroModal(){
   cobroPago.value = "";
   cobroCambio.textContent = money(0);
   cobroCambioBox.classList.remove("ok","bad");
-  cobroEstado.textContent = "Captura el pago para calcular el cambio.";
+  cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
   cobroBackdrop.style.display = "flex";
 
   setTimeout(()=>cobroPago.focus(), 60);
@@ -1128,24 +1129,27 @@ function closeCobroModal(){
 
 function recalcularCambio(){
   const total = getTotalCuenta();
-  const pago = Number(cobroPago.value || 0);
+  const pagoTexto = String(cobroPago.value || "").trim();
+
+  cobroCambioBox.classList.remove("ok","bad");
+
+  if(!pagoTexto){
+    cobroCambio.textContent = money(0);
+    cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
+    return;
+  }
+
+  const pago = Number(pagoTexto);
   const cambio = pago - total;
 
   cobroCambio.textContent = money(cambio);
 
-  cobroCambioBox.classList.remove("ok","bad");
-
-  if(!cobroPago.value){
-    cobroEstado.textContent = "Captura el pago para calcular el cambio.";
-    return;
-  }
-
   if(cambio >= 0){
     cobroCambioBox.classList.add("ok");
-    cobroEstado.textContent = "Pago suficiente. Ya puedes confirmar el cierre.";
+    cobroEstado.textContent = "Cambio calculado correctamente.";
   }else{
     cobroCambioBox.classList.add("bad");
-    cobroEstado.textContent = `Faltan ${money(Math.abs(cambio))} para completar el pago.`;
+    cobroEstado.textContent = `Faltan ${money(Math.abs(cambio))} para cubrir el total.`;
   }
 }
 
@@ -1995,6 +1999,17 @@ loginRol.addEventListener("change", ()=>{
 });
 
 cobroPago.addEventListener("input", recalcularCambio);
+cobroPago.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter"){
+    e.preventDefault();
+    cobroPago.blur();
+    recalcularCambio();
+    document.getElementById("btnCobroConfirmar").scrollIntoView({
+      behavior:"smooth",
+      block:"center"
+    });
+  }
+});
 
 document.getElementById("btnCambiarModo").onclick = openLoginModal;
 document.getElementById("btnCerrarLogin").onclick = closeLoginModal;
@@ -2017,19 +2032,6 @@ document.getElementById("btnEditSave").onclick = guardarEdicion;
 
 document.getElementById("btnCobroCancelar").onclick = closeCobroModal;
 document.getElementById("btnCobroConfirmar").onclick = async ()=>{
-  const total = getTotalCuenta();
-  const pago = Number(cobroPago.value || 0);
-
-  if(!cobroPago.value){
-    alert("Captura con cuánto van a pagar.");
-    return;
-  }
-
-  if(pago < total){
-    alert("El pago es menor al total de la cuenta.");
-    return;
-  }
-
   await cerrarCuentaDefinitiva();
 };
 
