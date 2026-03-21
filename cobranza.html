@@ -812,7 +812,7 @@ header{
 
         <div class="actionsSticky">
           <div class="actions">
-            <button class="btn btnYellow" id="btnResumen" type="button">Resumen general de ventas</button>
+            <button class="btn btnYellow" id="btnResumen" type="button">Resumen por fecha</button>
             <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
             <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
             <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
@@ -927,14 +927,33 @@ header{
   </div>
 </div>
 
+<div class="backdrop" id="fechaResumenBackdrop">
+  <div class="modal">
+    <div class="modalHead">
+      <h3>Resumen por fecha</h3>
+    </div>
+    <div class="modalBody">
+      <label class="modalLabel">Elige la fecha</label>
+      <input class="modalInput" id="fechaResumenInput" type="date">
+      <div class="modalHelp">
+        Se enviará por WhatsApp únicamente el resumen de las cuentas cerradas de ese día.
+      </div>
+    </div>
+    <div class="modalFoot">
+      <button class="btn btnLight" id="btnFechaResumenCancelar" type="button">Cancelar</button>
+      <button class="btn btnYellow" id="btnFechaResumenEnviar" type="button">Mandar resumen</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
-
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJjZWciOiJyY2VnaWtlaWF4cHRvbHJkdWd1YyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzU1NjUzMjA3LCJleHAiOjIwNzEyMjkyMDd9.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 const ADMIN_PIN = "1234";
 const WHATSAPP_RESUMEN = "524624672994";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -1042,6 +1061,9 @@ const cobroPago = document.getElementById("cobroPago");
 const cobroCambio = document.getElementById("cobroCambio");
 const cobroCambioBox = document.getElementById("cobroCambioBox");
 const cobroEstado = document.getElementById("cobroEstado");
+
+const fechaResumenBackdrop = document.getElementById("fechaResumenBackdrop");
+const fechaResumenInput = document.getElementById("fechaResumenInput");
 
 const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
@@ -1745,50 +1767,99 @@ function buildCuentaPrint(){
   return html;
 }
 
-async function buildResumenGeneralVentas(){
+function openFechaResumenModal(){
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+  const dd = String(hoy.getDate()).padStart(2, "0");
+  fechaResumenInput.value = `${yyyy}-${mm}-${dd}`;
+  fechaResumenBackdrop.style.display = "flex";
+}
+
+function closeFechaResumenModal(){
+  fechaResumenBackdrop.style.display = "none";
+}
+
+function getRangoLocalDia(fechaStr){
+  const [y, m, d] = fechaStr.split("-").map(Number);
+
+  const inicio = new Date(y, m - 1, d, 0, 0, 0, 0);
+  const fin = new Date(y, m - 1, d, 23, 59, 59, 999);
+
+  return {
+    inicioISO: inicio.toISOString(),
+    finISO: fin.toISOString(),
+    fechaBonita: inicio.toLocaleDateString("es-MX", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    })
+  };
+}
+
+async function buildResumenGeneralVentas(fechaStr){
   if(!supabaseReady) return "";
+
+  if(!fechaStr){
+    alert("Elige una fecha.");
+    return "";
+  }
+
+  const { inicioISO, finISO, fechaBonita } = getRangoLocalDia(fechaStr);
 
   const { data: comandas, error: errComandas } = await supabase
     .from("comandas")
     .select("id, mesa, mesero, estado, created_at, updated_at")
-    .order("created_at", { ascending: false });
+    .eq("estado", "cerrada")
+    .gte("updated_at", inicioISO)
+    .lte("updated_at", finISO)
+    .order("updated_at", { ascending: false });
 
   if(errComandas){
     console.error(errComandas);
-    alert("No se pudo consultar el resumen general.");
-    return "";
-  }
-
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario");
-
-  if(errItems){
-    console.error(errItems);
-    alert("No se pudieron consultar los productos del resumen general.");
+    alert("No se pudo consultar el resumen del día.");
     return "";
   }
 
   const listaComandas = comandas || [];
-  const listaItems = items || [];
 
   if(!listaComandas.length){
-    return "*RESUMEN GENERAL*\nNo hay ventas registradas.";
+    return `*RESUMEN DEL DÍA (${fechaBonita})*\n\nNo hay cuentas cerradas registradas en esa fecha.`;
   }
 
+  const idsComandas = listaComandas.map(c => c.id);
+
+  const { data: items, error: errItems } = await supabase
+    .from("comandas_items")
+    .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario")
+    .in("comanda_id", idsComandas);
+
+  if(errItems){
+    console.error(errItems);
+    alert("No se pudieron consultar los productos del resumen.");
+    return "";
+  }
+
+  const listaItems = items || [];
   const itemsPorComanda = {};
+
   listaItems.forEach(it=>{
     if(!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
     itemsPorComanda[it.comanda_id].push(it);
   });
 
   let totalGeneral = 0;
-  let totalAbiertas = 0;
-  let totalCerradas = 0;
   const productos = {};
+  const porMesero = {};
+  const porTipoCuenta = {
+    mesas: { total:0, comandas:0 },
+    llevar: { total:0, comandas:0 },
+    carrito: { total:0, comandas:0 }
+  };
 
   listaComandas.forEach(com=>{
     const arr = itemsPorComanda[com.id] || [];
+
     const totalComanda = arr.reduce((acc, it)=>{
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
         ? Number(it.precio_unitario || 0)
@@ -1797,12 +1868,28 @@ async function buildResumenGeneralVentas(){
     }, 0);
 
     totalGeneral += totalComanda;
-    if(com.estado === "cerrada") totalCerradas += totalComanda;
-    else totalAbiertas += totalComanda;
+
+    const mesero = com.mesero || "Sin mesero";
+    if(!porMesero[mesero]) porMesero[mesero] = { total:0, comandas:0 };
+    porMesero[mesero].total += totalComanda;
+    porMesero[mesero].comandas += 1;
+
+    const mesaNombre = (com.mesa || "").toLowerCase();
+    if(mesaNombre.includes("para llevar")){
+      porTipoCuenta.llevar.total += totalComanda;
+      porTipoCuenta.llevar.comandas += 1;
+    }else if(mesaNombre.includes("carrito")){
+      porTipoCuenta.carrito.total += totalComanda;
+      porTipoCuenta.carrito.comandas += 1;
+    }else{
+      porTipoCuenta.mesas.total += totalComanda;
+      porTipoCuenta.mesas.comandas += 1;
+    }
 
     arr.forEach(it=>{
       const nombre = it.producto_nombre || "Producto";
       if(!productos[nombre]) productos[nombre] = { qty:0, total:0 };
+
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
         ? Number(it.precio_unitario || 0)
         : Number(PRECIOS[it.producto_id] || 0);
@@ -1816,13 +1903,30 @@ async function buildResumenGeneralVentas(){
     .sort((a,b)=> b[1].total - a[1].total)
     .slice(0,10);
 
-  let texto = `*RESUMEN GENERAL DE VENTAS*\n\n`;
-  texto += `Total general: *${money(totalGeneral)}*\n`;
-  texto += `Ventas cerradas: *${money(totalCerradas)}*\n`;
-  texto += `Cuentas abiertas: *${money(totalAbiertas)}*\n`;
-  texto += `Total de comandas: *${listaComandas.length}*\n\n`;
+  const rankingMeseros = Object.entries(porMesero)
+    .sort((a,b)=> b[1].total - a[1].total);
 
-  texto += `*Top productos:*\n`;
+  let texto = `*RESUMEN DEL DÍA (${fechaBonita})*\n\n`;
+  texto += `Solo cuentas cerradas\n\n`;
+  texto += `Total vendido: *${money(totalGeneral)}*\n`;
+  texto += `Total de cuentas cerradas: *${listaComandas.length}*\n\n`;
+
+  texto += `*Por tipo de cuenta:*\n`;
+  texto += `• Mesas: ${porTipoCuenta.mesas.comandas} cuentas / ${money(porTipoCuenta.mesas.total)}\n`;
+  texto += `• Para llevar: ${porTipoCuenta.llevar.comandas} cuentas / ${money(porTipoCuenta.llevar.total)}\n`;
+  texto += `• Carrito afuera: ${porTipoCuenta.carrito.comandas} cuentas / ${money(porTipoCuenta.carrito.total)}\n\n`;
+
+  texto += `*Ventas por mesero:*\n`;
+  if(!rankingMeseros.length){
+    texto += `Sin registros.\n\n`;
+  }else{
+    rankingMeseros.forEach(([mesero, info])=>{
+      texto += `• ${mesero}: ${info.comandas} cuentas / ${money(info.total)}\n`;
+    });
+    texto += `\n`;
+  }
+
+  texto += `*Top productos del día:*\n`;
   if(!topProductos.length){
     texto += `Sin productos registrados.\n`;
   }else{
@@ -1834,8 +1938,8 @@ async function buildResumenGeneralVentas(){
   return texto;
 }
 
-async function mandarResumenGeneralWhatsapp(){
-  const texto = await buildResumenGeneralVentas();
+async function mandarResumenGeneralWhatsapp(fechaStr){
+  const texto = await buildResumenGeneralVentas(fechaStr);
   if(!texto) return;
 
   const url = `https://wa.me/${WHATSAPP_RESUMEN}?text=${encodeURIComponent(texto)}`;
@@ -2037,7 +2141,19 @@ document.getElementById("btnCobroConfirmar").onclick = async ()=>{
 
 document.getElementById("btnCerrar").onclick = openCobroModal;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
-document.getElementById("btnResumen").onclick = mandarResumenGeneralWhatsapp;
+document.getElementById("btnResumen").onclick = openFechaResumenModal;
+
+document.getElementById("btnFechaResumenCancelar").onclick = closeFechaResumenModal;
+document.getElementById("btnFechaResumenEnviar").onclick = async ()=>{
+  const fecha = fechaResumenInput.value;
+  if(!fecha){
+    alert("Selecciona una fecha.");
+    return;
+  }
+  await mandarResumenGeneralWhatsapp(fecha);
+  closeFechaResumenModal();
+};
+
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
   await cargarEstadoMesas();
   if (mesaActual) await cargarCuenta();
