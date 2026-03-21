@@ -234,7 +234,7 @@ header{
   font-weight:700;
 }
 .cardBody{
-  padding:14px;
+  padding:14px 14px 28px;
 }
 
 .syncStatus{
@@ -516,6 +516,7 @@ header{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+  margin-bottom:12px;
 }
 @media (max-width:700px){
   .topInfo{grid-template-columns:1fr}
@@ -738,6 +739,32 @@ header{
   font-weight:800;
   font-size:14px;
 }
+
+.cobroResumen{
+  display:grid;
+  gap:12px;
+}
+.cobroBox{
+  border:2px solid #d6e3f2;
+  border-radius:18px;
+  background:#fff;
+  padding:14px;
+}
+.cobroBox b{
+  display:block;
+  font-size:12px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+.cobroBox span{
+  display:block;
+  font-size:28px;
+  font-weight:1000;
+  line-height:1;
+}
+.cobroCambio.ok span{ color:#1f6a24; }
+.cobroCambio.bad span{ color:#8e1d1d; }
 </style>
 </head>
 <body>
@@ -868,6 +895,38 @@ header{
   </div>
 </div>
 
+<div class="backdrop" id="cobroBackdrop">
+  <div class="modal">
+    <div class="modalHead">
+      <h3>Cerrar cuenta y calcular cambio</h3>
+    </div>
+    <div class="modalBody">
+      <div class="cobroResumen">
+        <div class="cobroBox">
+          <b>Total a cobrar</b>
+          <span id="cobroTotal">$0.00</span>
+        </div>
+
+        <div>
+          <label class="modalLabel">¿Con cuánto van a pagar?</label>
+          <input class="modalInput" id="cobroPago" type="number" min="0" step="0.01" placeholder="Ej. 500">
+        </div>
+
+        <div class="cobroBox cobroCambio" id="cobroCambioBox">
+          <b>Cambio</b>
+          <span id="cobroCambio">$0.00</span>
+        </div>
+
+        <div class="modalHelp" id="cobroEstado">Captura el pago para calcular el cambio.</div>
+      </div>
+    </div>
+    <div class="modalFoot">
+      <button class="btn btnLight" id="btnCobroCancelar" type="button">Cancelar</button>
+      <button class="btn btnRed" id="btnCobroConfirmar" type="button">Confirmar cierre</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
@@ -875,7 +934,8 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const ADMIN_PIN = "1234";
 const WHATSAPP_RESUMEN = "524624672994";
 
-
+let supabase = null;
+let supabaseReady = false;
 
 if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
   supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -977,6 +1037,13 @@ const editTitle = document.getElementById("editTitle");
 const editValue = document.getElementById("editValue");
 const editHelp = document.getElementById("editHelp");
 
+const cobroBackdrop = document.getElementById("cobroBackdrop");
+const cobroTotal = document.getElementById("cobroTotal");
+const cobroPago = document.getElementById("cobroPago");
+const cobroCambio = document.getElementById("cobroCambio");
+const cobroCambioBox = document.getElementById("cobroCambioBox");
+const cobroEstado = document.getElementById("cobroEstado");
+
 const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
 const btnTipoCarrito = document.getElementById("btnTipoCarrito");
@@ -1038,6 +1105,50 @@ function closeEditModal(){
   currentEditItem = null;
   editValue.value = "";
   editBackdrop.style.display = "none";
+}
+
+function openCobroModal(){
+  if(!comandaActual){
+    alert("Primero carga una cuenta.");
+    return;
+  }
+
+  const total = getTotalCuenta();
+  cobroTotal.textContent = money(total);
+  cobroPago.value = "";
+  cobroCambio.textContent = money(0);
+  cobroCambioBox.classList.remove("ok","bad");
+  cobroEstado.textContent = "Captura el pago para calcular el cambio.";
+  cobroBackdrop.style.display = "flex";
+
+  setTimeout(()=>cobroPago.focus(), 60);
+}
+
+function closeCobroModal(){
+  cobroBackdrop.style.display = "none";
+}
+
+function recalcularCambio(){
+  const total = getTotalCuenta();
+  const pago = Number(cobroPago.value || 0);
+  const cambio = pago - total;
+
+  cobroCambio.textContent = money(cambio);
+
+  cobroCambioBox.classList.remove("ok","bad");
+
+  if(!cobroPago.value){
+    cobroEstado.textContent = "Captura el pago para calcular el cambio.";
+    return;
+  }
+
+  if(cambio >= 0){
+    cobroCambioBox.classList.add("ok");
+    cobroEstado.textContent = "Pago suficiente. Ya puedes confirmar el cierre.";
+  }else{
+    cobroCambioBox.classList.add("bad");
+    cobroEstado.textContent = `Faltan ${money(Math.abs(cambio))} para completar el pago.`;
+  }
 }
 
 function getPrecioUnitario(item){
@@ -1121,8 +1232,7 @@ async function cerrarCuentaDirecta(mesa){
     return;
   }
 
-  await cerrarCuenta();
-  renderHeaderActivas();
+  openCobroModal();
 }
 
 function renderHeaderActivas(){
@@ -1542,7 +1652,7 @@ async function guardarEdicion(){
   }
 }
 
-async function cerrarCuenta(){
+async function cerrarCuentaDefinitiva(){
   if(!supabaseReady){
     setSyncStatus("Configura Supabase primero", "bad");
     return;
@@ -1552,8 +1662,6 @@ async function cerrarCuenta(){
     alert("Primero carga una cuenta.");
     return;
   }
-
-  if(!confirm(`¿Cerrar la cuenta de ${comandaActual.mesa}?`)) return;
 
   setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
 
@@ -1572,6 +1680,7 @@ async function cerrarCuenta(){
     return;
   }
 
+  closeCobroModal();
   alert("Cuenta cerrada correctamente.");
   comandaActual = null;
   itemsActuales = [];
@@ -1887,6 +1996,8 @@ loginRol.addEventListener("change", ()=>{
   pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
 });
 
+cobroPago.addEventListener("input", recalcularCambio);
+
 document.getElementById("btnCambiarModo").onclick = openLoginModal;
 document.getElementById("btnCerrarLogin").onclick = closeLoginModal;
 document.getElementById("btnEntrarLogin").onclick = ()=>{
@@ -1906,7 +2017,25 @@ document.getElementById("btnEntrarLogin").onclick = ()=>{
 document.getElementById("btnEditCancel").onclick = closeEditModal;
 document.getElementById("btnEditSave").onclick = guardarEdicion;
 
-document.getElementById("btnCerrar").onclick = cerrarCuenta;
+document.getElementById("btnCobroCancelar").onclick = closeCobroModal;
+document.getElementById("btnCobroConfirmar").onclick = async ()=>{
+  const total = getTotalCuenta();
+  const pago = Number(cobroPago.value || 0);
+
+  if(!cobroPago.value){
+    alert("Captura con cuánto van a pagar.");
+    return;
+  }
+
+  if(pago < total){
+    alert("El pago es menor al total de la cuenta.");
+    return;
+  }
+
+  await cerrarCuentaDefinitiva();
+};
+
+document.getElementById("btnCerrar").onclick = openCobroModal;
 document.getElementById("btnCuenta").onclick = imprimirCuenta;
 document.getElementById("btnResumen").onclick = mandarResumenGeneralWhatsapp;
 document.getElementById("btnActualizarMesas").onclick = async ()=>{
