@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="es">
 <head>
@@ -6,6 +7,8 @@
 <title>Cuentas — Guadalupe Victoria</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 :root{
@@ -239,9 +242,9 @@ header{
 
 .syncStatus{
   margin-top:12px;
-  padding:12px 14px;
+  padding:14px 16px;
   border-radius:16px;
-  font-size:14px;
+  font-size:15px;
   font-weight:1000;
   border:1px solid #d6e4f5;
   background:#f4f9ff;
@@ -463,16 +466,30 @@ header{
   .actions{
     grid-template-columns:1fr;
   }
+
+  .btn{
+    font-size:19px;
+    min-height:60px;
+  }
+
+  .cardHead h2{
+    font-size:22px;
+  }
+
+  .cardHead p{
+    font-size:16px;
+  }
 }
 
 .btn{
   border:none;
   border-radius:16px;
-  padding:12px 12px;
+  padding:15px 14px;
   font-weight:1000;
-  font-size:16px;
+  font-size:18px;
   cursor:pointer;
   width:100%;
+  min-height:56px;
 }
 .btnBlue{
   background:linear-gradient(180deg,var(--blue),var(--blue-dark));
@@ -788,8 +805,8 @@ header{
 
     <section class="card leftColSticky">
       <div class="cardHead">
-        <h2>Elegir cuenta</h2>
-        <p>Toca una opción y luego selecciona la cuenta.</p>
+        <h2>Paso 1: Elegir cuenta</h2>
+        <p>Selecciona el tipo de cuenta y luego toca una cuenta activa.</p>
         <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
       </div>
 
@@ -812,11 +829,11 @@ header{
 
         <div class="actionsSticky">
           <div class="actions">
-            <button class="btn btnYellow" id="btnResumen" type="button">Resumen por fecha</button>
-            <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
-            <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
-            <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
-            <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">Ajuste admin</button>
+            <button class="btn btnYellow" id="btnResumen" type="button">📊 Ver resumen del día</button>
+            <button class="btn btnGreen" id="btnCuenta" type="button">🖨️ Imprimir cuenta</button>
+            <button class="btn btnRed" id="btnCerrar" type="button">💵 Cerrar y cobrar</button>
+            <button class="btn btnLight" id="btnActualizarMesas" type="button">🔄 Actualizar cuentas</button>
+            <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">⚙️ Ajuste admin</button>
           </div>
         </div>
       </div>
@@ -824,8 +841,8 @@ header{
 
     <section class="card rightColScroll">
       <div class="cardHead">
-        <h2>Detalle</h2>
-        <p>Lo que lleva la cuenta seleccionada.</p>
+        <h2>Paso 2: Revisar detalle</h2>
+        <p>Aquí ves productos, cantidades y total de la cuenta.</p>
       </div>
 
       <div class="cardBody">
@@ -936,12 +953,12 @@ header{
       <label class="modalLabel">Elige la fecha</label>
       <input class="modalInput" id="fechaResumenInput" type="date">
       <div class="modalHelp">
-        Se enviará por WhatsApp únicamente el resumen de las cuentas cerradas de ese día.
+        Se generará un documento PDF con el resumen de las cuentas cerradas de ese día.
       </div>
     </div>
     <div class="modalFoot">
       <button class="btn btnLight" id="btnFechaResumenCancelar" type="button">Cancelar</button>
-      <button class="btn btnYellow" id="btnFechaResumenEnviar" type="button">Mandar resumen</button>
+      <button class="btn btnYellow" id="btnFechaResumenEnviar" type="button">Descargar PDF</button>
     </div>
   </div>
 </div>
@@ -951,7 +968,6 @@ const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
 
 const ADMIN_PIN = "1234";
-const WHATSAPP_RESUMEN = "524624672994";
 
 
 
@@ -970,6 +986,7 @@ const PRECIOS = {
   taco_barbacoa:28,
   taco_alambre:28,
   taco_combi:38,
+  taco_campechano:38,
 
   quesa_tripa:120,
   quesa_pastor:90,
@@ -994,6 +1011,9 @@ const PRECIOS = {
   burrito_combi:100,
 
   charola_combi:100,
+  charola_combi_100:100,
+  charola_combi_150:150,
+  charola_combi_200:200,
   charola_alam:90,
 
   volcan_tripa:90,
@@ -1797,98 +1817,122 @@ function getRangoLocalDia(fechaStr){
   };
 }
 
-async function buildResumenGeneralVentas(fechaStr){
-  if(!supabaseReady) return "";
-
-  if(!fechaStr){
-    alert("Elige una fecha.");
-    return "";
-  }
+async function obtenerDatosResumenDia(fechaStr) {
+  if (!supabaseReady) return null;
 
   const { inicioISO, finISO, fechaBonita } = getRangoLocalDia(fechaStr);
 
   const { data: comandas, error: errComandas } = await supabase
     .from("comandas")
-    .select("id, mesa, mesero, estado, created_at, updated_at")
+    .select("id, mesa, mesero, estado, updated_at")
     .eq("estado", "cerrada")
     .gte("updated_at", inicioISO)
     .lte("updated_at", finISO)
     .order("updated_at", { ascending: false });
 
-  if(errComandas){
+  if (errComandas) {
     console.error(errComandas);
     alert("No se pudo consultar el resumen del día.");
-    return "";
+    return null;
   }
 
-  const listaComandas = comandas || [];
-
-  if(!listaComandas.length){
-    return `*RESUMEN DEL DÍA (${fechaBonita})*\n\nNo hay cuentas cerradas registradas en esa fecha.`;
-  }
-
+  let listaComandas = comandas || [];
   const idsComandas = listaComandas.map(c => c.id);
 
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario")
-    .in("comanda_id", idsComandas);
+  let listaItems = [];
+  if (idsComandas.length) {
+    const { data: items, error: errItems } = await supabase
+      .from("comandas_items")
+      .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario")
+      .in("comanda_id", idsComandas);
 
-  if(errItems){
-    console.error(errItems);
-    alert("No se pudieron consultar los productos del resumen.");
-    return "";
+    if (errItems) {
+      console.error(errItems);
+      alert("No se pudieron consultar los productos del resumen.");
+      return null;
+    }
+
+    listaItems = items || [];
   }
 
-  const listaItems = items || [];
   const itemsPorComanda = {};
-
-  listaItems.forEach(it=>{
-    if(!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
+  listaItems.forEach(it => {
+    if (!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
     itemsPorComanda[it.comanda_id].push(it);
   });
 
-  let totalGeneral = 0;
-  const productos = {};
-  const porMesero = {};
-  const porTipoCuenta = {
-    mesas: { total:0, comandas:0 },
-    llevar: { total:0, comandas:0 },
-    carrito: { total:0, comandas:0 }
-  };
-
-  listaComandas.forEach(com=>{
+  // Calcular total por comanda y filtrar las que tienen total > 0
+  const comandasConTotal = listaComandas.map(com => {
     const arr = itemsPorComanda[com.id] || [];
 
-    const totalComanda = arr.reduce((acc, it)=>{
+    const totalComanda = arr.reduce((acc, it) => {
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
         ? Number(it.precio_unitario || 0)
         : Number(PRECIOS[it.producto_id] || 0);
       return acc + (Number(it.qty || 0) * precio);
     }, 0);
 
+    return {
+      ...com,
+      totalComanda
+    };
+  });
+
+  // Filtrar solo las comandas con total > 0
+  const comandasFiltradas = comandasConTotal.filter(com => com.totalComanda > 0);
+
+  if (comandasFiltradas.length === 0) {
+    return {
+      fechaBonita,
+      fechaStr,
+      totalGeneral: 0,
+      totalComandas: 0,
+      porTipoCuenta: {
+        mesas: { total: 0, comandas: 0 },
+        llevar: { total: 0, comandas: 0 },
+        carrito: { total: 0, comandas: 0 }
+      },
+      rankingMeseros: [],
+      todosProductos: [],
+      detalleComandas: []
+    };
+  }
+
+  let totalGeneral = 0;
+  const productos = {};
+  const porMesero = {};
+  const porTipoCuenta = {
+    mesas: { total: 0, comandas: 0 },
+    llevar: { total: 0, comandas: 0 },
+    carrito: { total: 0, comandas: 0 }
+  };
+
+  const detalleComandas = comandasFiltradas.map(com => {
+    const arr = itemsPorComanda[com.id] || [];
+    const totalComanda = com.totalComanda;
+
     totalGeneral += totalComanda;
 
     const mesero = com.mesero || "Sin mesero";
-    if(!porMesero[mesero]) porMesero[mesero] = { total:0, comandas:0 };
+    if (!porMesero[mesero]) porMesero[mesero] = { total: 0, comandas: 0 };
     porMesero[mesero].total += totalComanda;
     porMesero[mesero].comandas += 1;
 
     const mesaNombre = (com.mesa || "").toLowerCase();
-    if(mesaNombre.includes("para llevar")){
+    if (mesaNombre.includes("para llevar")) {
       porTipoCuenta.llevar.total += totalComanda;
       porTipoCuenta.llevar.comandas += 1;
-    }else if(mesaNombre.includes("carrito")){
+    } else if (mesaNombre.includes("carrito")) {
       porTipoCuenta.carrito.total += totalComanda;
       porTipoCuenta.carrito.comandas += 1;
-    }else{
+    } else {
       porTipoCuenta.mesas.total += totalComanda;
       porTipoCuenta.mesas.comandas += 1;
     }
 
-    arr.forEach(it=>{
+    arr.forEach(it => {
       const nombre = it.producto_nombre || "Producto";
-      if(!productos[nombre]) productos[nombre] = { qty:0, total:0 };
+      if (!productos[nombre]) productos[nombre] = { qty: 0, total: 0 };
 
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
         ? Number(it.precio_unitario || 0)
@@ -1897,66 +1941,327 @@ async function buildResumenGeneralVentas(fechaStr){
       productos[nombre].qty += Number(it.qty || 0);
       productos[nombre].total += Number(it.qty || 0) * precio;
     });
+
+    return {
+      mesa: com.mesa || "Sin cuenta",
+      mesero,
+      total: totalComanda,
+      updated_at: com.updated_at
+    };
   });
 
-  const topProductos = Object.entries(productos)
-    .sort((a,b)=> b[1].total - a[1].total)
-    .slice(0,10);
+  // Ordenar detalleComandas por total descendente
+  detalleComandas.sort((a, b) => b.total - a.total);
 
-  const rankingMeseros = Object.entries(porMesero)
-    .sort((a,b)=> b[1].total - a[1].total);
-
-  let texto = `*RESUMEN DEL DÍA (${fechaBonita})*\n\n`;
-  texto += `Solo cuentas cerradas\n\n`;
-  texto += `Total vendido: *${money(totalGeneral)}*\n`;
-  texto += `Total de cuentas cerradas: *${listaComandas.length}*\n\n`;
-
-  texto += `*Por tipo de cuenta:*\n`;
-  texto += `• Mesas: ${porTipoCuenta.mesas.comandas} cuentas / ${money(porTipoCuenta.mesas.total)}\n`;
-  texto += `• Para llevar: ${porTipoCuenta.llevar.comandas} cuentas / ${money(porTipoCuenta.llevar.total)}\n`;
-  texto += `• Carrito afuera: ${porTipoCuenta.carrito.comandas} cuentas / ${money(porTipoCuenta.carrito.total)}\n\n`;
-
-  texto += `*Ventas por mesero:*\n`;
-  if(!rankingMeseros.length){
-    texto += `Sin registros.\n\n`;
-  }else{
-    rankingMeseros.forEach(([mesero, info])=>{
-      texto += `• ${mesero}: ${info.comandas} cuentas / ${money(info.total)}\n`;
-    });
-    texto += `\n`;
+  const rankingMeseros = Object.entries(porMesero).sort((a, b) => b[1].total - a[1].total);
+  
+  function normalizarTexto(s) {
+    return String(s || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
   }
 
-  texto += `*Top productos del día:*\n`;
-  if(!topProductos.length){
-    texto += `Sin productos registrados.\n`;
-  }else{
-    topProductos.forEach(([nombre, info])=>{
-      texto += `• ${nombre}: ${info.qty} pzas / ${money(info.total)}\n`;
+  function categoriaProductoPorNombre(nombre) {
+    const n = normalizarTexto(nombre);
+
+    if (n.includes("quesa")) return "quesadillas";
+    if (n.includes("taco")) return "tacos";
+    if (n.includes("burrito")) return "burritos";
+    if (n.includes("charola")) return "charolas";
+    if (n.includes("volcan")) return "volcanes";
+    if (n.includes("coca") || n.includes("fresca") || n.includes("sprite") || n.includes("agua") || n.includes("beb")) return "bebidas";
+    if (n.includes("pay") || n.includes("rompope") || n.includes("arroz") || n.includes("flan") || n.includes("fresa") || n.includes("napolitano") || n.includes("postre")) return "postres";
+    return "otros";
+  }
+
+  function ordenarProductosSimilares(productosEntries) {
+    const ordenCategorias = {
+      quesadillas: 1,
+      tacos: 2,
+      burritos: 3,
+      charolas: 4,
+      volcanes: 5,
+      bebidas: 6,
+      postres: 7,
+      otros: 8
+    };
+
+    return [...productosEntries].sort((a, b) => {
+      const catA = categoriaProductoPorNombre(a[0]);
+      const catB = categoriaProductoPorNombre(b[0]);
+
+      const oa = ordenCategorias[catA] || 999;
+      const ob = ordenCategorias[catB] || 999;
+
+      if (oa !== ob) return oa - ob;
+
+      return String(a[0]).localeCompare(String(b[0]), "es", { sensitivity: "base" });
     });
   }
 
-  return texto;
+  const todosProductos = ordenarProductosSimilares(Object.entries(productos));
+
+  return {
+    fechaBonita,
+    fechaStr,
+    totalGeneral,
+    totalComandas: comandasFiltradas.length,
+    porTipoCuenta,
+    rankingMeseros,
+    todosProductos,
+    detalleComandas
+  };
 }
 
-async function mandarResumenGeneralWhatsapp(fechaStr){
-  const texto = await buildResumenGeneralVentas(fechaStr);
-  if(!texto) return;
-
-  const url = `https://wa.me/${WHATSAPP_RESUMEN}?text=${encodeURIComponent(texto)}`;
-  window.open(url, "_blank");
-}
-
-function imprimirHtmlTicket(htmlContenido){
-  if(!htmlContenido) return;
-
-  const returnUrl = location.href;
-  const win = window.open("", "_blank");
-
-  if(!win){
-    alert("El navegador bloqueó la ventana de impresión. Activa las ventanas emergentes.");
+async function descargarResumenPDF(fechaStr) {
+  if (!fechaStr) {
+    alert("Selecciona una fecha.");
     return;
   }
 
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert("No se pudo cargar la librería PDF.");
+    return;
+  }
+
+  const data = await obtenerDatosResumenDia(fechaStr);
+  if (!data) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 40;
+  const topSafeY = 56;
+  const contentWidth = pageWidth - (marginX * 2);
+  const nowStr = new Date().toLocaleString("es-MX", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  const avgTicket = data.totalComandas ? (data.totalGeneral / data.totalComandas) : 0;
+
+  const colors = {
+    navy: [20, 55, 105],
+    blue: [21, 101, 192],
+    sky: [236, 244, 253],
+    line: [216, 228, 243],
+    text: [25, 40, 60],
+    muted: [95, 115, 140],
+    zebra: [248, 251, 255]
+  };
+
+  const formatMoney = (n) => money(n);
+  
+  const drawHeader = () => {
+    doc.setFillColor(...colors.navy);
+    doc.rect(0, 0, pageWidth, 32, "F");
+
+    doc.setDrawColor(...colors.line);
+    doc.setLineWidth(1);
+    doc.roundedRect(marginX, topSafeY - 18, contentWidth, 92, 12, 12, "S");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(...colors.text);
+    doc.text("Resumen de ventas del día", marginX + 14, topSafeY + 8);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10.5);
+    doc.setTextColor(...colors.muted);
+    doc.text(`Fecha de resumen: ${data.fechaBonita}`, marginX + 14, topSafeY + 28);
+    doc.text(`Generado: ${nowStr}`, marginX + 14, topSafeY + 44);
+    
+    if (data.totalComandas === 0) {
+      doc.setFont("helvetica", "italic");
+      doc.setFontSize(9);
+      doc.setTextColor(...colors.muted);
+      doc.text("*Nota: No se registraron ventas en esta fecha", marginX + 14, topSafeY + 60);
+    }
+  };
+
+  const drawKpiCard = (x, y, w, h, label, value) => {
+    doc.setFillColor(...colors.sky);
+    doc.setDrawColor(...colors.line);
+    doc.roundedRect(x, y, w, h, 10, 10, "FD");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9.5);
+    doc.setTextColor(...colors.muted);
+    doc.text(label.toUpperCase(), x + 10, y + 16);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(...colors.text);
+    doc.text(String(value), x + 10, y + 35);
+  };
+
+  const buildTableTheme = (fontSize = 10) => ({
+    margin: { left: marginX, right: marginX },
+    headStyles: {
+      fillColor: colors.blue,
+      textColor: [255, 255, 255],
+      fontStyle: "bold",
+      fontSize,
+      halign: "left"
+    },
+    bodyStyles: {
+      textColor: colors.text,
+      fontSize,
+      lineColor: colors.line,
+      lineWidth: 0.5
+    },
+    alternateRowStyles: {
+      fillColor: colors.zebra
+    },
+    styles: {
+      cellPadding: { top: 6, right: 6, bottom: 6, left: 6 },
+      overflow: "linebreak",
+      valign: "middle"
+    },
+    tableLineColor: colors.line,
+    tableLineWidth: 0.6
+  });
+
+  drawHeader();
+
+  const kpiY = topSafeY + 88;
+  const gap = 10;
+  const cardW = (contentWidth - (gap * 2)) / 3;
+  const cardH = 48;
+
+  drawKpiCard(marginX, kpiY, cardW, cardH, "Total vendido", formatMoney(data.totalGeneral));
+  drawKpiCard(marginX + cardW + gap, kpiY, cardW, cardH, "Cuentas cerradas", data.totalComandas);
+  drawKpiCard(marginX + (cardW + gap) * 2, kpiY, cardW, cardH, "Ticket promedio", formatMoney(avgTicket));
+
+  let y = kpiY + cardH + 26;
+
+  if (data.totalComandas === 0) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.setTextColor(...colors.text);
+    doc.text("No hay ventas registradas en esta fecha.", marginX, y + 30);
+    
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      doc.setTextColor(...colors.muted);
+      doc.text(`Página ${i} de ${totalPages}`, pageWidth - marginX, pageHeight - 16, { align: "right" });
+    }
+    
+    const nombreArchivo = `resumen_${data.fechaStr}_sin_ventas.pdf`;
+    doc.save(nombreArchivo);
+    return;
+  }
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(...colors.text);
+  doc.text("Por tipo de cuenta", marginX, y);
+
+  y += 10;
+  doc.autoTable({
+    ...buildTableTheme(10),
+    startY: y,
+    head: [["Tipo", "Cuentas", "Total"]],
+    body: [
+      ["Mesas", String(data.porTipoCuenta.mesas.comandas), formatMoney(data.porTipoCuenta.mesas.total)],
+      ["Para llevar", String(data.porTipoCuenta.llevar.comandas), formatMoney(data.porTipoCuenta.llevar.total)],
+      ["Carrito afuera", String(data.porTipoCuenta.carrito.comandas), formatMoney(data.porTipoCuenta.carrito.total)]
+    ],
+    columnStyles: {
+      1: { halign: "center", cellWidth: 90 },
+      2: { halign: "right", cellWidth: 110 }
+    }
+  });
+
+  y = doc.lastAutoTable.finalY + 22;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Ventas por mesero", marginX, y);
+
+  y += 10;
+  doc.autoTable({
+    ...buildTableTheme(10),
+    startY: y,
+    head: [["Mesero", "Cuentas", "Total"]],
+    body: data.rankingMeseros.length
+      ? data.rankingMeseros.map(([mesero, info]) => [mesero, String(info.comandas), formatMoney(info.total)])
+      : [["Sin registros", "0", formatMoney(0)]],
+    columnStyles: {
+      1: { halign: "center", cellWidth: 90 },
+      2: { halign: "right", cellWidth: 110 }
+    }
+  });
+
+  y = doc.lastAutoTable.finalY + 22;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Todas las comandas cerradas del día (con ventas > $0)", marginX, y);
+
+  y += 10;
+  doc.autoTable({
+    ...buildTableTheme(9.5),
+    startY: y,
+    head: [["Cuenta", "Mesero", "Hora cierre", "Total"]],
+    body: data.detalleComandas.length
+      ? data.detalleComandas.map(c => [
+          c.mesa,
+          c.mesero,
+          new Date(c.updated_at).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" }),
+          formatMoney(c.total)
+        ])
+      : [["Sin registros", "-", "-", formatMoney(0)]],
+    columnStyles: {
+      2: { halign: "center", cellWidth: 90 },
+      3: { halign: "right", cellWidth: 90 }
+    }
+  });
+
+  y = doc.lastAutoTable.finalY + 22;
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Todos los productos vendidos del día", marginX, y);
+
+  y += 10;
+  doc.autoTable({
+    ...buildTableTheme(9.5),
+    startY: y,
+    head: [["Producto", "Cantidad", "Total"]],
+    body: data.todosProductos.length
+      ? data.todosProductos.map(([nombre, info]) => [nombre, String(info.qty), formatMoney(info.total)])
+      : [["Sin productos", "0", formatMoney(0)]],
+    columnStyles: {
+      1: { halign: "center", cellWidth: 90 },
+      2: { halign: "right", cellWidth: 110 }
+    }
+  });
+
+  const totalPages = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...colors.muted);
+    doc.text(`Página ${i} de ${totalPages}`, pageWidth - marginX, pageHeight - 16, { align: "right" });
+  }
+
+  const nombreArchivo = `resumen_${data.fechaStr}.pdf`;
+  doc.save(nombreArchivo);
+}
+
+function imprimirHtmlTicket(htmlContenido) {
+  if (!htmlContenido) return;
+
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  
   const ticketDoc = `
     <!doctype html>
     <html lang="es">
@@ -1965,114 +2270,217 @@ function imprimirHtmlTicket(htmlContenido){
       <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
       <title>Ticket</title>
       <style>
-        @page{
-          size:80mm auto;
-          margin:0;
+        @page {
+          size: 80mm auto;
+          margin: 0;
         }
-
-        html, body{
-          margin:0;
-          padding:0;
-          width:80mm;
-          max-width:80mm;
-          background:#fff;
-          overflow-x:hidden;
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
         }
-
-        body{
+        
+        html, body {
+          margin: 0;
+          padding: 0;
+          width: 80mm;
+          max-width: 80mm;
+          background: #fff;
+          overflow-x: hidden;
+        }
+        
+        body {
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          color:#000;
+          color: #000;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
-
-        .ticket{
-          width:72mm;
-          margin:0 auto;
-          box-sizing:border-box;
-          padding:2mm 1.5mm 3mm;
-          font-size:16px;
-          line-height:1.25;
-          color:#000;
-          background:#fff;
+        
+        .ticket {
+          width: 72mm;
+          margin: 0 auto;
+          box-sizing: border-box;
+          padding: 2mm 1.5mm 3mm;
+          font-size: 16px;
+          line-height: 1.25;
+          color: #000;
+          background: #fff;
         }
-
-        .c{text-align:center}
-        .b{font-weight:900}
-        .lg{font-size:18px}
-        .hr{border-top:1px dashed #000;margin:5px 0}
-        .g{
-          font-weight:900;
-          margin-top:6px;
-          font-size:16px;
-          text-transform:uppercase;
+        
+        .c { text-align: center; }
+        .b { font-weight: 900; }
+        .lg { font-size: 18px; }
+        .hr { border-top: 1px dashed #000; margin: 5px 0; }
+        .g {
+          font-weight: 900;
+          margin-top: 6px;
+          font-size: 16px;
+          text-transform: uppercase;
         }
-        .it{margin:5px 0}
-        .itn{
-          font-weight:900;
-          font-size:18px;
-          line-height:1.15;
+        .it { margin: 5px 0; }
+        .itn {
+          font-weight: 900;
+          font-size: 18px;
+          line-height: 1.15;
         }
-        .sub{
-          padding-left:6px;
-          font-size:15px;
-          white-space:pre-wrap;
+        .sub {
+          padding-left: 6px;
+          font-size: 15px;
+          white-space: pre-wrap;
         }
-        .priceRow{
-          display:flex;
-          justify-content:space-between;
-          gap:8px;
-          font-size:15px;
-          margin-top:2px;
+        .priceRow {
+          display: flex;
+          justify-content: space-between;
+          gap: 8px;
+          font-size: 15px;
+          margin-top: 2px;
         }
-        .totalRowPrint{
-          display:flex;
-          justify-content:space-between;
-          gap:8px;
-          font-size:26px;
-          font-weight:900;
-          margin-top:8px;
+        .totalRowPrint {
+          display: flex;
+          justify-content: space-between;
+          gap: 8px;
+          font-size: 26px;
+          font-weight: 900;
+          margin-top: 8px;
         }
-
-        .screen-bar{
-          position:sticky;
-          top:0;
-          background:#fff;
-          padding:8px;
-          border-bottom:1px solid #ddd;
-          text-align:center;
-          font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+        
+        .screen-bar {
+          position: sticky;
+          top: 0;
+          background: #fff;
+          padding: 8px;
+          border-bottom: 1px solid #ddd;
+          text-align: center;
+          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+          z-index: 100;
         }
-        .screen-bar button{
-          border:none;
-          border-radius:10px;
-          padding:10px 14px;
-          font-weight:800;
-          font-size:14px;
-          background:#1565c0;
-          color:#fff;
-          margin:0 4px;
-          cursor:pointer;
+        
+        .screen-bar button {
+          border: none;
+          border-radius: 10px;
+          padding: 12px 20px;
+          font-weight: 800;
+          font-size: 16px;
+          background: #1565c0;
+          color: #fff;
+          margin: 0 6px;
+          cursor: pointer;
         }
-
-        @media print{
-          .screen-bar{ display:none !important; }
+        
+        .screen-bar button:active {
+          opacity: 0.8;
+        }
+        
+        @media print {
+          .screen-bar { 
+            display: none !important; 
+          }
+          body {
+            margin: 0;
+            padding: 0;
+          }
         }
       </style>
     </head>
     <body>
       <div class="screen-bar">
-        <button onclick="window.print()">Imprimir</button>
-        <button onclick="window.location.href='${returnUrl}'">Regresar</button>
+        <button id="btnPrintManual" onclick="window.print()">🖨️ Imprimir</button>
+        <button onclick="window.close()">✖️ Cerrar</button>
       </div>
       ${htmlContenido}
+      
+      <script>
+        (function() {
+          function lanzarImpresion() {
+            setTimeout(function() {
+              try {
+                window.print();
+              } catch(e) {
+                console.log('Error al imprimir:', e);
+                var msg = document.createElement('div');
+                msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:1000;';
+                msg.innerHTML = '⚠️ Haz clic en "Imprimir" para continuar';
+                document.body.appendChild(msg);
+                setTimeout(function() { msg.remove(); }, 3000);
+              }
+            }, 500);
+          }
+          
+          if (document.readyState === 'complete') {
+            lanzarImpresion();
+          } else {
+            window.addEventListener('load', lanzarImpresion);
+          }
+          
+          window.onafterprint = function() {
+            setTimeout(function() {
+              try {
+                window.close();
+              } catch(e) {
+                console.log('Cierre manual requerido');
+              }
+            }, 1000);
+          };
+        })();
+      <\/script>
     </body>
     </html>
   `;
-
-  win.document.open();
-  win.document.write(ticketDoc);
-  win.document.close();
+  
+  if (isAndroid) {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(ticketDoc);
+      printWindow.document.close();
+    } else {
+      alert('Por favor, permite ventanas emergentes para imprimir');
+      const printFrame = document.createElement('iframe');
+      printFrame.style.position = 'absolute';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = 'none';
+      document.body.appendChild(printFrame);
+      
+      const frameDoc = printFrame.contentWindow.document;
+      frameDoc.write(ticketDoc);
+      frameDoc.close();
+      
+      setTimeout(function() {
+        printFrame.contentWindow.print();
+        setTimeout(function() {
+          document.body.removeChild(printFrame);
+        }, 1000);
+      }, 500);
+    }
+  } else {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
+    
+    const iframeDoc = iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(ticketDoc);
+    iframeDoc.close();
+    
+    setTimeout(function() {
+      try {
+        iframe.contentWindow.print();
+      } catch(e) {
+        console.error('Error al imprimir:', e);
+      }
+    }, 500);
+    
+    setTimeout(function() {
+      if (iframe && iframe.parentNode) {
+        document.body.removeChild(iframe);
+      }
+    }, 3000);
+  }
 }
 
 function imprimirCuenta(){
@@ -2150,7 +2558,7 @@ document.getElementById("btnFechaResumenEnviar").onclick = async ()=>{
     alert("Selecciona una fecha.");
     return;
   }
-  await mandarResumenGeneralWhatsapp(fecha);
+  await descargarResumenPDF(fecha);
   closeFechaResumenModal();
 };
 
