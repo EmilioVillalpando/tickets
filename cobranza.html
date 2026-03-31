@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -17,7 +16,6 @@
   --ink:#132238;
   --muted:#61758d;
   --line:#dbe6f3;
-
   --blue:#1565c0;
   --blue-dark:#0f4f98;
   --green:#2e7d32;
@@ -26,12 +24,8 @@
   --yellow-dark:#dfa400;
   --red:#c62828;
   --red-dark:#8e1d1d;
-
   --shadow:0 14px 34px rgba(15,35,60,.10);
   --r:24px;
-
-  --topbar-h:84px;
-  --content-h:calc(100vh - var(--topbar-h) - 32px);
 }
 
 *{box-sizing:border-box}
@@ -40,10 +34,7 @@ body{
   margin:0;
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   color:var(--ink);
-  background:
-    radial-gradient(900px 380px at 0% 0%, rgba(246,195,59,.15), transparent 60%),
-    radial-gradient(900px 380px at 100% 0%, rgba(21,101,192,.12), transparent 60%),
-    linear-gradient(180deg,#f6f9fd 0%, #eef4fb 100%);
+  background:linear-gradient(180deg,#f6f9fd 0%, #eef4fb 100%);
 }
 
 header{
@@ -62,11 +53,11 @@ header{
   justify-content:space-between;
   align-items:center;
   gap:12px;
+  flex-wrap:wrap;
 }
 .brand h1{
   margin:0;
   font-size:22px;
-  line-height:1.05;
 }
 .brand .sub{
   margin-top:4px;
@@ -84,104 +75,10 @@ header{
   font-size:16px;
 }
 
-.headerRight{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-
-.headerActivas{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  max-width:760px;
-}
-
-.headerMesaItem{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:6px;
-  border-radius:999px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.18);
-  backdrop-filter:blur(6px);
-}
-
-.headerMesaName{
-  border:none;
-  border-radius:999px;
-  padding:9px 12px;
-  font-size:14px;
-  font-weight:1000;
-  cursor:pointer;
-  background:#fff;
-  color:#14591b;
-  white-space:nowrap;
-}
-
-.headerMesaName.active{
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  color:#14591b;
-  box-shadow:0 6px 14px rgba(46,125,50,.18);
-}
-
-.headerMiniBtn{
-  border:none;
-  border-radius:999px;
-  padding:8px 10px;
-  font-size:12px;
-  font-weight:1000;
-  cursor:pointer;
-  white-space:nowrap;
-}
-
-.headerMiniPrint{
-  background:#fff7de;
-  color:#7a5400;
-}
-
-.headerMiniClose{
-  background:#fff1f1;
-  color:#8e1d1d;
-}
-
-.headerNoActivas{
-  padding:9px 12px;
-  border-radius:999px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.18);
-  color:#fff;
-  font-size:13px;
-  font-weight:900;
-}
-
-@media (max-width:900px){
-  .head{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .headerRight{
-    width:100%;
-    justify-content:flex-start;
-  }
-
-  .headerActivas{
-    max-width:none;
-    justify-content:flex-start;
-  }
-}
-
 .wrap{
   max-width:1180px;
   margin:auto;
   padding:12px;
-  display:grid;
-  gap:12px;
 }
 
 .grid{
@@ -192,25 +89,6 @@ header{
 }
 @media (max-width:820px){
   .grid{grid-template-columns:1fr}
-}
-
-.leftColSticky{
-  position:sticky;
-  top:calc(var(--topbar-h) + 8px);
-}
-
-.rightColScroll{
-  max-height:none;
-  overflow:visible;
-}
-
-@media (max-width:960px){
-  .leftColSticky,
-  .rightColScroll{
-    position:static;
-    max-height:none;
-    overflow:visible;
-  }
 }
 
 .card{
@@ -305,16 +183,6 @@ header{
   color:var(--red-dark);
 }
 
-.actionsSticky{
-  position:sticky;
-  top:0;
-  z-index:12;
-  background:linear-gradient(180deg,#ffffff 0%, rgba(255,255,255,.97) 100%);
-  padding-top:8px;
-  padding-bottom:8px;
-  margin-top:10px;
-}
-
 .activasWrap{
   margin-top:12px;
   margin-bottom:12px;
@@ -341,192 +209,44 @@ header{
   }
 }
 
-.activasGrid .mesaCard{
-  min-height:110px;
-  border-color:rgba(46,125,50,.55);
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  box-shadow:0 14px 30px rgba(46,125,50,.18);
-}
-
-.activasGrid .mesaText,
-.activasGrid .mesaAmount{
-  color:var(--green-dark);
-}
-
-.activasGrid .mesaState{
-  background:#edf9ef;
-  color:#1f6a24;
-  border-color:rgba(46,125,50,.22);
-}
-
 .mesaBtn{
   border:none;
   cursor:pointer;
   background:transparent;
   padding:0;
+  width:100%;
 }
 .mesaCard{
   min-height:96px;
   border-radius:18px;
-  border:2px solid rgba(21,101,192,.16);
-  background:linear-gradient(180deg,#ffffff,#eef6ff);
-  box-shadow:0 10px 24px rgba(21,101,192,.10);
+  border:2px solid rgba(46,125,50,.55);
+  background:linear-gradient(180deg,#effdf2,#d9f6df);
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
   gap:5px;
-  transition:.18s ease;
   padding:8px;
-}
-.mesaBtn:active .mesaCard{ transform:scale(.98); }
-.mesaTop{
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
-  border:3px solid rgba(90,59,0,.12);
-}
-.mesaLegs{
-  display:flex;
-  gap:14px;
-  margin-top:-3px;
-}
-.mesaLegs span{
-  width:5px;
-  height:14px;
-  border-radius:99px;
-  background:#8d6e63;
 }
 .mesaText{
   font-weight:1000;
-  color:#0b3d6e;
+  color:var(--green-dark);
   font-size:16px;
-  line-height:1.05;
   text-align:center;
+}
+.mesaAmount{
+  font-size:14px;
+  font-weight:1000;
+  color:var(--green-dark);
 }
 .mesaState{
   font-size:11px;
   font-weight:1000;
   border-radius:999px;
   padding:4px 7px;
-  background:#fff;
-  border:1px solid #d7e4f2;
-  color:#466887;
-  text-align:center;
-}
-.mesaAmount{
-  font-size:14px;
-  font-weight:1000;
-  line-height:1;
-  color:#143f70;
-}
-
-.mesaBtn.selected .mesaCard{
-  border-color:var(--red);
-  background:linear-gradient(180deg,#fff1f1,#ffe2e2);
-  box-shadow:0 14px 30px rgba(198,40,40,.18);
-}
-.mesaBtn.selected .mesaText,
-.mesaBtn.selected .mesaAmount{
-  color:var(--red-dark);
-}
-
-.mesaBtn.activeMesa .mesaCard{
-  border-color:rgba(46,125,50,.55);
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  box-shadow:0 14px 30px rgba(46,125,50,.18);
-}
-.mesaBtn.activeMesa .mesaText,
-.mesaBtn.activeMesa .mesaAmount{
-  color:var(--green-dark);
-}
-.mesaBtn.activeMesa .mesaState{
   background:#edf9ef;
   color:#1f6a24;
   border-color:rgba(46,125,50,.22);
-}
-
-.mesaBtn.activeMesa.selected .mesaCard{
-  border-color:#14591b;
-  background:linear-gradient(180deg,#e4f8e8,#c6efcf);
-  box-shadow:0 16px 34px rgba(46,125,50,.24);
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:0;
-}
-.actions .btn:nth-child(5){
-  grid-column:1 / -1;
-}
-@media (max-width:520px){
-  .actions{
-    grid-template-columns:1fr;
-  }
-
-  .btn{
-    font-size:19px;
-    min-height:60px;
-  }
-
-  .cardHead h2{
-    font-size:22px;
-  }
-
-  .cardHead p{
-    font-size:16px;
-  }
-}
-
-.btn{
-  border:none;
-  border-radius:16px;
-  padding:15px 14px;
-  font-weight:1000;
-  font-size:18px;
-  cursor:pointer;
-  width:100%;
-  min-height:56px;
-}
-.btnBlue{
-  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
-  color:#fff;
-}
-.btnGreen{
-  background:linear-gradient(180deg,var(--green),var(--green-dark));
-  color:#fff;
-}
-.btnYellow{
-  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
-  color:#5a3b00;
-}
-.btnRed{
-  background:linear-gradient(180deg,var(--red),var(--red-dark));
-  color:#fff;
-}
-.btnLight{
-  background:#fff;
-  color:#0b4f93;
-  border:2px solid #d4e2f2;
-}
-.btnSmall{
-  border:none;
-  border-radius:14px;
-  padding:10px 12px;
-  font-weight:1000;
-  font-size:14px;
-  cursor:pointer;
-}
-.btnMiniBlue{
-  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
-  color:#fff;
-}
-.btnMiniRed{
-  background:linear-gradient(180deg,var(--red),var(--red-dark));
-  color:#fff;
 }
 
 .topInfo{
@@ -534,9 +254,6 @@ header{
   grid-template-columns:1fr 1fr;
   gap:10px;
   margin-bottom:12px;
-}
-@media (max-width:700px){
-  .topInfo{grid-template-columns:1fr}
 }
 .bigBox{
   border:2px solid #d6e3f2;
@@ -555,7 +272,6 @@ header{
   display:block;
   font-size:22px;
   font-weight:1000;
-  line-height:1.05;
 }
 
 .mainSummary{
@@ -569,14 +285,6 @@ header{
   font-size:28px;
   font-weight:1000;
   color:#143f70;
-  line-height:1;
-}
-.mainSummary .sub{
-  margin-top:6px;
-  color:var(--muted);
-  font-size:14px;
-  font-weight:800;
-  line-height:1.35;
 }
 
 .detalle{
@@ -594,8 +302,6 @@ header{
 .platoHead{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  gap:10px;
   padding:10px 12px;
   background:linear-gradient(90deg, rgba(246,195,59,.24), rgba(21,101,192,.10));
   border-bottom:1px dashed #d6e3f1;
@@ -605,15 +311,6 @@ header{
   font-weight:1000;
   color:#143f70;
 }
-.platoBadge{
-  font-size:13px;
-  font-weight:1000;
-  background:#fff;
-  color:#355779;
-  border:1px solid #d4e2f2;
-  border-radius:999px;
-  padding:6px 10px;
-}
 
 .line{
   display:grid;
@@ -622,66 +319,29 @@ header{
   padding:10px 12px;
   border-top:1px dashed #dbe6f3;
 }
-.line:first-child{border-top:none}
-.lineLeft{
-  min-width:0;
-}
 .lineTitle{
   font-size:16px;
   font-weight:1000;
-  line-height:1.2;
-}
-.lineMeta{
-  margin-top:4px;
-  font-size:13px;
-  color:var(--muted);
-  white-space:pre-wrap;
-  font-weight:800;
-  line-height:1.3;
-}
-.lineRight{
-  text-align:right;
-  min-width:120px;
-}
-.linePrice{
-  font-size:13px;
-  font-weight:900;
 }
 .lineTotal{
-  margin-top:4px;
   font-size:20px;
   font-weight:1000;
   color:#143f70;
-  line-height:1;
-}
-.adminTools{
-  margin-top:6px;
-  display:flex;
-  gap:6px;
-  justify-content:flex-end;
-  flex-wrap:wrap;
+  text-align:right;
 }
 
 .totalBox{
   border-radius:20px;
   padding:14px 16px;
   background:linear-gradient(180deg,#fff7de,#ffe7a1);
-  border:2px solid rgba(246,195,59,.45);
 }
 .totalRow{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:12px;
-}
-.totalRow span{
-  font-size:18px;
-  font-weight:1000;
-  color:#5a3b00;
 }
 .totalRow strong{
   font-size:34px;
-  line-height:1;
   color:#5a3b00;
 }
 
@@ -693,9 +353,9 @@ header{
   color:var(--muted);
   font-weight:900;
   text-align:center;
-  font-size:18px;
 }
 
+/* Modal */
 .backdrop{
   position:fixed;
   inset:0;
@@ -711,7 +371,6 @@ header{
   background:#fff;
   border-radius:24px;
   overflow:hidden;
-  border:1px solid rgba(21,101,192,.14);
   box-shadow:0 30px 80px rgba(2,6,23,.24);
 }
 .modalHead{
@@ -731,15 +390,12 @@ header{
   display:flex;
   gap:10px;
 }
-.modalInput, .modalSelect{
+.modalInput{
   width:100%;
-  padding:14px 14px;
+  padding:14px;
   border-radius:16px;
   border:2px solid #d4e2f2;
-  background:#fff;
   font-size:18px;
-  color:var(--ink);
-  outline:none;
 }
 .modalLabel{
   display:block;
@@ -748,40 +404,76 @@ header{
   font-weight:1000;
   color:#365779;
   text-transform:uppercase;
-  letter-spacing:.35px;
-}
-.modalHelp{
-  margin-top:8px;
-  color:var(--muted);
-  font-weight:800;
-  font-size:14px;
 }
 
-.cobroResumen{
-  display:grid;
-  gap:12px;
-}
-.cobroBox{
-  border:2px solid #d6e3f2;
-  border-radius:18px;
-  background:#fff;
-  padding:14px;
-}
-.cobroBox b{
-  display:block;
-  font-size:12px;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-.cobroBox span{
-  display:block;
-  font-size:28px;
+.mesaActionModal .totalDisplay{
+  font-size:32px;
   font-weight:1000;
-  line-height:1;
+  color:#143f70;
+  text-align:center;
+  padding:12px;
+  background:#f7fbff;
+  border-radius:16px;
+  margin-bottom:16px;
 }
-.cobroCambio.ok span{ color:#1f6a24; }
-.cobroCambio.bad span{ color:#8e1d1d; }
+
+.actionButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-top:16px;
+}
+.actionBtn{
+  padding:14px;
+  border:none;
+  border-radius:16px;
+  font-weight:1000;
+  font-size:16px;
+  cursor:pointer;
+}
+.actionPrint{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+}
+.actionPay{
+  background:linear-gradient(180deg,var(--green),var(--green-dark));
+  color:#fff;
+}
+.actionCancel{
+  background:#fff;
+  border:2px solid #d4e2f2;
+  color:#0b4f93;
+}
+
+.btn{
+  border:none;
+  border-radius:16px;
+  padding:15px;
+  font-weight:1000;
+  font-size:18px;
+  cursor:pointer;
+  width:100%;
+}
+.btnYellow{
+  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
+  color:#5a3b00;
+}
+.btnLight{
+  background:#fff;
+  color:#0b4f93;
+  border:2px solid #d4e2f2;
+}
+.btnBlue{
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
+  color:#fff;
+}
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
 </style>
 </head>
 <body>
@@ -792,249 +484,153 @@ header{
       <h1>💳 Cuentas</h1>
       <div class="sub">Mesas, para llevar y carrito afuera</div>
     </div>
-
-    <div class="headerRight">
-      <div class="pill" id="pillMesa">Sin seleccionar</div>
-      <div class="headerActivas" id="headerActivas"></div>
-    </div>
+    <div class="pill" id="pillMesa">Sin seleccionar</div>
   </div>
 </header>
 
 <div class="wrap">
   <div class="grid">
-
-    <section class="card leftColSticky">
+    <section class="card">
       <div class="cardHead">
-        <h2>Paso 1: Elegir cuenta</h2>
-        <p>Selecciona el tipo de cuenta y luego toca una cuenta activa.</p>
-        <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
+        <h2>Cuentas activas</h2>
+        <p>Toca una cuenta para ver opciones</p>
+        <div class="syncStatus warn" id="syncStatus">Cargando...</div>
       </div>
-
       <div class="cardBody">
         <div class="roleBox">
           <div class="roleInfo" id="roleInfo">Modo actual: Operador</div>
-          <button class="btn btnLight" id="btnCambiarModo" type="button">Cambiar modo</button>
+          <button class="btn btnLight" id="btnCambiarModo">Cambiar modo</button>
         </div>
 
         <div class="tipoGrid">
-          <button class="tipoBtn active" id="btnTipoMesas" type="button">🍽️ Mesas</button>
-          <button class="tipoBtn" id="btnTipoLlevar" type="button">🥡 Para llevar</button>
-          <button class="tipoBtn" id="btnTipoCarrito" type="button">🛒 Carrito afuera</button>
+          <button class="tipoBtn active" id="btnTipoMesas">🍽️ Mesas</button>
+          <button class="tipoBtn" id="btnTipoLlevar">🥡 Para llevar</button>
+          <button class="tipoBtn" id="btnTipoCarrito">🛒 Carrito afuera</button>
         </div>
 
         <div class="activasWrap">
           <div class="activasTitle">Cuentas activas</div>
-          <div class="activasGrid" id="activasGrid"></div>
+          <div class="activasGrid" id="activasGrid">
+            <div style="text-align:center; padding:20px;">Cargando...</div>
+          </div>
         </div>
 
-        <div class="actionsSticky">
-          <div class="actions">
-            <button class="btn btnYellow" id="btnResumen" type="button">📊 Ver resumen del día</button>
-            <button class="btn btnGreen" id="btnCuenta" type="button">🖨️ Imprimir cuenta</button>
-            <button class="btn btnRed" id="btnCerrar" type="button">💵 Cerrar y cobrar</button>
-            <button class="btn btnLight" id="btnActualizarMesas" type="button">🔄 Actualizar cuentas</button>
-            <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">⚙️ Ajuste admin</button>
-          </div>
+        <div class="actions">
+          <button class="btn btnYellow" id="btnResumen">📊 Resumen del día</button>
+          <button class="btn btnLight" id="btnActualizarMesas">🔄 Actualizar</button>
         </div>
       </div>
     </section>
 
-    <section class="card rightColScroll">
+    <section class="card">
       <div class="cardHead">
-        <h2>Paso 2: Revisar detalle</h2>
-        <p>Aquí ves productos, cantidades y total de la cuenta.</p>
+        <h2>Detalle de la cuenta</h2>
+        <p>Selecciona una cuenta para ver los productos</p>
       </div>
-
       <div class="cardBody">
         <div class="topInfo">
-          <div class="bigBox">
-            <b>Cuenta</b>
-            <span id="kpiMesa">—</span>
-          </div>
-          <div class="bigBox">
-            <b>Mesero</b>
-            <span id="kpiMesero">—</span>
-          </div>
+          <div class="bigBox"><b>Cuenta</b><span id="kpiMesa">—</span></div>
+          <div class="bigBox"><b>Mesero</b><span id="kpiMesero">—</span></div>
         </div>
-
-        <div class="ticketBox" id="detalleCuenta">
+        <div id="detalleCuenta">
           <div class="emptyState">Selecciona una cuenta.</div>
         </div>
       </div>
     </section>
-
   </div>
 </div>
 
-<div class="backdrop" id="loginBackdrop">
-  <div class="modal">
+<!-- Modal de acción -->
+<div class="backdrop" id="mesaActionBackdrop">
+  <div class="modal mesaActionModal">
     <div class="modalHead">
-      <h3>Entrar como operador o admin</h3>
+      <h3 id="mesaActionTitle">Cuenta</h3>
     </div>
     <div class="modalBody">
+      <div class="totalDisplay" id="mesaActionTotal">$0.00</div>
+      <label class="modalLabel">💰 ¿Con cuánto pagan?</label>
+      <input class="modalInput" id="mesaActionPago" type="number" step="0.01" placeholder="Ingresa el monto">
+      <div id="mesaActionCambioBox" style="margin-top:12px; padding:12px; border-radius:16px; background:#f7fbff;">
+        <b>💵 Cambio:</b>
+        <span id="mesaActionCambio" style="font-size:24px; font-weight:1000; display:block;">$0.00</span>
+      </div>
+      <div class="actionButtons">
+        <button class="actionBtn actionPrint" id="mesaActionPrintBtn">🖨️ Imprimir</button>
+        <button class="actionBtn actionPay" id="mesaActionPayBtn">💵 Cobrar</button>
+        <button class="actionBtn actionCancel" id="mesaActionCancelBtn">❌ Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal login -->
+<div class="backdrop" id="loginBackdrop">
+  <div class="modal">
+    <div class="modalHead"><h3>Acceso</h3></div>
+    <div class="modalBody">
       <label class="modalLabel">Modo</label>
-      <select class="modalSelect" id="loginRol">
+      <select class="modalInput" id="loginRol" style="margin-bottom:12px;">
         <option value="operador">Operador</option>
         <option value="admin">Admin</option>
       </select>
-
-      <div id="pinWrap" style="display:none; margin-top:14px;">
-        <label class="modalLabel">PIN admin</label>
-        <input class="modalInput" id="loginPin" type="password" placeholder="Escribe el PIN">
-      </div>
-
-      <div class="modalHelp">
-        Operador: consulta, imprime y cierra.<br>
-        Admin: además puede editar precios, borrar productos y hacer ajustes.
+      <div id="pinWrap" style="display:none;">
+        <label class="modalLabel">PIN Admin</label>
+        <input class="modalInput" id="loginPin" type="password" placeholder="PIN">
       </div>
     </div>
     <div class="modalFoot">
-      <button class="btn btnLight" id="btnCerrarLogin" type="button">Cancelar</button>
-      <button class="btn btnBlue" id="btnEntrarLogin" type="button">Entrar</button>
+      <button class="btn btnLight" id="btnCerrarLogin">Cancelar</button>
+      <button class="btn btnBlue" id="btnEntrarLogin">Entrar</button>
     </div>
   </div>
 </div>
 
-<div class="backdrop" id="editBackdrop">
-  <div class="modal">
-    <div class="modalHead">
-      <h3 id="editTitle">Editar</h3>
-    </div>
-    <div class="modalBody">
-      <label class="modalLabel">Valor</label>
-      <input class="modalInput" id="editValue" type="text" placeholder="Escribe el valor">
-      <div class="modalHelp" id="editHelp"></div>
-    </div>
-    <div class="modalFoot">
-      <button class="btn btnLight" id="btnEditCancel" type="button">Cancelar</button>
-      <button class="btn btnBlue" id="btnEditSave" type="button">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<div class="backdrop" id="cobroBackdrop">
-  <div class="modal">
-    <div class="modalHead">
-      <h3>Cerrar cuenta y calcular cambio</h3>
-    </div>
-    <div class="modalBody">
-      <div class="cobroResumen">
-        <div class="cobroBox">
-          <b>Total a cobrar</b>
-          <span id="cobroTotal">$0.00</span>
-        </div>
-
-        <div>
-          <label class="modalLabel">¿Con cuánto van a pagar? (opcional)</label>
-          <input class="modalInput" id="cobroPago" type="number" min="0" step="0.01" placeholder="Opcional, ej. 500">
-        </div>
-
-        <div class="cobroBox cobroCambio" id="cobroCambioBox">
-          <b>Cambio</b>
-          <span id="cobroCambio">$0.00</span>
-        </div>
-
-        <div class="modalHelp" id="cobroEstado">Puedes cerrar la cuenta sin capturar pago.</div>
-      </div>
-    </div>
-    <div class="modalFoot">
-      <button class="btn btnLight" id="btnCobroCancelar" type="button">Cancelar</button>
-      <button class="btn btnRed" id="btnCobroConfirmar" type="button">Confirmar cierre</button>
-    </div>
-  </div>
-</div>
-
+<!-- Modal fecha resumen -->
 <div class="backdrop" id="fechaResumenBackdrop">
   <div class="modal">
-    <div class="modalHead">
-      <h3>Resumen por fecha</h3>
-    </div>
+    <div class="modalHead"><h3>Resumen de ventas</h3></div>
     <div class="modalBody">
-      <label class="modalLabel">Elige la fecha</label>
-      <input class="modalInput" id="fechaResumenInput" type="date">
-      <div class="modalHelp">
-        Se generará un documento PDF con el resumen de las cuentas cerradas de ese día.
+      <label class="modalLabel">📅 Selecciona la fecha</label>
+      <input class="modalInput" id="fechaResumenInput" type="date" style="font-size:18px;">
+      <div class="modalHelp" style="margin-top:12px; color:#61758d; font-size:13px;">
+        Se generará un PDF con todas las ventas del día seleccionado.
       </div>
     </div>
     <div class="modalFoot">
-      <button class="btn btnLight" id="btnFechaResumenCancelar" type="button">Cancelar</button>
-      <button class="btn btnYellow" id="btnFechaResumenEnviar" type="button">Descargar PDF</button>
+      <button class="btn btnLight" id="btnFechaResumenCancelar">Cancelar</button>
+      <button class="btn btnYellow" id="btnFechaResumenEnviar">📄 Descargar PDF</button>
     </div>
   </div>
 </div>
 
 <script>
+// Configuración
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
-
 const ADMIN_PIN = "1234";
 
+// Estado global
 
+let comandaActual = null;
+let itemsActuales = [];
+let mesaActual = "";
+let mesasConCuenta = new Set();
+let resumenMesas = {};
+let userRole = "operador";
+let tipoVista = "mesas";
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  supabaseReady = true;
-}
-
+// Precios
 const PRECIOS = {
-  taco_tripa:38,
-  taco_pastor:28,
-  taco_bistec:28,
-  taco_chorizo:28,
-  taco_higado:28,
-  taco_costilla:28,
-  taco_barbacoa:28,
-  taco_alambre:28,
-  taco_combi:38,
-  taco_campechano:38,
-
-  quesa_tripa:120,
-  quesa_pastor:90,
-  quesa_bistec:90,
-  quesa_chorizo:90,
-  quesa_higado:90,
-  quesa_costilla:90,
-  quesa_barbacoa:90,
-  quesa_alambre:90,
-  quesa_sencilla:30,
-  quesa_combi:100,
-
-  burrito_tripa:100,
-  burrito_pastor:90,
-  burrito_bistec:90,
-  burrito_chorizo:90,
-  burrito_higado:90,
-  burrito_costilla:90,
-  burrito_barbacoa:90,
-  burrito_alambre:90,
-  burrito_sencillo:30,
-  burrito_combi:100,
-
-  charola_combi:100,
-  charola_combi_100:100,
-  charola_combi_150:150,
-  charola_combi_200:200,
-  charola_alam:90,
-
-  volcan_tripa:90,
-  volcan_pastor:85,
-  volcan_bistec:85,
-  volcan_chorizo:85,
-  volcan_higado:85,
-
-  beb_coca_light:35,
-  beb_coca:35,
-  beb_fresca:35,
-  beb_sprite:35,
-  beb_agua:30,
-  beb_agua_lt:60,
-
-  pos_pay:60,
-  pos_rompope:60,
-  pos_arroz:60,
-  pos_flan:60,
-  pos_fresa:60,
-  pos_napolitano:60
+  taco_tripa:38, taco_pastor:28, taco_bistec:28, taco_chorizo:28, taco_higado:28,
+  taco_costilla:28, taco_barbacoa:28, taco_alambre:28, taco_combi:38, taco_campechano:38,
+  quesa_tripa:120, quesa_pastor:90, quesa_bistec:90, quesa_chorizo:90, quesa_higado:90,
+  quesa_costilla:90, quesa_barbacoa:90, quesa_alambre:90, quesa_sencilla:30, quesa_combi:100,
+  burrito_tripa:100, burrito_pastor:90, burrito_bistec:90, burrito_chorizo:90, burrito_higado:90,
+  burrito_costilla:90, burrito_barbacoa:90, burrito_alambre:90, burrito_sencillo:30, burrito_combi:100,
+  charola_combi:100, charola_combi_100:100, charola_combi_150:150, charola_combi_200:200, charola_alam:90,
+  volcan_tripa:90, volcan_pastor:85, volcan_bistec:85, volcan_chorizo:85, volcan_higado:85,
+  beb_coca_light:35, beb_coca:35, beb_fresca:35, beb_sprite:35, beb_agua:30, beb_agua_lt:60,
+  pos_pay:60, pos_rompope:60, pos_arroz:60, pos_flan:60, pos_fresa:60, pos_napolitano:60
 };
 
 const CUENTAS_FIJAS = {
@@ -1043,44 +639,29 @@ const CUENTAS_FIJAS = {
   carrito: ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"]
 };
 
-const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
-
-let comandaActual = null;
-let itemsActuales = [];
-let mesaActual = "";
-let mesasConCuenta = new Set();
-let resumenMesas = {};
-let userRole = "operador";
-let currentEditAction = null;
-let currentEditItem = null;
-let tipoVista = "mesas";
-
+// Elementos DOM
 const syncStatus = document.getElementById("syncStatus");
 const pillMesa = document.getElementById("pillMesa");
 const kpiMesa = document.getElementById("kpiMesa");
 const kpiMesero = document.getElementById("kpiMesero");
 const detalleCuenta = document.getElementById("detalleCuenta");
 const activasGrid = document.getElementById("activasGrid");
-const headerActivas = document.getElementById("headerActivas");
 const roleInfo = document.getElementById("roleInfo");
-const btnAjusteAdmin = document.getElementById("btnAjusteAdmin");
+
+// Modales
+const mesaActionBackdrop = document.getElementById("mesaActionBackdrop");
+const mesaActionTitle = document.getElementById("mesaActionTitle");
+const mesaActionTotal = document.getElementById("mesaActionTotal");
+const mesaActionPago = document.getElementById("mesaActionPago");
+const mesaActionCambio = document.getElementById("mesaActionCambio");
+const mesaActionPrintBtn = document.getElementById("mesaActionPrintBtn");
+const mesaActionPayBtn = document.getElementById("mesaActionPayBtn");
+const mesaActionCancelBtn = document.getElementById("mesaActionCancelBtn");
 
 const loginBackdrop = document.getElementById("loginBackdrop");
 const loginRol = document.getElementById("loginRol");
 const loginPin = document.getElementById("loginPin");
 const pinWrap = document.getElementById("pinWrap");
-
-const editBackdrop = document.getElementById("editBackdrop");
-const editTitle = document.getElementById("editTitle");
-const editValue = document.getElementById("editValue");
-const editHelp = document.getElementById("editHelp");
-
-const cobroBackdrop = document.getElementById("cobroBackdrop");
-const cobroTotal = document.getElementById("cobroTotal");
-const cobroPago = document.getElementById("cobroPago");
-const cobroCambio = document.getElementById("cobroCambio");
-const cobroCambioBox = document.getElementById("cobroCambioBox");
-const cobroEstado = document.getElementById("cobroEstado");
 
 const fechaResumenBackdrop = document.getElementById("fechaResumenBackdrop");
 const fechaResumenInput = document.getElementById("fechaResumenInput");
@@ -1089,426 +670,42 @@ const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
 const btnTipoCarrito = document.getElementById("btnTipoCarrito");
 
-function money(n){
+// Funciones auxiliares
+function money(n) {
   return "$" + Number(n || 0).toFixed(2);
 }
 
-function escapeHtml(s){
-  return String(s || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
+function escapeHtml(s) {
+  return String(s || "").replace(/[&<>]/g, function(m) {
+    if (m === '&') return '&amp;';
+    if (m === '<') return '&lt;';
+    if (m === '>') return '&gt;';
+    return m;
+  });
 }
 
-function setSyncStatus(text, type="warn"){
+function setSyncStatus(text, type = "warn") {
   syncStatus.textContent = text;
   syncStatus.className = `syncStatus ${type}`;
+  console.log(`[Status] ${type}: ${text}`);
 }
 
-function updateRoleUI(){
-  roleInfo.textContent = `Modo actual: ${userRole === "admin" ? "Admin" : "Operador"}`;
-  btnAjusteAdmin.style.display = userRole === "admin" ? "block" : "none";
-}
-
-function updateTipoUI(){
-  btnTipoMesas.classList.toggle("active", tipoVista === "mesas");
-  btnTipoLlevar.classList.toggle("active", tipoVista === "llevar");
-  btnTipoCarrito.classList.toggle("active", tipoVista === "carrito");
-}
-
-function getCuentasVisibles(){
-  return CUENTAS_FIJAS[tipoVista] || [];
-}
-
-function openLoginModal(){
-  loginRol.value = userRole;
-  loginPin.value = "";
-  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
-  loginBackdrop.style.display = "flex";
-}
-
-function closeLoginModal(){
-  loginBackdrop.style.display = "none";
-}
-
-function openEditModal(title, help, action, item=null, initialValue=""){
-  currentEditAction = action;
-  currentEditItem = item;
-  editTitle.textContent = title;
-  editHelp.textContent = help || "";
-  editValue.value = initialValue;
-  editBackdrop.style.display = "flex";
-  setTimeout(()=>editValue.focus(), 50);
-}
-
-function closeEditModal(){
-  currentEditAction = null;
-  currentEditItem = null;
-  editValue.value = "";
-  editBackdrop.style.display = "none";
-}
-
-function openCobroModal(){
-  if(!comandaActual){
-    alert("Primero carga una cuenta.");
-    return;
-  }
-
-  const total = getTotalCuenta();
-  cobroTotal.textContent = money(total);
-  cobroPago.value = "";
-  cobroCambio.textContent = money(0);
-  cobroCambioBox.classList.remove("ok","bad");
-  cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
-  cobroBackdrop.style.display = "flex";
-
-  setTimeout(()=>cobroPago.focus(), 60);
-}
-
-function closeCobroModal(){
-  cobroBackdrop.style.display = "none";
-}
-
-function recalcularCambio(){
-  const total = getTotalCuenta();
-  const pagoTexto = String(cobroPago.value || "").trim();
-
-  cobroCambioBox.classList.remove("ok","bad");
-
-  if(!pagoTexto){
-    cobroCambio.textContent = money(0);
-    cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
-    return;
-  }
-
-  const pago = Number(pagoTexto);
-  const cambio = pago - total;
-
-  cobroCambio.textContent = money(cambio);
-
-  if(cambio >= 0){
-    cobroCambioBox.classList.add("ok");
-    cobroEstado.textContent = "Cambio calculado correctamente.";
-  }else{
-    cobroCambioBox.classList.add("bad");
-    cobroEstado.textContent = `Faltan ${money(Math.abs(cambio))} para cubrir el total.`;
-  }
-}
-
-function getPrecioUnitario(item){
+function getPrecioUnitario(item) {
   if (item.precio_unitario != null && item.precio_unitario !== "") {
-    return Number(item.precio_unitario || 0);
+    return Number(item.precio_unitario);
   }
   return Number(PRECIOS[item.producto_id] || 0);
 }
 
-function getTotalCuenta(){
-  return itemsActuales.reduce((sum, item) => {
-    return sum + (Number(item.qty || 0) * getPrecioUnitario(item));
-  }, 0);
+function getTotalCuenta() {
+  return itemsActuales.reduce((sum, item) => sum + (Number(item.qty || 0) * getPrecioUnitario(item)), 0);
 }
 
-function agruparItemsPorPlato(items){
-  const grupos = {};
-  items.forEach(item => {
-    const plato = item.plato || "General";
-    if(!grupos[plato]) grupos[plato] = [];
-    grupos[plato].push(item);
-  });
-
-  return PLATOS
-    .filter(plato => grupos[plato] && grupos[plato].length)
-    .map(plato => ({ plato, items: grupos[plato] }));
-}
-
-function resetVista(){
-  comandaActual = null;
-  itemsActuales = [];
-  kpiMesa.textContent = "—";
-  kpiMesero.textContent = "—";
-  detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
-}
-
-async function seleccionarCuentaDesdeHeader(mesa){
-  mesaActual = mesa;
-  pillMesa.textContent = mesa;
-  renderMesas();
-  renderHeaderActivas();
-  await cargarCuenta();
-}
-
-async function imprimirCuentaDirecta(mesa){
-  const mesaAnterior = mesaActual;
-  const comandaAnterior = comandaActual;
-  const itemsAnteriores = [...itemsActuales];
-
-  mesaActual = mesa;
-  await cargarCuenta();
-
-  if(!comandaActual){
-    alert("No hay cuenta abierta en " + mesa);
-    mesaActual = mesaAnterior;
-    comandaActual = comandaAnterior;
-    itemsActuales = itemsAnteriores;
-    renderCuenta();
-    renderMesas();
-    renderHeaderActivas();
-    return;
-  }
-
-  imprimirCuenta();
-
-  mesaActual = mesa;
-  renderMesas();
-  renderHeaderActivas();
-}
-
-async function cerrarCuentaDirecta(mesa){
-  const mesaAnterior = mesaActual;
-  mesaActual = mesa;
-  await cargarCuenta();
-
-  if(!comandaActual){
-    alert("No hay cuenta abierta en " + mesa);
-    mesaActual = mesaAnterior;
-    renderMesas();
-    renderHeaderActivas();
-    return;
-  }
-
-  openCobroModal();
-}
-
-function renderHeaderActivas(){
-  headerActivas.innerHTML = "";
-
-  const cuentasVisibles = getCuentasVisibles();
-  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
-
-  if(!cuentasActivas.length){
-    headerActivas.innerHTML = `<div class="headerNoActivas">Sin cuentas activas</div>`;
-    return;
-  }
-
-  cuentasActivas.forEach(mesa=>{
-    const item = document.createElement("div");
-    item.className = "headerMesaItem";
-
-    const btnMesa = document.createElement("button");
-    btnMesa.type = "button";
-    btnMesa.className = "headerMesaName" + (mesaActual === mesa ? " active" : "");
-    btnMesa.textContent = mesa;
-    btnMesa.onclick = ()=> seleccionarCuentaDesdeHeader(mesa);
-
-    const btnPrint = document.createElement("button");
-    btnPrint.type = "button";
-    btnPrint.className = "headerMiniBtn headerMiniPrint";
-    btnPrint.textContent = "Imprimir";
-    btnPrint.onclick = (e)=>{
-      e.stopPropagation();
-      imprimirCuentaDirecta(mesa);
-    };
-
-    const btnClose = document.createElement("button");
-    btnClose.type = "button";
-    btnClose.className = "headerMiniBtn headerMiniClose";
-    btnClose.textContent = "Cerrar";
-    btnClose.onclick = (e)=>{
-      e.stopPropagation();
-      cerrarCuentaDirecta(mesa);
-    };
-
-    item.appendChild(btnMesa);
-    item.appendChild(btnPrint);
-    item.appendChild(btnClose);
-
-    headerActivas.appendChild(item);
-  });
-}
-
-function renderMesas(){
-  activasGrid.innerHTML = "";
-
-  const cuentasVisibles = getCuentasVisibles();
-  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
-
-  renderHeaderActivas();
-
-  if(!cuentasActivas.length){
-    activasGrid.innerHTML = `
-      <div style="
-        grid-column:1 / -1;
-        border-radius:18px;
-        padding:18px;
-        background:#fff;
-        border:2px dashed #d4e2f2;
-        color:#61758d;
-        font-weight:900;
-        text-align:center;
-        font-size:16px;
-      ">
-        No hay cuentas activas en esta sección.
-      </div>
-    `;
-    return;
-  }
-
-  cuentasActivas.forEach(mesa => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-
-    let cls = "mesaBtn activeMesa";
-    if (mesaActual === mesa) cls += " selected";
-    btn.className = cls;
-
-    const info = resumenMesas[mesa] || { total: 0, items: 0 };
-    const totalMesa = money(info.total || 0);
-
-    const iconHtml = tipoVista === "mesas"
-      ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
-      : tipoVista === "llevar"
-      ? `<div style="font-size:44px;">🥡</div>`
-      : `<div style="font-size:44px;">🛒</div>`;
-
-    btn.innerHTML = `
-      <div class="mesaCard">
-        ${iconHtml}
-        <div class="mesaText">${escapeHtml(mesa)}</div>
-        <div class="mesaAmount">${totalMesa}</div>
-        <div class="mesaState">Cuenta activa</div>
-      </div>
-    `;
-
-    btn.onclick = async () => {
-      mesaActual = mesa;
-      pillMesa.textContent = mesa;
-      renderMesas();
-      await cargarCuenta();
-    };
-
-    activasGrid.appendChild(btn);
-  });
-}
-
-async function cargarEstadoMesas(){
-  if(!supabaseReady){
-    mesasConCuenta = new Set();
-    resumenMesas = {};
-    renderMesas();
-    return;
-  }
-
-  const cuentasVisibles = getCuentasVisibles();
-
-  const { data: comandas, error: errComandas } = await supabase
-    .from("comandas")
-    .select("id, mesa, estado")
-    .eq("estado", "abierta")
-    .in("mesa", cuentasVisibles);
-
-  if(errComandas){
-    console.error(errComandas);
-    mesasConCuenta = new Set();
-    resumenMesas = {};
-    renderMesas();
-    return;
-  }
-
-  const abiertas = comandas || [];
-  mesasConCuenta = new Set(abiertas.map(x => x.mesa).filter(Boolean));
-  resumenMesas = {};
-
-  for (const com of abiertas) {
-    const { data: items } = await supabase
-      .from("comandas_items")
-      .select("qty, producto_id, precio_unitario")
-      .eq("comanda_id", com.id);
-
-    const lista = items || [];
-    const total = lista.reduce((acc, it) => {
-      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
-        : Number(PRECIOS[it.producto_id] || 0);
-      return acc + (Number(it.qty || 0) * precio);
-    }, 0);
-
-    const totalItems = lista.reduce((acc, it) => acc + Number(it.qty || 0), 0);
-
-    resumenMesas[com.mesa] = {
-      total,
-      items: totalItems
-    };
-  }
-
-  renderMesas();
-}
-
-async function cargarCuenta(){
-  if(!supabaseReady){
-    setSyncStatus("Configura SUPABASE_URL y SUPABASE_ANON_KEY", "bad");
-    return;
-  }
-
-  const mesa = mesaActual;
-  if(!mesa){
-    alert("Selecciona una cuenta.");
-    return;
-  }
-
-  pillMesa.textContent = mesa;
-  setSyncStatus(`Buscando cuenta en ${mesa}...`, "warn");
-
-  const { data: comanda, error: errCom } = await supabase
-    .from("comandas")
-    .select("*")
-    .eq("mesa", mesa)
-    .eq("estado", "abierta")
-    .order("created_at", { ascending:false })
-    .limit(1)
-    .maybeSingle();
-
-  if(errCom){
-    console.error(errCom);
-    setSyncStatus("Error al buscar la cuenta", "bad");
-    alert("No se pudo consultar la cuenta.");
-    return;
-  }
-
-  if(!comanda){
-    comandaActual = null;
-    itemsActuales = [];
-    kpiMesa.textContent = mesa;
+function renderCuenta() {
+  if (!comandaActual) {
+    kpiMesa.textContent = "—";
     kpiMesero.textContent = "—";
-    detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta abierta en ${escapeHtml(mesa)}.</div>`;
-    setSyncStatus(`No hay cuenta abierta en ${mesa}`, "warn");
-    await cargarEstadoMesas();
-    return;
-  }
-
-  comandaActual = comanda;
-
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("*")
-    .eq("comanda_id", comanda.id)
-    .order("created_at", { ascending:true });
-
-  if(errItems){
-    console.error(errItems);
-    setSyncStatus("Error al cargar productos", "bad");
-    alert("No se pudieron cargar los productos.");
-    return;
-  }
-
-  itemsActuales = items || [];
-  renderCuenta();
-  setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
-  await cargarEstadoMesas();
-}
-
-function renderCuenta(){
-  if(!comandaActual){
-    resetVista();
+    detalleCuenta.innerHTML = `<div class="emptyState">Selecciona una cuenta.</div>`;
     return;
   }
 
@@ -1516,312 +713,459 @@ function renderCuenta(){
   kpiMesero.textContent = comandaActual.mesero || "—";
   pillMesa.textContent = comandaActual.mesa || "Sin seleccionar";
 
-  const grupos = agruparItemsPorPlato(itemsActuales);
   const total = getTotalCuenta();
+  
+  if (!itemsActuales.length) {
+    detalleCuenta.innerHTML = `
+      <div class="mainSummary">
+        <div class="mesaGrande">${escapeHtml(comandaActual.mesa)}</div>
+        <div class="sub">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+      </div>
+      <div class="emptyState">La cuenta está vacía.</div>
+      <div class="totalBox">
+        <div class="totalRow"><span>Total</span><strong>${money(total)}</strong></div>
+      </div>
+    `;
+    return;
+  }
 
   let html = `
     <div class="mainSummary">
-      <div class="mesaGrande">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
+      <div class="mesaGrande">${escapeHtml(comandaActual.mesa)}</div>
       <div class="sub">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
     </div>
     <div class="detalle">
   `;
 
-  if(!itemsActuales.length){
-    html += `<div class="emptyState">La cuenta está vacía.</div>`;
-  } else {
-    grupos.forEach(group => {
-      const countGrupo = group.items.reduce((a, x) => a + Number(x.qty || 0), 0);
-
-      html += `
-        <div class="platoCard">
-          <div class="platoHead">
-            <div class="platoTitle">${escapeHtml(group.plato)}</div>
-            <div class="platoBadge">${countGrupo} productos</div>
-          </div>
-      `;
-
-      group.items.forEach(item => {
-        const precio = getPrecioUnitario(item);
-        const importe = Number(item.qty || 0) * precio;
-
-        html += `
-          <div class="line">
-            <div class="lineLeft">
-              <div class="lineTitle">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || item.name || "Producto")}</div>
-              ${item.nota ? `<div class="lineMeta">• ${escapeHtml(item.nota)}</div>` : ``}
-            </div>
-            <div class="lineRight">
-              <div class="linePrice">${money(precio)} c/u</div>
-              <div class="lineTotal">${money(importe)}</div>
-              ${userRole === "admin" ? `
-                <div class="adminTools">
-                  <button class="btnSmall btnMiniBlue" onclick="editarPrecio('${item.id}')">Precio</button>
-                  <button class="btnSmall btnMiniRed" onclick="eliminarProducto('${item.id}')">Borrar</button>
-                </div>
-              ` : ``}
-            </div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-    });
-
+  itemsActuales.forEach(item => {
+    const precio = getPrecioUnitario(item);
+    const importe = Number(item.qty || 0) * precio;
     html += `
-      <div class="totalBox">
-        <div class="totalRow">
-          <span>Total</span>
-          <strong>${money(total)}</strong>
+      <div class="platoCard">
+        <div class="platoHead">
+          <div class="platoTitle">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
+        </div>
+        <div class="line">
+          <div class="lineTitle">${money(precio)} c/u</div>
+          <div class="lineTotal">${money(importe)}</div>
         </div>
       </div>
     `;
-  }
-
-  html += `</div>`;
-  detalleCuenta.innerHTML = html;
-}
-
-function findItemById(id){
-  return itemsActuales.find(x => String(x.id) === String(id));
-}
-
-async function editarPrecio(id){
-  if(userRole !== "admin") return;
-  const item = findItemById(id);
-  if(!item) return;
-
-  openEditModal(
-    `Cambiar precio de ${item.producto_nombre}`,
-    "Escribe el nuevo precio unitario.",
-    "precio",
-    item,
-    String(getPrecioUnitario(item))
-  );
-}
-
-async function eliminarProducto(id){
-  if(userRole !== "admin") return;
-  const item = findItemById(id);
-  if(!item) return;
-
-  if(!confirm(`¿Eliminar "${item.producto_nombre}" de la cuenta?`)) return;
-
-  const { error } = await supabase
-    .from("comandas_items")
-    .delete()
-    .eq("id", item.id);
-
-  if(error){
-    console.error(error);
-    alert("No se pudo eliminar el producto.");
-    return;
-  }
-
-  await cargarCuenta();
-}
-
-async function crearAjusteAdmin(){
-  if(userRole !== "admin"){
-    alert("Solo admin puede hacer ajustes.");
-    return;
-  }
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
-
-  openEditModal(
-    "Ajuste admin",
-    "Ejemplo: -50 para descuento o 30 para recargo.",
-    "ajuste",
-    null,
-    ""
-  );
-}
-
-async function guardarEdicion(){
-  if(currentEditAction === "precio" && currentEditItem){
-    const nuevo = Number(editValue.value);
-    if(isNaN(nuevo) || nuevo < 0){
-      alert("Pon un precio válido.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("comandas_items")
-      .update({ precio_unitario: nuevo })
-      .eq("id", currentEditItem.id);
-
-    if(error){
-      console.error(error);
-      alert("No se pudo actualizar el precio.");
-      return;
-    }
-
-    closeEditModal();
-    await cargarCuenta();
-    return;
-  }
-
-  if(currentEditAction === "ajuste"){
-    const ajuste = Number(editValue.value);
-    if(isNaN(ajuste) || ajuste === 0){
-      alert("Pon un ajuste válido.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("comandas_items")
-      .insert([{
-        comanda_id: comandaActual.id,
-        producto_id: "ajuste_admin",
-        producto_nombre: ajuste < 0 ? "Descuento admin" : "Recargo admin",
-        categoria: "AJUSTE",
-        plato: "General",
-        nota: "Ajuste manual admin",
-        qty: 1,
-        cocina: false,
-        precio_unitario: ajuste
-      }]);
-
-    if(error){
-      console.error(error);
-      alert("No se pudo guardar el ajuste.");
-      return;
-    }
-
-    closeEditModal();
-    await cargarCuenta();
-  }
-}
-
-async function cerrarCuentaDefinitiva(){
-  if(!supabaseReady){
-    setSyncStatus("Configura Supabase primero", "bad");
-    return;
-  }
-
-  if(!comandaActual){
-    alert("Primero carga una cuenta.");
-    return;
-  }
-
-  setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
-
-  const { error } = await supabase
-    .from("comandas")
-    .update({
-      estado: "cerrada",
-      updated_at: new Date().toISOString()
-    })
-    .eq("id", comandaActual.id);
-
-  if(error){
-    console.error(error);
-    setSyncStatus("Error al cerrar la cuenta", "bad");
-    alert("No se pudo cerrar la cuenta.");
-    return;
-  }
-
-  closeCobroModal();
-  alert("Cuenta cerrada correctamente.");
-  comandaActual = null;
-  itemsActuales = [];
-  await cargarEstadoMesas();
-
-  if (mesaActual) {
-    kpiMesa.textContent = mesaActual;
-    kpiMesero.textContent = "—";
-    detalleCuenta.innerHTML = `<div class="emptyState">La cuenta de ${escapeHtml(mesaActual)} ya fue cerrada.</div>`;
-    pillMesa.textContent = mesaActual;
-  }
-
-  setSyncStatus(`Cuenta cerrada: ${mesaActual}`, "ok");
-}
-
-function buildCuentaPrint(){
-  if(!comandaActual) return "";
-
-  const total = getTotalCuenta();
-  const grupos = agruparItemsPorPlato(itemsActuales);
-
-  let html = `
-    <div class="ticket">
-      <div class="c b lg">CUENTA</div>
-      <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
-      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
-      <div class="hr"></div>
-  `;
-
-  grupos.forEach(group => {
-    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
-
-    group.items.forEach(item => {
-      const precio = getPrecioUnitario(item);
-      const importe = Number(item.qty || 0) * precio;
-
-      html += `
-        <div class="it">
-          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
-          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
-          <div class="priceRow">
-            <span>${money(precio)} c/u</span>
-            <span>${money(importe)}</span>
-          </div>
-        </div>
-      `;
-    });
-
-    html += `<div class="hr"></div>`;
   });
 
   html += `
-      <div class="totalRowPrint">
-        <span>TOTAL</span>
-        <span>${money(total)}</span>
+      <div class="totalBox">
+        <div class="totalRow"><span>Total</span><strong>${money(total)}</strong></div>
       </div>
     </div>
   `;
+  
+  detalleCuenta.innerHTML = html;
+}
 
+async function cargarCuenta(mesa) {
+  if (!supabaseReady) {
+    setSyncStatus("Supabase no configurado", "bad");
+    return false;
+  }
+
+  setSyncStatus(`Cargando ${mesa}...`, "warn");
+  mesaActual = mesa;
+  pillMesa.textContent = mesa;
+
+  try {
+    const { data: comanda, error: errCom } = await supabase
+      .from("comandas")
+      .select("*")
+      .eq("mesa", mesa)
+      .eq("estado", "abierta")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (errCom || !comanda) {
+      comandaActual = null;
+      itemsActuales = [];
+      renderCuenta();
+      setSyncStatus(`No hay cuenta abierta en ${mesa}`, "warn");
+      return false;
+    }
+
+    comandaActual = comanda;
+
+    const { data: items, error: errItems } = await supabase
+      .from("comandas_items")
+      .select("*")
+      .eq("comanda_id", comanda.id)
+      .order("created_at", { ascending: true });
+
+    if (errItems) {
+      setSyncStatus("Error al cargar productos", "bad");
+      return false;
+    }
+
+    itemsActuales = items || [];
+    renderCuenta();
+    setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
+    return true;
+    
+  } catch (error) {
+    console.error("Error en cargarCuenta:", error);
+    setSyncStatus("Error al cargar cuenta", "bad");
+    return false;
+  }
+}
+
+async function cargarEstadoMesas() {
+  if (!supabaseReady) {
+    activasGrid.innerHTML = `<div style="text-align:center; padding:20px;">Conectando...</div>`;
+    return;
+  }
+
+  const cuentasVisibles = CUENTAS_FIJAS[tipoVista];
+
+  try {
+    const { data: comandas, error: errComandas } = await supabase
+      .from("comandas")
+      .select("id, mesa, estado")
+      .eq("estado", "abierta")
+      .in("mesa", cuentasVisibles);
+
+    if (errComandas) {
+      activasGrid.innerHTML = `<div style="text-align:center; padding:20px;">Error al cargar</div>`;
+      return;
+    }
+
+    const abiertas = comandas || [];
+    mesasConCuenta = new Set(abiertas.map(x => x.mesa));
+    resumenMesas = {};
+
+    for (const com of abiertas) {
+      const { data: items } = await supabase
+        .from("comandas_items")
+        .select("qty, producto_id, precio_unitario")
+        .eq("comanda_id", com.id);
+
+      const lista = items || [];
+      const total = lista.reduce((acc, it) => {
+        const precio = (it.precio_unitario != null && it.precio_unitario !== "")
+          ? Number(it.precio_unitario)
+          : Number(PRECIOS[it.producto_id] || 0);
+        return acc + (Number(it.qty || 0) * precio);
+      }, 0);
+
+      resumenMesas[com.mesa] = { total };
+    }
+
+    renderMesas();
+    
+  } catch (error) {
+    console.error("Error en cargarEstadoMesas:", error);
+    activasGrid.innerHTML = `<div style="text-align:center; padding:20px;">Error: ${error.message}</div>`;
+  }
+}
+
+function renderMesas() {
+  const cuentasVisibles = CUENTAS_FIJAS[tipoVista];
+  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
+
+  if (!cuentasActivas.length) {
+    activasGrid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:20px;">No hay cuentas activas</div>`;
+    return;
+  }
+
+  activasGrid.innerHTML = "";
+  
+  cuentasActivas.forEach(mesa => {
+    const btn = document.createElement("button");
+    btn.className = "mesaBtn";
+    btn.style.cssText = "width:100%;";
+    
+    const info = resumenMesas[mesa] || { total: 0 };
+    
+    btn.innerHTML = `
+      <div class="mesaCard">
+        <div class="mesaText">${escapeHtml(mesa)}</div>
+        <div class="mesaAmount">${money(info.total)}</div>
+        <div class="mesaState">💰 Activa</div>
+      </div>
+    `;
+    
+    btn.onclick = async () => {
+      const cargado = await cargarCuenta(mesa);
+      
+      if (cargado && comandaActual) {
+        const total = getTotalCuenta();
+        mesaActionTitle.textContent = `Cuenta - ${mesa}`;
+        mesaActionTotal.textContent = money(total);
+        mesaActionPago.value = "";
+        mesaActionCambio.textContent = money(0);
+        document.getElementById("mesaActionCambioBox").style.background = "#f7fbff";
+        mesaActionBackdrop.style.display = "flex";
+        setTimeout(() => mesaActionPago.focus(), 300);
+      } else {
+        alert(`No se pudo cargar la cuenta de ${mesa}. Verifica que tenga productos.`);
+      }
+    };
+    
+    activasGrid.appendChild(btn);
+  });
+}
+
+function calcularCambioModal() {
+  const total = getTotalCuenta();
+  const pago = parseFloat(mesaActionPago.value) || 0;
+  const cambio = pago - total;
+  mesaActionCambio.textContent = money(cambio);
+  
+  const cambioBox = document.getElementById("mesaActionCambioBox");
+  if (cambio >= 0 && pago > 0) {
+    cambioBox.style.background = "#e8f5e9";
+  } else if (pago > 0 && cambio < 0) {
+    cambioBox.style.background = "#ffebee";
+  } else {
+    cambioBox.style.background = "#f7fbff";
+  }
+}
+
+function buildCuentaPrint() {
+  if (!comandaActual) return "";
+  
+  const total = getTotalCuenta();
+  let html = `
+    <div style="text-align:center; font-weight:900; font-size:18px;">GUADALUPE VICTORIA</div>
+    <div style="text-align:center; font-weight:900;">${escapeHtml(comandaActual.mesa)}</div>
+    <div style="text-align:center;">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+    <div style="text-align:center;">${new Date().toLocaleString()}</div>
+    <div style="border-top:1px dashed #000; margin:8px 0;"></div>
+  `;
+  
+  itemsActuales.forEach(item => {
+    const precio = getPrecioUnitario(item);
+    const importe = Number(item.qty || 0) * precio;
+    html += `
+      <div style="margin:6px 0;">
+        <div style="font-weight:900;">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre)}</div>
+        <div style="display:flex; justify-content:space-between;">
+          <span>${money(precio)} c/u</span>
+          <span>${money(importe)}</span>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += `
+    <div style="border-top:1px dashed #000; margin:8px 0;"></div>
+    <div style="display:flex; justify-content:space-between; font-size:24px; font-weight:900;">
+      <span>TOTAL</span>
+      <span>${money(total)}</span>
+    </div>
+    <div style="text-align:center; margin-top:12px;">
+        <div style="text-align:center; margin-top:12px;">¡Gracias por su visita!</div>
+  `;
+  
   return html;
 }
 
-function openFechaResumenModal(){
-  const hoy = new Date();
-  const yyyy = hoy.getFullYear();
-  const mm = String(hoy.getMonth() + 1).padStart(2, "0");
-  const dd = String(hoy.getDate()).padStart(2, "0");
-  fechaResumenInput.value = `${yyyy}-${mm}-${dd}`;
-  fechaResumenBackdrop.style.display = "flex";
+// Función de impresión que no deja pestaña adicional
+function imprimirTicket() {
+  if (!comandaActual) {
+    alert("No hay cuenta cargada");
+    return;
+  }
+  
+  const contenidoTicket = buildCuentaPrint();
+  
+  // Detectar si es Android
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  
+  if (isAndroid) {
+    // Para Android: usar un iframe oculto
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+    
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Imprimir Ticket</title>
+        <style>
+          @page { size: 80mm auto; margin: 5mm; }
+          body { 
+            font-family: monospace; 
+            width: 100%;
+            margin: 0;
+            padding: 8px;
+            background: white;
+          }
+          @media print {
+            body { margin: 0; padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        ${contenidoTicket}
+        <script>
+          window.onload = function() {
+            setTimeout(function() {
+              window.print();
+              setTimeout(function() {
+                window.parent.document.body.removeChild(window.frameElement);
+              }, 1000);
+            }, 300);
+          };
+        <\/script>
+      </body>
+      </html>
+    `);
+    doc.close();
+  } else {
+    // Para desktop: usar print de la página actual con un div oculto
+    const printDiv = document.createElement('div');
+    printDiv.style.position = 'absolute';
+    printDiv.style.left = '-9999px';
+    printDiv.style.top = '-9999px';
+    printDiv.innerHTML = `
+      <div style="width: 80mm; margin: 0 auto; font-family: monospace; padding: 8px;">
+        ${contenidoTicket}
+      </div>
+    `;
+    document.body.appendChild(printDiv);
+    
+    const originalTitle = document.title;
+    document.title = "Ticket - " + comandaActual.mesa;
+    
+    window.print();
+    
+    setTimeout(() => {
+      document.body.removeChild(printDiv);
+      document.title = originalTitle;
+    }, 500);
+  }
 }
 
-function closeFechaResumenModal(){
-  fechaResumenBackdrop.style.display = "none";
+async function cerrarCuenta() {
+  if (!comandaActual) {
+    alert("No hay cuenta cargada");
+    return;
+  }
+  
+  const total = getTotalCuenta();
+  const pago = parseFloat(mesaActionPago.value) || 0;
+  
+  if (pago > 0 && pago < total) {
+    if (!confirm(`El pago (${money(pago)}) es menor al total (${money(total)}). ¿Deseas continuar?`)) {
+      return;
+    }
+  }
+  
+  setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
+  
+  try {
+    const { error } = await supabase
+      .from("comandas")
+      .update({ estado: "cerrada", updated_at: new Date().toISOString() })
+      .eq("id", comandaActual.id);
+    
+    if (error) {
+      alert("No se pudo cerrar la cuenta");
+      return;
+    }
+    
+    alert(`✅ Cuenta ${comandaActual.mesa} cerrada correctamente\nTotal: ${money(total)}\nPago: ${money(pago)}\nCambio: ${money(pago - total)}`);
+    
+    mesaActionBackdrop.style.display = "none";
+    comandaActual = null;
+    itemsActuales = [];
+    mesaActual = "";
+    pillMesa.textContent = "Sin seleccionar";
+    
+    await cargarEstadoMesas();
+    renderCuenta();
+    setSyncStatus("Cuenta cerrada", "ok");
+    
+  } catch (error) {
+    console.error("Error:", error);
+    alert("Error al cerrar la cuenta");
+  }
 }
 
-function getRangoLocalDia(fechaStr){
+// ==================== FUNCIONES PARA EL RESUMEN PDF ====================
+
+function getRangoLocalDia(fechaStr) {
   const [y, m, d] = fechaStr.split("-").map(Number);
-
   const inicio = new Date(y, m - 1, d, 0, 0, 0, 0);
   const fin = new Date(y, m - 1, d, 23, 59, 59, 999);
-
+  
   return {
     inicioISO: inicio.toISOString(),
     finISO: fin.toISOString(),
     fechaBonita: inicio.toLocaleDateString("es-MX", {
       year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
+      month: "long",
+      day: "numeric"
     })
   };
 }
 
+function normalizarTexto(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function categoriaProductoPorNombre(nombre) {
+  const n = normalizarTexto(nombre);
+  
+  if (n.includes("quesa")) return "Quesadillas";
+  if (n.includes("taco")) return "Tacos";
+  if (n.includes("burrito")) return "Burritos";
+  if (n.includes("charola")) return "Charolas";
+  if (n.includes("volcan")) return "Volcanes";
+  if (n.includes("coca") || n.includes("fresca") || n.includes("sprite") || n.includes("agua") || n.includes("beb")) return "Bebidas";
+  if (n.includes("pay") || n.includes("rompope") || n.includes("arroz") || n.includes("flan") || n.includes("fresa") || n.includes("napolitano") || n.includes("postre")) return "Postres";
+  return "Otros";
+}
+
+function ordenarProductosSimilares(productosEntries) {
+  const ordenCategorias = {
+    "Quesadillas": 1,
+    "Tacos": 2,
+    "Burritos": 3,
+    "Charolas": 4,
+    "Volcanes": 5,
+    "Bebidas": 6,
+    "Postres": 7,
+    "Otros": 8
+  };
+  
+  return [...productosEntries].sort((a, b) => {
+    const catA = categoriaProductoPorNombre(a[0]);
+    const catB = categoriaProductoPorNombre(b[0]);
+    
+    const oa = ordenCategorias[catA] || 999;
+    const ob = ordenCategorias[catB] || 999;
+    
+    if (oa !== ob) return oa - ob;
+    return String(a[0]).localeCompare(String(b[0]), "es", { sensitivity: "base" });
+  });
+}
+
 async function obtenerDatosResumenDia(fechaStr) {
   if (!supabaseReady) return null;
-
+  
   const { inicioISO, finISO, fechaBonita } = getRangoLocalDia(fechaStr);
-
+  
+  // Obtener comandas cerradas en la fecha
   const { data: comandas, error: errComandas } = await supabase
     .from("comandas")
     .select("id, mesa, mesero, estado, updated_at")
@@ -1829,58 +1173,53 @@ async function obtenerDatosResumenDia(fechaStr) {
     .gte("updated_at", inicioISO)
     .lte("updated_at", finISO)
     .order("updated_at", { ascending: false });
-
+  
   if (errComandas) {
-    console.error(errComandas);
-    alert("No se pudo consultar el resumen del día.");
+    console.error("Error al obtener comandas:", errComandas);
     return null;
   }
-
+  
   let listaComandas = comandas || [];
   const idsComandas = listaComandas.map(c => c.id);
-
+  
   let listaItems = [];
   if (idsComandas.length) {
     const { data: items, error: errItems } = await supabase
       .from("comandas_items")
       .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario")
       .in("comanda_id", idsComandas);
-
+    
     if (errItems) {
-      console.error(errItems);
-      alert("No se pudieron consultar los productos del resumen.");
+      console.error("Error al obtener items:", errItems);
       return null;
     }
-
+    
     listaItems = items || [];
   }
-
+  
+  // Agrupar items por comanda
   const itemsPorComanda = {};
   listaItems.forEach(it => {
     if (!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
     itemsPorComanda[it.comanda_id].push(it);
   });
-
+  
   // Calcular total por comanda y filtrar las que tienen total > 0
   const comandasConTotal = listaComandas.map(com => {
     const arr = itemsPorComanda[com.id] || [];
-
     const totalComanda = arr.reduce((acc, it) => {
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
+        ? Number(it.precio_unitario)
         : Number(PRECIOS[it.producto_id] || 0);
       return acc + (Number(it.qty || 0) * precio);
     }, 0);
-
-    return {
-      ...com,
-      totalComanda
-    };
+    
+    return { ...com, totalComanda };
   });
-
+  
   // Filtrar solo las comandas con total > 0
   const comandasFiltradas = comandasConTotal.filter(com => com.totalComanda > 0);
-
+  
   if (comandasFiltradas.length === 0) {
     return {
       fechaBonita,
@@ -1897,7 +1236,7 @@ async function obtenerDatosResumenDia(fechaStr) {
       detalleComandas: []
     };
   }
-
+  
   let totalGeneral = 0;
   const productos = {};
   const porMesero = {};
@@ -1906,18 +1245,18 @@ async function obtenerDatosResumenDia(fechaStr) {
     llevar: { total: 0, comandas: 0 },
     carrito: { total: 0, comandas: 0 }
   };
-
+  
   const detalleComandas = comandasFiltradas.map(com => {
     const arr = itemsPorComanda[com.id] || [];
     const totalComanda = com.totalComanda;
-
+    
     totalGeneral += totalComanda;
-
+    
     const mesero = com.mesero || "Sin mesero";
     if (!porMesero[mesero]) porMesero[mesero] = { total: 0, comandas: 0 };
     porMesero[mesero].total += totalComanda;
     porMesero[mesero].comandas += 1;
-
+    
     const mesaNombre = (com.mesa || "").toLowerCase();
     if (mesaNombre.includes("para llevar")) {
       porTipoCuenta.llevar.total += totalComanda;
@@ -1929,19 +1268,19 @@ async function obtenerDatosResumenDia(fechaStr) {
       porTipoCuenta.mesas.total += totalComanda;
       porTipoCuenta.mesas.comandas += 1;
     }
-
+    
     arr.forEach(it => {
       const nombre = it.producto_nombre || "Producto";
       if (!productos[nombre]) productos[nombre] = { qty: 0, total: 0 };
-
+      
       const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
+        ? Number(it.precio_unitario)
         : Number(PRECIOS[it.producto_id] || 0);
-
+      
       productos[nombre].qty += Number(it.qty || 0);
       productos[nombre].total += Number(it.qty || 0) * precio;
     });
-
+    
     return {
       mesa: com.mesa || "Sin cuenta",
       mesero,
@@ -1949,59 +1288,12 @@ async function obtenerDatosResumenDia(fechaStr) {
       updated_at: com.updated_at
     };
   });
-
-  // Ordenar detalleComandas por total descendente
-  detalleComandas.sort((a, b) => b.total - a.total);
-
-  const rankingMeseros = Object.entries(porMesero).sort((a, b) => b[1].total - a[1].total);
   
-  function normalizarTexto(s) {
-    return String(s || "")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "");
-  }
-
-  function categoriaProductoPorNombre(nombre) {
-    const n = normalizarTexto(nombre);
-
-    if (n.includes("quesa")) return "quesadillas";
-    if (n.includes("taco")) return "tacos";
-    if (n.includes("burrito")) return "burritos";
-    if (n.includes("charola")) return "charolas";
-    if (n.includes("volcan")) return "volcanes";
-    if (n.includes("coca") || n.includes("fresca") || n.includes("sprite") || n.includes("agua") || n.includes("beb")) return "bebidas";
-    if (n.includes("pay") || n.includes("rompope") || n.includes("arroz") || n.includes("flan") || n.includes("fresa") || n.includes("napolitano") || n.includes("postre")) return "postres";
-    return "otros";
-  }
-
-  function ordenarProductosSimilares(productosEntries) {
-    const ordenCategorias = {
-      quesadillas: 1,
-      tacos: 2,
-      burritos: 3,
-      charolas: 4,
-      volcanes: 5,
-      bebidas: 6,
-      postres: 7,
-      otros: 8
-    };
-
-    return [...productosEntries].sort((a, b) => {
-      const catA = categoriaProductoPorNombre(a[0]);
-      const catB = categoriaProductoPorNombre(b[0]);
-
-      const oa = ordenCategorias[catA] || 999;
-      const ob = ordenCategorias[catB] || 999;
-
-      if (oa !== ob) return oa - ob;
-
-      return String(a[0]).localeCompare(String(b[0]), "es", { sensitivity: "base" });
-    });
-  }
-
+  detalleComandas.sort((a, b) => b.total - a.total);
+  
+  const rankingMeseros = Object.entries(porMesero).sort((a, b) => b[1].total - a[1].total);
   const todosProductos = ordenarProductosSimilares(Object.entries(productos));
-
+  
   return {
     fechaBonita,
     fechaStr,
@@ -2019,18 +1311,18 @@ async function descargarResumenPDF(fechaStr) {
     alert("Selecciona una fecha.");
     return;
   }
-
+  
   if (!window.jspdf || !window.jspdf.jsPDF) {
     alert("No se pudo cargar la librería PDF.");
     return;
   }
-
+  
   const data = await obtenerDatosResumenDia(fechaStr);
   if (!data) return;
-
+  
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
-
+  
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const marginX = 40;
@@ -2043,9 +1335,9 @@ async function descargarResumenPDF(fechaStr) {
     hour: "2-digit",
     minute: "2-digit"
   });
-
+  
   const avgTicket = data.totalComandas ? (data.totalGeneral / data.totalComandas) : 0;
-
+  
   const colors = {
     navy: [20, 55, 105],
     blue: [21, 101, 192],
@@ -2055,22 +1347,22 @@ async function descargarResumenPDF(fechaStr) {
     muted: [95, 115, 140],
     zebra: [248, 251, 255]
   };
-
+  
   const formatMoney = (n) => money(n);
   
   const drawHeader = () => {
     doc.setFillColor(...colors.navy);
     doc.rect(0, 0, pageWidth, 32, "F");
-
+    
     doc.setDrawColor(...colors.line);
     doc.setLineWidth(1);
     doc.roundedRect(marginX, topSafeY - 18, contentWidth, 92, 12, 12, "S");
-
+    
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.setTextColor(...colors.text);
     doc.text("Resumen de ventas del día", marginX + 14, topSafeY + 8);
-
+    
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10.5);
     doc.setTextColor(...colors.muted);
@@ -2084,23 +1376,23 @@ async function descargarResumenPDF(fechaStr) {
       doc.text("*Nota: No se registraron ventas en esta fecha", marginX + 14, topSafeY + 60);
     }
   };
-
+  
   const drawKpiCard = (x, y, w, h, label, value) => {
     doc.setFillColor(...colors.sky);
     doc.setDrawColor(...colors.line);
     doc.roundedRect(x, y, w, h, 10, 10, "FD");
-
+    
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9.5);
     doc.setTextColor(...colors.muted);
     doc.text(label.toUpperCase(), x + 10, y + 16);
-
+    
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
     doc.setTextColor(...colors.text);
     doc.text(String(value), x + 10, y + 35);
   };
-
+  
   const buildTableTheme = (fontSize = 10) => ({
     margin: { left: marginX, right: marginX },
     headStyles: {
@@ -2127,20 +1419,20 @@ async function descargarResumenPDF(fechaStr) {
     tableLineColor: colors.line,
     tableLineWidth: 0.6
   });
-
+  
   drawHeader();
-
+  
   const kpiY = topSafeY + 88;
   const gap = 10;
   const cardW = (contentWidth - (gap * 2)) / 3;
   const cardH = 48;
-
+  
   drawKpiCard(marginX, kpiY, cardW, cardH, "Total vendido", formatMoney(data.totalGeneral));
   drawKpiCard(marginX + cardW + gap, kpiY, cardW, cardH, "Cuentas cerradas", data.totalComandas);
   drawKpiCard(marginX + (cardW + gap) * 2, kpiY, cardW, cardH, "Ticket promedio", formatMoney(avgTicket));
-
+  
   let y = kpiY + cardH + 26;
-
+  
   if (data.totalComandas === 0) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
@@ -2160,12 +1452,13 @@ async function descargarResumenPDF(fechaStr) {
     doc.save(nombreArchivo);
     return;
   }
-
+  
+  // Tabla por tipo de cuenta
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.setTextColor(...colors.text);
   doc.text("Por tipo de cuenta", marginX, y);
-
+  
   y += 10;
   doc.autoTable({
     ...buildTableTheme(10),
@@ -2181,12 +1474,14 @@ async function descargarResumenPDF(fechaStr) {
       2: { halign: "right", cellWidth: 110 }
     }
   });
-
+  
   y = doc.lastAutoTable.finalY + 22;
+  
+  // Tabla por mesero
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("Ventas por mesero", marginX, y);
-
+  
   y += 10;
   doc.autoTable({
     ...buildTableTheme(10),
@@ -2200,12 +1495,14 @@ async function descargarResumenPDF(fechaStr) {
       2: { halign: "right", cellWidth: 110 }
     }
   });
-
+  
   y = doc.lastAutoTable.finalY + 22;
+  
+  // Tabla de comandas cerradas
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("Todas las comandas cerradas del día (con ventas > $0)", marginX, y);
-
+  
   y += 10;
   doc.autoTable({
     ...buildTableTheme(9.5),
@@ -2224,12 +1521,14 @@ async function descargarResumenPDF(fechaStr) {
       3: { halign: "right", cellWidth: 90 }
     }
   });
-
+  
   y = doc.lastAutoTable.finalY + 22;
+  
+  // Tabla de productos vendidos
   doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
   doc.text("Todos los productos vendidos del día", marginX, y);
-
+  
   y += 10;
   doc.autoTable({
     ...buildTableTheme(9.5),
@@ -2243,7 +1542,8 @@ async function descargarResumenPDF(fechaStr) {
       2: { halign: "right", cellWidth: 110 }
     }
   });
-
+  
+  // Numeración de páginas
   const totalPages = doc.internal.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
@@ -2252,246 +1552,26 @@ async function descargarResumenPDF(fechaStr) {
     doc.setTextColor(...colors.muted);
     doc.text(`Página ${i} de ${totalPages}`, pageWidth - marginX, pageHeight - 16, { align: "right" });
   }
-
-  const nombreArchivo = `resumen_${data.fechaStr}.pdf`;
+  
+  const nombreArchivo = `resumen_ventas_${data.fechaStr}.pdf`;
   doc.save(nombreArchivo);
+  alert(`✅ PDF generado correctamente: ${nombreArchivo}`);
 }
 
-function imprimirHtmlTicket(htmlContenido) {
-  if (!htmlContenido) return;
-
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  
-  const ticketDoc = `
-    <!doctype html>
-    <html lang="es">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-      <title>Ticket</title>
-      <style>
-        @page {
-          size: 80mm auto;
-          margin: 0;
-        }
-        
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
-        html, body {
-          margin: 0;
-          padding: 0;
-          width: 80mm;
-          max-width: 80mm;
-          background: #fff;
-          overflow-x: hidden;
-        }
-        
-        body {
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          color: #000;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        
-        .ticket {
-          width: 72mm;
-          margin: 0 auto;
-          box-sizing: border-box;
-          padding: 2mm 1.5mm 3mm;
-          font-size: 16px;
-          line-height: 1.25;
-          color: #000;
-          background: #fff;
-        }
-        
-        .c { text-align: center; }
-        .b { font-weight: 900; }
-        .lg { font-size: 18px; }
-        .hr { border-top: 1px dashed #000; margin: 5px 0; }
-        .g {
-          font-weight: 900;
-          margin-top: 6px;
-          font-size: 16px;
-          text-transform: uppercase;
-        }
-        .it { margin: 5px 0; }
-        .itn {
-          font-weight: 900;
-          font-size: 18px;
-          line-height: 1.15;
-        }
-        .sub {
-          padding-left: 6px;
-          font-size: 15px;
-          white-space: pre-wrap;
-        }
-        .priceRow {
-          display: flex;
-          justify-content: space-between;
-          gap: 8px;
-          font-size: 15px;
-          margin-top: 2px;
-        }
-        .totalRowPrint {
-          display: flex;
-          justify-content: space-between;
-          gap: 8px;
-          font-size: 26px;
-          font-weight: 900;
-          margin-top: 8px;
-        }
-        
-        .screen-bar {
-          position: sticky;
-          top: 0;
-          background: #fff;
-          padding: 8px;
-          border-bottom: 1px solid #ddd;
-          text-align: center;
-          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-          z-index: 100;
-        }
-        
-        .screen-bar button {
-          border: none;
-          border-radius: 10px;
-          padding: 12px 20px;
-          font-weight: 800;
-          font-size: 16px;
-          background: #1565c0;
-          color: #fff;
-          margin: 0 6px;
-          cursor: pointer;
-        }
-        
-        .screen-bar button:active {
-          opacity: 0.8;
-        }
-        
-        @media print {
-          .screen-bar { 
-            display: none !important; 
-          }
-          body {
-            margin: 0;
-            padding: 0;
-          }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="screen-bar">
-        <button id="btnPrintManual" onclick="window.print()">🖨️ Imprimir</button>
-        <button onclick="window.close()">✖️ Cerrar</button>
-      </div>
-      ${htmlContenido}
-      
-      <script>
-        (function() {
-          function lanzarImpresion() {
-            setTimeout(function() {
-              try {
-                window.print();
-              } catch(e) {
-                console.log('Error al imprimir:', e);
-                var msg = document.createElement('div');
-                msg.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;z-index:1000;';
-                msg.innerHTML = '⚠️ Haz clic en "Imprimir" para continuar';
-                document.body.appendChild(msg);
-                setTimeout(function() { msg.remove(); }, 3000);
-              }
-            }, 500);
-          }
-          
-          if (document.readyState === 'complete') {
-            lanzarImpresion();
-          } else {
-            window.addEventListener('load', lanzarImpresion);
-          }
-          
-          window.onafterprint = function() {
-            setTimeout(function() {
-              try {
-                window.close();
-              } catch(e) {
-                console.log('Cierre manual requerido');
-              }
-            }, 1000);
-          };
-        })();
-      <\/script>
-    </body>
-    </html>
-  `;
-  
-  if (isAndroid) {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(ticketDoc);
-      printWindow.document.close();
-    } else {
-      alert('Por favor, permite ventanas emergentes para imprimir');
-      const printFrame = document.createElement('iframe');
-      printFrame.style.position = 'absolute';
-      printFrame.style.width = '0';
-      printFrame.style.height = '0';
-      printFrame.style.border = 'none';
-      document.body.appendChild(printFrame);
-      
-      const frameDoc = printFrame.contentWindow.document;
-      frameDoc.write(ticketDoc);
-      frameDoc.close();
-      
-      setTimeout(function() {
-        printFrame.contentWindow.print();
-        setTimeout(function() {
-          document.body.removeChild(printFrame);
-        }, 1000);
-      }, 500);
-    }
-  } else {
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    iframe.style.visibility = 'hidden';
-    document.body.appendChild(iframe);
-    
-    const iframeDoc = iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(ticketDoc);
-    iframeDoc.close();
-    
-    setTimeout(function() {
-      try {
-        iframe.contentWindow.print();
-      } catch(e) {
-        console.error('Error al imprimir:', e);
-      }
-    }, 500);
-    
-    setTimeout(function() {
-      if (iframe && iframe.parentNode) {
-        document.body.removeChild(iframe);
-      }
-    }, 3000);
-  }
+function openFechaResumenModal() {
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+  const dd = String(hoy.getDate()).padStart(2, "0");
+  fechaResumenInput.value = `${yyyy}-${mm}-${dd}`;
+  fechaResumenBackdrop.style.display = "flex";
 }
 
-function imprimirCuenta(){
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
-  imprimirHtmlTicket(buildCuentaPrint());
+function closeFechaResumenModal() {
+  fechaResumenBackdrop.style.display = "none";
 }
 
-async function cambiarTipoVista(nuevoTipo){
+async function cambiarTipoVista(nuevoTipo) {
   tipoVista = nuevoTipo;
   mesaActual = "";
   comandaActual = null;
@@ -2500,90 +1580,107 @@ async function cambiarTipoVista(nuevoTipo){
   kpiMesa.textContent = "—";
   kpiMesero.textContent = "—";
   detalleCuenta.innerHTML = `<div class="emptyState">Selecciona una cuenta.</div>`;
-  headerActivas.innerHTML = "";
-  updateTipoUI();
+  
+  btnTipoMesas.classList.toggle("active", tipoVista === "mesas");
+  btnTipoLlevar.classList.toggle("active", tipoVista === "llevar");
+  btnTipoCarrito.classList.toggle("active", tipoVista === "carrito");
+  
   await cargarEstadoMesas();
-  renderMesas();
 }
 
-loginRol.addEventListener("change", ()=>{
-  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
-});
+// Event listeners
+mesaActionPago.addEventListener("input", calcularCambioModal);
+mesaActionPrintBtn.onclick = imprimirTicket;
+mesaActionPayBtn.onclick = cerrarCuenta;
+mesaActionCancelBtn.onclick = () => {
+  mesaActionBackdrop.style.display = "none";
+};
 
-cobroPago.addEventListener("input", recalcularCambio);
-cobroPago.addEventListener("keydown", (e)=>{
-  if(e.key === "Enter"){
-    e.preventDefault();
-    cobroPago.blur();
-    recalcularCambio();
-    document.getElementById("btnCobroConfirmar").scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
-  }
-});
+document.getElementById("btnCambiarModo").onclick = () => {
+  loginBackdrop.style.display = "flex";
+};
 
-document.getElementById("btnCambiarModo").onclick = openLoginModal;
-document.getElementById("btnCerrarLogin").onclick = closeLoginModal;
-document.getElementById("btnEntrarLogin").onclick = ()=>{
+document.getElementById("btnCerrarLogin").onclick = () => {
+  loginBackdrop.style.display = "none";
+};
+
+document.getElementById("btnEntrarLogin").onclick = () => {
   const rol = loginRol.value;
-  if(rol === "admin"){
-    if(loginPin.value !== ADMIN_PIN){
-      alert("PIN admin incorrecto.");
+  if (rol === "admin") {
+    if (loginPin.value !== ADMIN_PIN) {
+      alert("PIN incorrecto");
       return;
     }
   }
   userRole = rol;
-  updateRoleUI();
-  closeLoginModal();
-  renderCuenta();
+  roleInfo.textContent = `Modo actual: ${userRole === "admin" ? "Admin 👑" : "Operador 👤"}`;
+  loginBackdrop.style.display = "none";
+  alert(`Modo ${userRole === "admin" ? "Administrador" : "Operador"} activado`);
 };
 
-document.getElementById("btnEditCancel").onclick = closeEditModal;
-document.getElementById("btnEditSave").onclick = guardarEdicion;
-
-document.getElementById("btnCobroCancelar").onclick = closeCobroModal;
-document.getElementById("btnCobroConfirmar").onclick = async ()=>{
-  await cerrarCuentaDefinitiva();
+document.getElementById("btnActualizarMesas").onclick = async () => {
+  await cargarEstadoMesas();
+  if (mesaActual) await cargarCuenta(mesaActual);
 };
 
-document.getElementById("btnCerrar").onclick = openCobroModal;
-document.getElementById("btnCuenta").onclick = imprimirCuenta;
 document.getElementById("btnResumen").onclick = openFechaResumenModal;
 
 document.getElementById("btnFechaResumenCancelar").onclick = closeFechaResumenModal;
-document.getElementById("btnFechaResumenEnviar").onclick = async ()=>{
+
+document.getElementById("btnFechaResumenEnviar").onclick = async () => {
   const fecha = fechaResumenInput.value;
-  if(!fecha){
-    alert("Selecciona una fecha.");
+  if (!fecha) {
+    alert("Selecciona una fecha");
     return;
   }
-  await descargarResumenPDF(fecha);
-  closeFechaResumenModal();
+  
+  // Mostrar indicador de carga
+  const btnEnviar = document.getElementById("btnFechaResumenEnviar");
+  const textoOriginal = btnEnviar.textContent;
+  btnEnviar.textContent = "⏳ Generando PDF...";
+  btnEnviar.disabled = true;
+  
+  try {
+    await descargarResumenPDF(fecha);
+    closeFechaResumenModal();
+  } catch (error) {
+    console.error("Error al generar PDF:", error);
+    alert("Error al generar el PDF. Por favor intenta de nuevo.");
+  } finally {
+    btnEnviar.textContent = textoOriginal;
+    btnEnviar.disabled = false;
+  }
 };
 
-document.getElementById("btnActualizarMesas").onclick = async ()=>{
-  await cargarEstadoMesas();
-  if (mesaActual) await cargarCuenta();
-};
-document.getElementById("btnAjusteAdmin").onclick = crearAjusteAdmin;
+loginRol.addEventListener("change", () => {
+  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
+});
 
-btnTipoMesas.onclick = ()=> cambiarTipoVista("mesas");
-btnTipoLlevar.onclick = ()=> cambiarTipoVista("llevar");
-btnTipoCarrito.onclick = ()=> cambiarTipoVista("carrito");
+btnTipoMesas.onclick = () => cambiarTipoVista("mesas");
+btnTipoLlevar.onclick = () => cambiarTipoVista("llevar");
+btnTipoCarrito.onclick = () => cambiarTipoVista("carrito");
 
-if(supabaseReady){
-  setSyncStatus("Supabase conectado. Selecciona una cuenta.", "ok");
-}else{
-  setSyncStatus("Supabase pendiente de configurar", "warn");
+// Inicialización
+if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseReady = true;
+    setSyncStatus("Supabase conectado", "ok");
+    console.log("Supabase inicializado correctamente");
+  } catch (e) {
+    console.error("Error al inicializar Supabase:", e);
+    setSyncStatus("Error de conexión", "bad");
+  }
+} else {
+  setSyncStatus("Configuración pendiente", "warn");
 }
 
-updateRoleUI();
-updateTipoUI();
+roleInfo.textContent = `Modo actual: Operador 👤`;
 
-(async function init(){
+(async function init() {
+  console.log("Iniciando aplicación...");
   await cargarEstadoMesas();
-  renderMesas();
+  console.log("Inicialización completada");
 })();
 </script>
 </body>
