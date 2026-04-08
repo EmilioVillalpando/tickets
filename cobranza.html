@@ -6,765 +6,540 @@
 <title>Cuentas — Guadalupe Victoria</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-:root{
-  --bg:#f4f7fb;
-  --paper:#ffffff;
-  --ink:#132238;
-  --muted:#61758d;
-  --line:#dbe6f3;
-
-  --blue:#1565c0;
-  --blue-dark:#0f4f98;
-  --green:#2e7d32;
-  --green-dark:#1f6a24;
-  --yellow:#f6c33b;
-  --yellow-dark:#dfa400;
-  --red:#c62828;
-  --red-dark:#8e1d1d;
-
-  --shadow:0 14px 34px rgba(15,35,60,.10);
-  --r:24px;
-
-  --topbar-h:84px;
-  --content-h:calc(100vh - var(--topbar-h) - 32px);
+/* ========== VARIABLES Y RESET ========== */
+:root {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --surface: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --primary: #2c3e66;
+  --primary-dark: #1e2a45;
+  --primary-light: #eef2ff;
+  --success: #2e7d32;
+  --success-light: #e8f5e9;
+  --warning: #f6c33b;
+  --warning-dark: #dfa400;
+  --warning-light: #fff8e7;
+  --danger: #c62828;
+  --danger-dark: #8e1d1d;
+  --danger-light: #ffebee;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  color:var(--ink);
-  background:
-    radial-gradient(900px 380px at 0% 0%, rgba(246,195,59,.15), transparent 60%),
-    radial-gradient(900px 380px at 100% 0%, rgba(21,101,192,.12), transparent 60%),
-    linear-gradient(180deg,#f6f9fd 0%, #eef4fb 100%);
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-header{
-  position:sticky;
-  top:0;
-  z-index:50;
-  padding:14px;
-  color:#fff;
-  background:linear-gradient(135deg,var(--blue) 0%, var(--blue-dark) 100%);
-  box-shadow:0 12px 28px rgba(21,101,192,.24);
-}
-.head{
-  max-width:1180px;
-  margin:auto;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-.brand h1{
-  margin:0;
-  font-size:22px;
-  line-height:1.05;
-}
-.brand .sub{
-  margin-top:4px;
-  font-size:14px;
-  opacity:.96;
-  font-weight:700;
-}
-.pill{
-  background:rgba(255,255,255,.16);
-  border:1px solid rgba(255,255,255,.18);
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:1000;
-  white-space:nowrap;
-  font-size:16px;
+body {
+  background: var(--bg-primary);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
 }
 
-.headerRight{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
+/* Header */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 0;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
-.headerActivas{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  max-width:760px;
+.head {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.headerMesaItem{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:6px;
-  border-radius:999px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.18);
-  backdrop-filter:blur(6px);
+.brand h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #e0e7ff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin: 0;
+}
+.brand .sub {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  margin-top: 2px;
 }
 
-.headerMesaName{
-  border:none;
-  border-radius:999px;
-  padding:9px 12px;
-  font-size:14px;
-  font-weight:1000;
-  cursor:pointer;
-  background:#fff;
-  color:#14591b;
-  white-space:nowrap;
+.header-actions {
+  display: flex;
+  gap: 12px;
 }
 
-.headerMesaName.active{
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  color:#14591b;
-  box-shadow:0 6px 14px rgba(46,125,50,.18);
+.btn-header {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  padding: 8px 18px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: white;
+}
+.btn-header:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateY(-1px);
 }
 
-.headerMiniBtn{
-  border:none;
-  border-radius:999px;
-  padding:8px 10px;
-  font-size:12px;
-  font-weight:1000;
-  cursor:pointer;
-  white-space:nowrap;
+/* Layout principal */
+.wrap {
+  max-width: 1280px;
+  margin: 24px auto;
+  padding: 0 24px;
 }
 
-.headerMiniPrint{
-  background:#fff7de;
-  color:#7a5400;
+.grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
 }
 
-.headerMiniClose{
-  background:#fff1f1;
-  color:#8e1d1d;
+@media (max-width: 768px) {
+  .wrap { padding: 0 16px; }
+  .grid { grid-template-columns: 1fr; gap: 20px; }
 }
 
-.headerNoActivas{
-  padding:9px 12px;
-  border-radius:999px;
-  background:rgba(255,255,255,.14);
-  border:1px solid rgba(255,255,255,.18);
-  color:#fff;
-  font-size:13px;
-  font-weight:900;
+/* Tarjetas */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.card:hover {
+  box-shadow: var(--shadow-md);
 }
 
-@media (max-width:900px){
-  .head{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .headerRight{
-    width:100%;
-    justify-content:flex-start;
-  }
-
-  .headerActivas{
-    max-width:none;
-    justify-content:flex-start;
-  }
+.cardHead {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(to bottom, #ffffff, #fefefe);
+}
+.cardHead h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+.cardHead p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 6px;
 }
 
-.wrap{
-  max-width:1180px;
-  margin:auto;
-  padding:12px;
-  display:grid;
-  gap:12px;
+.cardBody {
+  padding: 20px 24px 24px;
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:340px 1fr;
-  gap:12px;
-  align-items:start;
+/* Estado sincronización */
+.syncStatus {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid transparent;
 }
-@media (max-width:820px){
-  .grid{grid-template-columns:1fr}
+.syncStatus.ok { background: var(--success-light); color: var(--success); }
+.syncStatus.warn { background: var(--warning-light); color: #b45309; }
+.syncStatus.bad { background: var(--danger-light); color: var(--danger); }
+
+/* Rol */
+.roleBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-primary);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  margin-bottom: 16px;
+}
+.roleInfo {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+.btnLight {
+  background: white;
+  border: 1px solid var(--border-medium);
+  color: var(--primary);
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btnLight:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
 }
 
-.leftColSticky{
-  position:sticky;
-  top:calc(var(--topbar-h) + 8px);
+/* Botones tipo */
+.tipoGrid {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.tipoBtn {
+  flex: 1;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 60px;
+  padding: 12px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  color: var(--text-secondary);
+}
+.tipoBtn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
 }
 
-.rightColScroll{
-  max-height:none;
-  overflow:visible;
+/* Cuentas activas */
+.activasGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+.mesaBtn {
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+}
+.mesaCard {
+  background: linear-gradient(135deg, #f9fef9, #eef5ea);
+  border: 1px solid rgba(46,125,50,0.3);
+  border-radius: var(--radius-lg);
+  padding: 16px 8px;
+  text-align: center;
+  transition: all 0.2s;
+}
+.mesaCard:hover {
+  border-color: var(--success);
+  transform: translateY(-2px);
+}
+.mesaText {
+  font-weight: 700;
+  color: var(--success);
+}
+.mesaAmount {
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin: 6px 0;
+}
+.mesaState {
+  background: var(--success-light);
+  color: var(--success);
+  border-radius: 30px;
+  padding: 4px 10px;
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
-@media (max-width:960px){
-  .leftColSticky,
-  .rightColScroll{
-    position:static;
-    max-height:none;
-    overflow:visible;
-  }
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: #1e2a45;
+  color: white;
+  padding: 14px 24px;
+  border-radius: 60px;
+  font-weight: 600;
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  text-align: center;
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast.success { background: var(--success); }
+.toast.error { background: var(--danger); }
+
+/* Modales */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+}
+.modal {
+  max-width: 500px;
+  width: 100%;
+  background: white;
+  border-radius: 32px;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+  animation: modalSlideIn 0.2s ease;
+}
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.modalHead {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
+  background: linear-gradient(135deg, #fafcff, #ffffff);
+}
+.modalHead h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+.modalBody {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.modalFoot {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  gap: 12px;
+}
+.modalInput {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--border-medium);
+  border-radius: 48px;
+  font-size: 1rem;
+}
+.modalInput:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(44,62,102,0.1);
+}
+.modalLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
 }
 
-.card{
-  background:var(--paper);
-  border:1px solid var(--line);
-  border-radius:var(--r);
-  box-shadow:var(--shadow);
-  overflow:hidden;
+/* Método de pago (ahora sin botón continuar) */
+.paymentMethodGrid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
-.cardHead{
-  padding:18px 18px 14px;
-  border-bottom:1px solid var(--line);
-  background:linear-gradient(180deg, rgba(21,101,192,.04), rgba(246,195,59,.06));
+.paymentMethodBtn {
+  flex: 1;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 48px;
+  padding: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
 }
-.cardHead h2{
-  margin:0;
-  font-size:20px;
-  color:#143f70;
-}
-.cardHead p{
-  margin:6px 0 0;
-  color:var(--muted);
-  font-size:15px;
-  font-weight:700;
-}
-.cardBody{
-  padding:14px 14px 28px;
+.paymentMethodBtn:hover {
+  background: var(--primary-light);
+  transform: scale(0.98);
 }
 
-.syncStatus{
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:16px;
-  font-size:14px;
-  font-weight:1000;
-  border:1px solid #d6e4f5;
-  background:#f4f9ff;
-  color:#0b4f93;
+/* Detalle productos (acordeón dentro del modal) */
+.detailAccordion {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-.syncStatus.ok{
-  background:#edf9ef;
-  color:#1f6a24;
-  border-color:rgba(46,125,50,.22);
+.accordionHeader {
+  background: var(--bg-primary);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary);
 }
-.syncStatus.warn{
-  background:#fff8ea;
-  color:#8a5a00;
-  border-color:rgba(246,195,59,.35);
+.accordionContent {
+  display: none;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid var(--border-light);
+  max-height: 300px;
+  overflow-y: auto;
 }
-.syncStatus.bad{
-  background:#fff1f1;
-  color:#8e1d1d;
-  border-color:rgba(198,40,40,.25);
+.accordionContent.open {
+  display: block;
 }
-
-.roleBox{
-  margin-top:8px;
-  display:grid;
-  gap:8px;
+.detailItem {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-light);
+  font-size: 0.85rem;
 }
-.roleInfo{
-  padding:10px 12px;
-  border-radius:14px;
-  background:#f7fbff;
-  border:1px solid #d8e5f3;
-  font-weight:900;
-  color:#365779;
-  font-size:14px;
+.detailName {
+  font-weight: 600;
 }
-
-.tipoGrid{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:8px;
-  margin-top:10px;
+.detailQty {
+  color: var(--success);
+  font-weight: 500;
 }
-.tipoBtn{
-  border:none;
-  border-radius:16px;
-  padding:12px 14px;
-  background:#fff;
-  border:2px solid #d7e4f2;
-  color:#143f70;
-  font-size:18px;
-  font-weight:1000;
-  cursor:pointer;
-  text-align:left;
+.detailPrice {
+  float: right;
+  font-weight: 700;
+  color: var(--primary);
 }
-.tipoBtn.active{
-  background:linear-gradient(180deg,#fff1f1,#ffe2e2);
-  border-color:var(--red);
-  color:var(--red-dark);
+.admin-buttons {
+  margin-top: 6px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
 }
-
-.actionsSticky{
-  position:sticky;
-  top:0;
-  z-index:12;
-  background:linear-gradient(180deg,#ffffff 0%, rgba(255,255,255,.97) 100%);
-  padding-top:8px;
-  padding-bottom:8px;
-  margin-top:10px;
+.admin-btn {
+  background: none;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
 }
-
-.activasWrap{
-  margin-top:12px;
-  margin-bottom:12px;
+.admin-edit {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+.admin-edit:hover {
+  background: var(--primary);
+  color: white;
+}
+.admin-delete {
+  background: var(--danger-light);
+  color: var(--danger);
+}
+.admin-delete:hover {
+  background: var(--danger);
+  color: white;
 }
 
-.activasTitle{
-  font-size:13px;
-  font-weight:1000;
-  color:#365779;
-  text-transform:uppercase;
-  letter-spacing:.35px;
-  margin-bottom:8px;
+.totalDisplay {
+  background: var(--primary-light);
+  border-radius: 48px;
+  padding: 16px;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: 20px;
 }
 
-.activasGrid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
+.actionButtons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+.actionBtn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 48px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.actionPrint {
+  background: var(--warning);
+  color: #5a3b00;
+}
+.actionPay {
+  background: var(--success);
+  color: white;
+}
+.actionCancel {
+  background: white;
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+}
+.actionBtn:hover {
+  transform: translateY(-1px);
 }
 
-@media (max-width:520px){
-  .activasGrid{
-    grid-template-columns:1fr;
-  }
+.btn {
+  border: none;
+  border-radius: 48px;
+  padding: 14px 20px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+}
+.btnYellow {
+  background: var(--warning);
+  color: #5a3b00;
+}
+.btnBlue {
+  background: var(--primary);
+  color: white;
 }
 
-.activasGrid .mesaCard{
-  min-height:110px;
-  border-color:rgba(46,125,50,.55);
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  box-shadow:0 14px 30px rgba(46,125,50,.18);
+.emptyState {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--border-medium);
 }
-
-.activasGrid .mesaText,
-.activasGrid .mesaAmount{
-  color:var(--green-dark);
-}
-
-.activasGrid .mesaState{
-  background:#edf9ef;
-  color:#1f6a24;
-  border-color:rgba(46,125,50,.22);
-}
-
-.mesaBtn{
-  border:none;
-  cursor:pointer;
-  background:transparent;
-  padding:0;
-}
-.mesaCard{
-  min-height:96px;
-  border-radius:18px;
-  border:2px solid rgba(21,101,192,.16);
-  background:linear-gradient(180deg,#ffffff,#eef6ff);
-  box-shadow:0 10px 24px rgba(21,101,192,.10);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:5px;
-  transition:.18s ease;
-  padding:8px;
-}
-.mesaBtn:active .mesaCard{ transform:scale(.98); }
-.mesaTop{
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
-  border:3px solid rgba(90,59,0,.12);
-}
-.mesaLegs{
-  display:flex;
-  gap:14px;
-  margin-top:-3px;
-}
-.mesaLegs span{
-  width:5px;
-  height:14px;
-  border-radius:99px;
-  background:#8d6e63;
-}
-.mesaText{
-  font-weight:1000;
-  color:#0b3d6e;
-  font-size:16px;
-  line-height:1.05;
-  text-align:center;
-}
-.mesaState{
-  font-size:11px;
-  font-weight:1000;
-  border-radius:999px;
-  padding:4px 7px;
-  background:#fff;
-  border:1px solid #d7e4f2;
-  color:#466887;
-  text-align:center;
-}
-.mesaAmount{
-  font-size:14px;
-  font-weight:1000;
-  line-height:1;
-  color:#143f70;
-}
-
-.mesaBtn.selected .mesaCard{
-  border-color:var(--red);
-  background:linear-gradient(180deg,#fff1f1,#ffe2e2);
-  box-shadow:0 14px 30px rgba(198,40,40,.18);
-}
-.mesaBtn.selected .mesaText,
-.mesaBtn.selected .mesaAmount{
-  color:var(--red-dark);
-}
-
-.mesaBtn.activeMesa .mesaCard{
-  border-color:rgba(46,125,50,.55);
-  background:linear-gradient(180deg,#effdf2,#d9f6df);
-  box-shadow:0 14px 30px rgba(46,125,50,.18);
-}
-.mesaBtn.activeMesa .mesaText,
-.mesaBtn.activeMesa .mesaAmount{
-  color:var(--green-dark);
-}
-.mesaBtn.activeMesa .mesaState{
-  background:#edf9ef;
-  color:#1f6a24;
-  border-color:rgba(46,125,50,.22);
-}
-
-.mesaBtn.activeMesa.selected .mesaCard{
-  border-color:#14591b;
-  background:linear-gradient(180deg,#e4f8e8,#c6efcf);
-  box-shadow:0 16px 34px rgba(46,125,50,.24);
-}
-
-.actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:0;
-}
-.actions .btn:nth-child(5){
-  grid-column:1 / -1;
-}
-@media (max-width:520px){
-  .actions{
-    grid-template-columns:1fr;
-  }
-}
-
-.btn{
-  border:none;
-  border-radius:16px;
-  padding:12px 12px;
-  font-weight:1000;
-  font-size:16px;
-  cursor:pointer;
-  width:100%;
-}
-.btnBlue{
-  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
-  color:#fff;
-}
-.btnGreen{
-  background:linear-gradient(180deg,var(--green),var(--green-dark));
-  color:#fff;
-}
-.btnYellow{
-  background:linear-gradient(180deg,var(--yellow),var(--yellow-dark));
-  color:#5a3b00;
-}
-.btnRed{
-  background:linear-gradient(180deg,var(--red),var(--red-dark));
-  color:#fff;
-}
-.btnLight{
-  background:#fff;
-  color:#0b4f93;
-  border:2px solid #d4e2f2;
-}
-.btnSmall{
-  border:none;
-  border-radius:14px;
-  padding:10px 12px;
-  font-weight:1000;
-  font-size:14px;
-  cursor:pointer;
-}
-.btnMiniBlue{
-  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
-  color:#fff;
-}
-.btnMiniRed{
-  background:linear-gradient(180deg,var(--red),var(--red-dark));
-  color:#fff;
-}
-
-.topInfo{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-bottom:12px;
-}
-@media (max-width:700px){
-  .topInfo{grid-template-columns:1fr}
-}
-.bigBox{
-  border:2px solid #d6e3f2;
-  border-radius:18px;
-  background:#fff;
-  padding:12px;
-}
-.bigBox b{
-  display:block;
-  font-size:12px;
-  color:var(--muted);
-  text-transform:uppercase;
-  margin-bottom:4px;
-}
-.bigBox span{
-  display:block;
-  font-size:22px;
-  font-weight:1000;
-  line-height:1.05;
-}
-
-.mainSummary{
-  margin-top:10px;
-  border:2px solid #d8e4f2;
-  border-radius:20px;
-  background:linear-gradient(180deg,#ffffff,#f7fbff);
-  padding:14px;
-}
-.mainSummary .mesaGrande{
-  font-size:28px;
-  font-weight:1000;
-  color:#143f70;
-  line-height:1;
-}
-.mainSummary .sub{
-  margin-top:6px;
-  color:var(--muted);
-  font-size:14px;
-  font-weight:800;
-  line-height:1.35;
-}
-
-.detalle{
-  margin-top:12px;
-  display:grid;
-  gap:10px;
-}
-
-.platoCard{
-  border:2px solid #dbe6f3;
-  border-radius:18px;
-  overflow:hidden;
-  background:#fff;
-}
-.platoHead{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  background:linear-gradient(90deg, rgba(246,195,59,.24), rgba(21,101,192,.10));
-  border-bottom:1px dashed #d6e3f1;
-}
-.platoTitle{
-  font-size:18px;
-  font-weight:1000;
-  color:#143f70;
-}
-.platoBadge{
-  font-size:13px;
-  font-weight:1000;
-  background:#fff;
-  color:#355779;
-  border:1px solid #d4e2f2;
-  border-radius:999px;
-  padding:6px 10px;
-}
-
-.line{
-  display:grid;
-  grid-template-columns:1fr auto;
-  gap:10px;
-  padding:10px 12px;
-  border-top:1px dashed #dbe6f3;
-}
-.line:first-child{border-top:none}
-.lineLeft{
-  min-width:0;
-}
-.lineTitle{
-  font-size:16px;
-  font-weight:1000;
-  line-height:1.2;
-}
-.lineMeta{
-  margin-top:4px;
-  font-size:13px;
-  color:var(--muted);
-  white-space:pre-wrap;
-  font-weight:800;
-  line-height:1.3;
-}
-.lineRight{
-  text-align:right;
-  min-width:120px;
-}
-.linePrice{
-  font-size:13px;
-  font-weight:900;
-}
-.lineTotal{
-  margin-top:4px;
-  font-size:20px;
-  font-weight:1000;
-  color:#143f70;
-  line-height:1;
-}
-.adminTools{
-  margin-top:6px;
-  display:flex;
-  gap:6px;
-  justify-content:flex-end;
-  flex-wrap:wrap;
-}
-
-.totalBox{
-  border-radius:20px;
-  padding:14px 16px;
-  background:linear-gradient(180deg,#fff7de,#ffe7a1);
-  border:2px solid rgba(246,195,59,.45);
-}
-.totalRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-}
-.totalRow span{
-  font-size:18px;
-  font-weight:1000;
-  color:#5a3b00;
-}
-.totalRow strong{
-  font-size:34px;
-  line-height:1;
-  color:#5a3b00;
-}
-
-.emptyState{
-  border-radius:22px;
-  padding:30px 20px;
-  background:#fff;
-  border:2px dashed #d4e2f2;
-  color:var(--muted);
-  font-weight:900;
-  text-align:center;
-  font-size:18px;
-}
-
-.backdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.52);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:16px;
-  z-index:80;
-}
-.modal{
-  width:min(520px,100%);
-  background:#fff;
-  border-radius:24px;
-  overflow:hidden;
-  border:1px solid rgba(21,101,192,.14);
-  box-shadow:0 30px 80px rgba(2,6,23,.24);
-}
-.modalHead{
-  padding:16px 18px;
-  border-bottom:1px solid rgba(21,101,192,.12);
-  background:linear-gradient(180deg, rgba(21,101,192,.06), rgba(246,195,59,.08));
-}
-.modalHead h3{
-  margin:0;
-  font-size:18px;
-  color:#0b3d6e;
-}
-.modalBody{ padding:16px 18px; }
-.modalFoot{
-  padding:16px 18px;
-  border-top:1px solid rgba(21,101,192,.12);
-  display:flex;
-  gap:10px;
-}
-.modalInput, .modalSelect{
-  width:100%;
-  padding:14px 14px;
-  border-radius:16px;
-  border:2px solid #d4e2f2;
-  background:#fff;
-  font-size:18px;
-  color:var(--ink);
-  outline:none;
-}
-.modalLabel{
-  display:block;
-  margin-bottom:8px;
-  font-size:13px;
-  font-weight:1000;
-  color:#365779;
-  text-transform:uppercase;
-  letter-spacing:.35px;
-}
-.modalHelp{
-  margin-top:8px;
-  color:var(--muted);
-  font-weight:800;
-  font-size:14px;
-}
-
-.cobroResumen{
-  display:grid;
-  gap:12px;
-}
-.cobroBox{
-  border:2px solid #d6e3f2;
-  border-radius:18px;
-  background:#fff;
-  padding:14px;
-}
-.cobroBox b{
-  display:block;
-  font-size:12px;
-  text-transform:uppercase;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-.cobroBox span{
-  display:block;
-  font-size:28px;
-  font-weight:1000;
-  line-height:1;
-}
-.cobroCambio.ok span{ color:#1f6a24; }
-.cobroCambio.bad span{ color:#8e1d1d; }
 </style>
 </head>
 <body>
@@ -772,249 +547,200 @@ header{
 <header>
   <div class="head">
     <div class="brand">
-      <h1>💳 Cuentas</h1>
-      <div class="sub">Mesas, para llevar y carrito afuera</div>
+      <h1>🍽️ Guadalupe Victoria</h1>
+      <div class="sub">Gestión de cuentas | Mesas, para llevar y carrito</div>
     </div>
-
-    <div class="headerRight">
-      <div class="pill" id="pillMesa">Sin seleccionar</div>
-      <div class="headerActivas" id="headerActivas"></div>
+    <div class="header-actions">
+      <button class="btn-header" id="btnResumen">📊 Resumen</button>
+      <button class="btn-header" id="btnActualizarMesas">🔄 Actualizar</button>
     </div>
   </div>
 </header>
 
 <div class="wrap">
   <div class="grid">
-
-    <section class="card leftColSticky">
+    <!-- Columna izquierda: configuración -->
+    <section class="card">
       <div class="cardHead">
-        <h2>Elegir cuenta</h2>
-        <p>Toca una opción y luego selecciona la cuenta.</p>
-        <div class="syncStatus warn" id="syncStatus">Supabase pendiente de configurar</div>
+        <h2>Configuración</h2>
+        <p>Selecciona el tipo de cuenta y tu rol</p>
+        <div class="syncStatus warn" id="syncStatus">Cargando...</div>
       </div>
-
       <div class="cardBody">
         <div class="roleBox">
-          <div class="roleInfo" id="roleInfo">Modo actual: Operador</div>
-          <button class="btn btnLight" id="btnCambiarModo" type="button">Cambiar modo</button>
+          <div class="roleInfo" id="roleInfo">👤 Modo: Operador</div>
+          <button class="btnLight" id="btnCambiarModo">Cambiar modo</button>
         </div>
-
         <div class="tipoGrid">
-          <button class="tipoBtn active" id="btnTipoMesas" type="button">🍽️ Mesas</button>
-          <button class="tipoBtn" id="btnTipoLlevar" type="button">🥡 Para llevar</button>
-          <button class="tipoBtn" id="btnTipoCarrito" type="button">🛒 Carrito afuera</button>
-        </div>
-
-        <div class="activasWrap">
-          <div class="activasTitle">Cuentas activas</div>
-          <div class="activasGrid" id="activasGrid"></div>
-        </div>
-
-        <div class="actionsSticky">
-          <div class="actions">
-            <button class="btn btnYellow" id="btnResumen" type="button">Resumen por fecha</button>
-            <button class="btn btnGreen" id="btnCuenta" type="button">Imprimir cuenta</button>
-            <button class="btn btnRed" id="btnCerrar" type="button">Cerrar cuenta</button>
-            <button class="btn btnLight" id="btnActualizarMesas" type="button">Actualizar</button>
-            <button class="btn btnLight" id="btnAjusteAdmin" type="button" style="display:none">Ajuste admin</button>
-          </div>
+          <button class="tipoBtn active" id="btnTipoMesas">🍽️ Mesas</button>
+          <button class="tipoBtn" id="btnTipoLlevar">🥡 Para llevar</button>
+          <button class="tipoBtn" id="btnTipoCarrito">🛒 Carrito afuera</button>
         </div>
       </div>
     </section>
 
-    <section class="card rightColScroll">
+    <!-- Columna derecha: cuentas activas (sin detalles de productos) -->
+    <section class="card">
       <div class="cardHead">
-        <h2>Detalle</h2>
-        <p>Lo que lleva la cuenta seleccionada.</p>
+        <h2>Cuentas activas</h2>
+        <p>Toca una cuenta para ver detalle, imprimir o cobrar</p>
       </div>
-
       <div class="cardBody">
-        <div class="topInfo">
-          <div class="bigBox">
-            <b>Cuenta</b>
-            <span id="kpiMesa">—</span>
+        <div class="activasWrap">
+          <div class="activasTitle" style="font-size:0.7rem; font-weight:700; text-transform:uppercase; margin-bottom:12px;">Cuentas activas</div>
+          <div class="activasGrid" id="activasGrid">
+            <div class="emptyState">Cargando cuentas...</div>
           </div>
-          <div class="bigBox">
-            <b>Mesero</b>
-            <span id="kpiMesero">—</span>
-          </div>
-        </div>
-
-        <div class="ticketBox" id="detalleCuenta">
-          <div class="emptyState">Selecciona una cuenta.</div>
         </div>
       </div>
     </section>
-
   </div>
 </div>
 
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<!-- Modal de acción (detalle completo de productos + cobro) -->
+<div class="backdrop" id="mesaActionBackdrop">
+  <div class="modal mesaActionModal">
+    <div class="modalHead">
+      <h3 id="mesaActionTitle">Cuenta</h3>
+    </div>
+    <div class="modalBody">
+      <div class="totalDisplay" id="mesaActionTotal">$0.00</div>
+      <div class="detailAccordion">
+        <div class="accordionHeader" id="accordionHeader">
+          <span>📋 Ver productos</span>
+          <span>▼</span>
+        </div>
+        <div class="accordionContent" id="accordionContent">
+          <div id="modalDetalleItems">Cargando...</div>
+        </div>
+      </div>
+      <div class="actionButtons">
+        <button class="actionBtn actionPrint" id="mesaActionPrintBtn">🖨️ Imprimir</button>
+        <button class="actionBtn actionPay" id="mesaActionPayBtn">💵 Cobrar</button>
+        <button class="actionBtn actionCancel" id="mesaActionCancelBtn">❌ Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal método de pago (sin botón continuar) -->
+<div class="backdrop" id="paymentMethodBackdrop">
+  <div class="modal">
+    <div class="modalHead"><h3>Método de pago</h3></div>
+    <div class="modalBody">
+      <div class="paymentMethodGrid" id="paymentMethodGrid">
+        <button class="paymentMethodBtn" data-method="efectivo">💵 Efectivo</button>
+        <button class="paymentMethodBtn" data-method="tarjeta">💳 Tarjeta</button>
+        <button class="paymentMethodBtn" data-method="transferencia">🏦 Transferencia</button>
+      </div>
+    </div>
+    <div class="modalFoot">
+      <button class="btnLight" id="btnCancelPaymentMethod">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal editar precio -->
+<div class="backdrop" id="editPriceBackdrop">
+  <div class="modal">
+    <div class="modalHead"><h3>Editar precio unitario</h3></div>
+    <div class="modalBody">
+      <label class="modalLabel">Nuevo precio</label>
+      <input class="modalInput" id="editPriceInput" type="number" step="0.01" placeholder="Ej: 45.00">
+    </div>
+    <div class="modalFoot">
+      <button class="btnLight" id="btnCancelPrice">Cancelar</button>
+      <button class="btnBlue" id="btnConfirmPrice">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ajuste total (descuento/recargo) -->
+<div class="backdrop" id="adjustTotalBackdrop">
+  <div class="modal">
+    <div class="modalHead"><h3>Ajustar total de la cuenta</h3></div>
+    <div class="modalBody">
+      <label class="modalLabel">Motivo</label>
+      <input class="modalInput" id="adjustMotivo" placeholder="Ej: Descuento, Recargo, Propina">
+      <label class="modalLabel" style="margin-top:12px;">Valor (puede ser negativo para descuento)</label>
+      <input class="modalInput" id="adjustValor" type="number" step="0.01" placeholder="Ej: -50 o 30">
+    </div>
+    <div class="modalFoot">
+      <button class="btnLight" id="btnCancelAdjust">Cancelar</button>
+      <button class="btnBlue" id="btnConfirmAdjust">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal login -->
 <div class="backdrop" id="loginBackdrop">
   <div class="modal">
-    <div class="modalHead">
-      <h3>Entrar como operador o admin</h3>
-    </div>
+    <div class="modalHead"><h3>Acceso al sistema</h3></div>
     <div class="modalBody">
-      <label class="modalLabel">Modo</label>
-      <select class="modalSelect" id="loginRol">
+      <label class="modalLabel">Rol</label>
+      <select class="modalInput" id="loginRol" style="margin-bottom:16px;">
         <option value="operador">Operador</option>
-        <option value="admin">Admin</option>
+        <option value="admin">Administrador</option>
       </select>
-
-      <div id="pinWrap" style="display:none; margin-top:14px;">
-        <label class="modalLabel">PIN admin</label>
-        <input class="modalInput" id="loginPin" type="password" placeholder="Escribe el PIN">
-      </div>
-
-      <div class="modalHelp">
-        Operador: consulta, imprime y cierra.<br>
-        Admin: además puede editar precios, borrar productos y hacer ajustes.
+      <div id="pinWrap" style="display:none;">
+        <label class="modalLabel">PIN Administrador</label>
+        <input class="modalInput" id="loginPin" type="password" placeholder="Ingresa el PIN">
       </div>
     </div>
     <div class="modalFoot">
-      <button class="btn btnLight" id="btnCerrarLogin" type="button">Cancelar</button>
-      <button class="btn btnBlue" id="btnEntrarLogin" type="button">Entrar</button>
+      <button class="btnLight" id="btnCerrarLogin">Cancelar</button>
+      <button class="btnBlue" id="btnEntrarLogin">Entrar</button>
     </div>
   </div>
 </div>
 
-<div class="backdrop" id="editBackdrop">
-  <div class="modal">
-    <div class="modalHead">
-      <h3 id="editTitle">Editar</h3>
-    </div>
-    <div class="modalBody">
-      <label class="modalLabel">Valor</label>
-      <input class="modalInput" id="editValue" type="text" placeholder="Escribe el valor">
-      <div class="modalHelp" id="editHelp"></div>
-    </div>
-    <div class="modalFoot">
-      <button class="btn btnLight" id="btnEditCancel" type="button">Cancelar</button>
-      <button class="btn btnBlue" id="btnEditSave" type="button">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<div class="backdrop" id="cobroBackdrop">
-  <div class="modal">
-    <div class="modalHead">
-      <h3>Cerrar cuenta y calcular cambio</h3>
-    </div>
-    <div class="modalBody">
-      <div class="cobroResumen">
-        <div class="cobroBox">
-          <b>Total a cobrar</b>
-          <span id="cobroTotal">$0.00</span>
-        </div>
-
-        <div>
-          <label class="modalLabel">¿Con cuánto van a pagar? (opcional)</label>
-          <input class="modalInput" id="cobroPago" type="number" min="0" step="0.01" placeholder="Opcional, ej. 500">
-        </div>
-
-        <div class="cobroBox cobroCambio" id="cobroCambioBox">
-          <b>Cambio</b>
-          <span id="cobroCambio">$0.00</span>
-        </div>
-
-        <div class="modalHelp" id="cobroEstado">Puedes cerrar la cuenta sin capturar pago.</div>
-      </div>
-    </div>
-    <div class="modalFoot">
-      <button class="btn btnLight" id="btnCobroCancelar" type="button">Cancelar</button>
-      <button class="btn btnRed" id="btnCobroConfirmar" type="button">Confirmar cierre</button>
-    </div>
-  </div>
-</div>
-
+<!-- Modal fecha resumen -->
 <div class="backdrop" id="fechaResumenBackdrop">
   <div class="modal">
-    <div class="modalHead">
-      <h3>Resumen por fecha</h3>
-    </div>
+    <div class="modalHead"><h3>Resumen de ventas</h3></div>
     <div class="modalBody">
-      <label class="modalLabel">Elige la fecha</label>
+      <label class="modalLabel">Selecciona una fecha</label>
       <input class="modalInput" id="fechaResumenInput" type="date">
-      <div class="modalHelp">
-        Se enviará por WhatsApp únicamente el resumen de las cuentas cerradas de ese día.
-      </div>
+      <p style="margin-top:12px; font-size:0.75rem; color:var(--text-muted);">Se generará un PDF con todas las ventas del día, desglosado por método de pago.</p>
     </div>
     <div class="modalFoot">
-      <button class="btn btnLight" id="btnFechaResumenCancelar" type="button">Cancelar</button>
-      <button class="btn btnYellow" id="btnFechaResumenEnviar" type="button">Mandar resumen</button>
+      <button class="btnLight" id="btnFechaResumenCancelar">Cancelar</button>
+      <button class="btnYellow" id="btnFechaResumenEnviar">📄 Descargar PDF</button>
     </div>
   </div>
 </div>
 
 <script>
+// ==================== CONFIGURACIÓN ====================
 const SUPABASE_URL = "https://rcegikeiaxptolrduguc.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJjZWdpa2VpYXhwdG9scmR1Z3VjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NTMyMDcsImV4cCI6MjA3MTIyOTIwN30.jbPM9F977zeITEmFA_xvVU6SCxlWWVCi3Dx7ZhFfTp8";
-
 const ADMIN_PIN = "1234";
-const WHATSAPP_RESUMEN = "524624672994";
 
 
+let comandaActual = null;
+let itemsActuales = [];
+let mesaActual = "";
+let mesasConCuenta = new Set();
+let resumenMesas = {};
+let userRole = "operador";
+let tipoVista = "mesas";
+let currentEditingItemId = null;
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase && typeof window.supabase.createClient === "function") {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  supabaseReady = true;
-}
-
+// Precios predefinidos
 const PRECIOS = {
-  taco_tripa:38,
-  taco_pastor:28,
-  taco_bistec:28,
-  taco_chorizo:28,
-  taco_higado:28,
-  taco_costilla:28,
-  taco_barbacoa:28,
-  taco_alambre:28,
-  taco_combi:38,
-
-  quesa_tripa:120,
-  quesa_pastor:90,
-  quesa_bistec:90,
-  quesa_chorizo:90,
-  quesa_higado:90,
-  quesa_costilla:90,
-  quesa_barbacoa:90,
-  quesa_alambre:90,
-  quesa_sencilla:30,
-  quesa_combi:100,
-
-  burrito_tripa:100,
-  burrito_pastor:90,
-  burrito_bistec:90,
-  burrito_chorizo:90,
-  burrito_higado:90,
-  burrito_costilla:90,
-  burrito_barbacoa:90,
-  burrito_alambre:90,
-  burrito_sencillo:30,
-  burrito_combi:100,
-
-  charola_combi:100,
-  charola_alam:90,
-
-  volcan_tripa:90,
-  volcan_pastor:85,
-  volcan_bistec:85,
-  volcan_chorizo:85,
-  volcan_higado:85,
-
-  beb_coca_light:35,
-  beb_coca:35,
-  beb_fresca:35,
-  beb_sprite:35,
-  beb_agua:30,
-  beb_agua_lt:60,
-
-  pos_pay:60,
-  pos_rompope:60,
-  pos_arroz:60,
-  pos_flan:60,
-  pos_fresa:60,
-  pos_napolitano:60
+  taco_tripa:38, taco_pastor:28, taco_bistec:28, taco_chorizo:28, taco_higado:28,
+  taco_costilla:28, taco_barbacoa:28, taco_alambre:28, taco_combi:38, taco_campechano:38,
+  quesa_tripa:120, quesa_pastor:90, quesa_bistec:90, quesa_chorizo:90, quesa_higado:90,
+  quesa_costilla:90, quesa_barbacoa:90, quesa_alambre:90, quesa_sencilla:30, quesa_combi:100,
+  burrito_tripa:100, burrito_pastor:90, burrito_bistec:90, burrito_chorizo:90, burrito_higado:90,
+  burrito_costilla:90, burrito_barbacoa:90, burrito_alambre:90, burrito_sencillo:30, burrito_combi:100,
+  charola_combi:100, charola_combi_100:100, charola_combi_150:150, charola_combi_200:200, charola_alam:90,
+  volcan_tripa:90, volcan_pastor:85, volcan_bistec:85, volcan_chorizo:85, volcan_higado:85,
+  beb_coca_light:35, beb_coca:35, beb_fresca:35, beb_sprite:35, beb_agua:30, beb_agua_lt:60,
+  pos_pay:60, pos_rompope:60, pos_arroz:60, pos_flan:60, pos_fresa:60, pos_napolitano:60
 };
 
 const CUENTAS_FIJAS = {
@@ -1023,44 +749,41 @@ const CUENTAS_FIJAS = {
   carrito: ["Carrito 1","Carrito 2","Carrito 3","Carrito 4","Carrito 5"]
 };
 
-const PLATOS = ["Plato 1","Plato 2","Plato 3","Plato 4","Plato 5","General"];
-
-let comandaActual = null;
-let itemsActuales = [];
-let mesaActual = "";
-let mesasConCuenta = new Set();
-let resumenMesas = {};
-let userRole = "operador";
-let currentEditAction = null;
-let currentEditItem = null;
-let tipoVista = "mesas";
-
+// Elementos DOM
 const syncStatus = document.getElementById("syncStatus");
-const pillMesa = document.getElementById("pillMesa");
-const kpiMesa = document.getElementById("kpiMesa");
-const kpiMesero = document.getElementById("kpiMesero");
-const detalleCuenta = document.getElementById("detalleCuenta");
 const activasGrid = document.getElementById("activasGrid");
-const headerActivas = document.getElementById("headerActivas");
 const roleInfo = document.getElementById("roleInfo");
-const btnAjusteAdmin = document.getElementById("btnAjusteAdmin");
+const toastEl = document.getElementById("toast");
+
+const mesaActionBackdrop = document.getElementById("mesaActionBackdrop");
+const mesaActionTitle = document.getElementById("mesaActionTitle");
+const mesaActionTotal = document.getElementById("mesaActionTotal");
+const mesaActionPrintBtn = document.getElementById("mesaActionPrintBtn");
+const mesaActionPayBtn = document.getElementById("mesaActionPayBtn");
+const mesaActionCancelBtn = document.getElementById("mesaActionCancelBtn");
+const accordionHeader = document.getElementById("accordionHeader");
+const accordionContent = document.getElementById("accordionContent");
+const modalDetalleItems = document.getElementById("modalDetalleItems");
+
+const paymentMethodBackdrop = document.getElementById("paymentMethodBackdrop");
+const paymentMethodGrid = document.getElementById("paymentMethodGrid");
+const btnCancelPaymentMethod = document.getElementById("btnCancelPaymentMethod");
+
+const editPriceBackdrop = document.getElementById("editPriceBackdrop");
+const editPriceInput = document.getElementById("editPriceInput");
+const btnCancelPrice = document.getElementById("btnCancelPrice");
+const btnConfirmPrice = document.getElementById("btnConfirmPrice");
+
+const adjustTotalBackdrop = document.getElementById("adjustTotalBackdrop");
+const adjustMotivo = document.getElementById("adjustMotivo");
+const adjustValor = document.getElementById("adjustValor");
+const btnCancelAdjust = document.getElementById("btnCancelAdjust");
+const btnConfirmAdjust = document.getElementById("btnConfirmAdjust");
 
 const loginBackdrop = document.getElementById("loginBackdrop");
 const loginRol = document.getElementById("loginRol");
 const loginPin = document.getElementById("loginPin");
 const pinWrap = document.getElementById("pinWrap");
-
-const editBackdrop = document.getElementById("editBackdrop");
-const editTitle = document.getElementById("editTitle");
-const editValue = document.getElementById("editValue");
-const editHelp = document.getElementById("editHelp");
-
-const cobroBackdrop = document.getElementById("cobroBackdrop");
-const cobroTotal = document.getElementById("cobroTotal");
-const cobroPago = document.getElementById("cobroPago");
-const cobroCambio = document.getElementById("cobroCambio");
-const cobroCambioBox = document.getElementById("cobroCambioBox");
-const cobroEstado = document.getElementById("cobroEstado");
 
 const fechaResumenBackdrop = document.getElementById("fechaResumenBackdrop");
 const fechaResumenInput = document.getElementById("fechaResumenInput");
@@ -1069,1113 +792,571 @@ const btnTipoMesas = document.getElementById("btnTipoMesas");
 const btnTipoLlevar = document.getElementById("btnTipoLlevar");
 const btnTipoCarrito = document.getElementById("btnTipoCarrito");
 
-function money(n){
-  return "$" + Number(n || 0).toFixed(2);
-}
+// ==================== FUNCIONES AUXILIARES ====================
+function money(n) { return "$" + Number(n || 0).toFixed(2); }
+function escapeHtml(s) { return String(s || "").replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
+function setSyncStatus(text, type) { syncStatus.textContent = text; syncStatus.className = `syncStatus ${type}`; }
+function showToast(message, type = "success") { toastEl.textContent = message; toastEl.className = `toast ${type}`; toastEl.classList.add("show"); setTimeout(() => toastEl.classList.remove("show"), 3000); }
 
-function escapeHtml(s){
-  return String(s || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;");
-}
-
-function setSyncStatus(text, type="warn"){
-  syncStatus.textContent = text;
-  syncStatus.className = `syncStatus ${type}`;
-}
-
-function updateRoleUI(){
-  roleInfo.textContent = `Modo actual: ${userRole === "admin" ? "Admin" : "Operador"}`;
-  btnAjusteAdmin.style.display = userRole === "admin" ? "block" : "none";
-}
-
-function updateTipoUI(){
-  btnTipoMesas.classList.toggle("active", tipoVista === "mesas");
-  btnTipoLlevar.classList.toggle("active", tipoVista === "llevar");
-  btnTipoCarrito.classList.toggle("active", tipoVista === "carrito");
-}
-
-function getCuentasVisibles(){
-  return CUENTAS_FIJAS[tipoVista] || [];
-}
-
-function openLoginModal(){
-  loginRol.value = userRole;
-  loginPin.value = "";
-  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
-  loginBackdrop.style.display = "flex";
-}
-
-function closeLoginModal(){
-  loginBackdrop.style.display = "none";
-}
-
-function openEditModal(title, help, action, item=null, initialValue=""){
-  currentEditAction = action;
-  currentEditItem = item;
-  editTitle.textContent = title;
-  editHelp.textContent = help || "";
-  editValue.value = initialValue;
-  editBackdrop.style.display = "flex";
-  setTimeout(()=>editValue.focus(), 50);
-}
-
-function closeEditModal(){
-  currentEditAction = null;
-  currentEditItem = null;
-  editValue.value = "";
-  editBackdrop.style.display = "none";
-}
-
-function openCobroModal(){
-  if(!comandaActual){
-    alert("Primero carga una cuenta.");
-    return;
-  }
-
-  const total = getTotalCuenta();
-  cobroTotal.textContent = money(total);
-  cobroPago.value = "";
-  cobroCambio.textContent = money(0);
-  cobroCambioBox.classList.remove("ok","bad");
-  cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
-  cobroBackdrop.style.display = "flex";
-
-  setTimeout(()=>cobroPago.focus(), 60);
-}
-
-function closeCobroModal(){
-  cobroBackdrop.style.display = "none";
-}
-
-function recalcularCambio(){
-  const total = getTotalCuenta();
-  const pagoTexto = String(cobroPago.value || "").trim();
-
-  cobroCambioBox.classList.remove("ok","bad");
-
-  if(!pagoTexto){
-    cobroCambio.textContent = money(0);
-    cobroEstado.textContent = "Puedes cerrar la cuenta sin capturar pago.";
-    return;
-  }
-
-  const pago = Number(pagoTexto);
-  const cambio = pago - total;
-
-  cobroCambio.textContent = money(cambio);
-
-  if(cambio >= 0){
-    cobroCambioBox.classList.add("ok");
-    cobroEstado.textContent = "Cambio calculado correctamente.";
-  }else{
-    cobroCambioBox.classList.add("bad");
-    cobroEstado.textContent = `Faltan ${money(Math.abs(cambio))} para cubrir el total.`;
-  }
-}
-
-function getPrecioUnitario(item){
-  if (item.precio_unitario != null && item.precio_unitario !== "") {
-    return Number(item.precio_unitario || 0);
-  }
+function getPrecioUnitario(item) {
+  if (item.precio_unitario != null && item.precio_unitario !== "") return Number(item.precio_unitario);
   return Number(PRECIOS[item.producto_id] || 0);
 }
 
-function getTotalCuenta(){
-  return itemsActuales.reduce((sum, item) => {
-    return sum + (Number(item.qty || 0) * getPrecioUnitario(item));
-  }, 0);
+function getTotalCuenta() {
+  return itemsActuales.reduce((sum, item) => sum + (Number(item.qty || 0) * getPrecioUnitario(item)), 0);
 }
 
-function agruparItemsPorPlato(items){
-  const grupos = {};
-  items.forEach(item => {
-    const plato = item.plato || "General";
-    if(!grupos[plato]) grupos[plato] = [];
-    grupos[plato].push(item);
-  });
-
-  return PLATOS
-    .filter(plato => grupos[plato] && grupos[plato].length)
-    .map(plato => ({ plato, items: grupos[plato] }));
-}
-
-function resetVista(){
-  comandaActual = null;
-  itemsActuales = [];
-  kpiMesa.textContent = "—";
-  kpiMesero.textContent = "—";
-  detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta cargada.</div>`;
-}
-
-async function seleccionarCuentaDesdeHeader(mesa){
-  mesaActual = mesa;
-  pillMesa.textContent = mesa;
-  renderMesas();
-  renderHeaderActivas();
-  await cargarCuenta();
-}
-
-async function imprimirCuentaDirecta(mesa){
-  const mesaAnterior = mesaActual;
-  const comandaAnterior = comandaActual;
-  const itemsAnteriores = [...itemsActuales];
-
-  mesaActual = mesa;
-  await cargarCuenta();
-
-  if(!comandaActual){
-    alert("No hay cuenta abierta en " + mesa);
-    mesaActual = mesaAnterior;
-    comandaActual = comandaAnterior;
-    itemsActuales = itemsAnteriores;
-    renderCuenta();
-    renderMesas();
-    renderHeaderActivas();
+// ==================== RENDER DE DETALLE DENTRO DEL MODAL (con botones admin) ====================
+function renderDetalleProductosModal() {
+  if (!comandaActual || !itemsActuales.length) {
+    modalDetalleItems.innerHTML = '<div style="padding:12px; text-align:center;">No hay productos en esta cuenta.</div>';
     return;
   }
-
-  imprimirCuenta();
-
-  mesaActual = mesa;
-  renderMesas();
-  renderHeaderActivas();
-}
-
-async function cerrarCuentaDirecta(mesa){
-  const mesaAnterior = mesaActual;
-  mesaActual = mesa;
-  await cargarCuenta();
-
-  if(!comandaActual){
-    alert("No hay cuenta abierta en " + mesa);
-    mesaActual = mesaAnterior;
-    renderMesas();
-    renderHeaderActivas();
-    return;
-  }
-
-  openCobroModal();
-}
-
-function renderHeaderActivas(){
-  headerActivas.innerHTML = "";
-
-  const cuentasVisibles = getCuentasVisibles();
-  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
-
-  if(!cuentasActivas.length){
-    headerActivas.innerHTML = `<div class="headerNoActivas">Sin cuentas activas</div>`;
-    return;
-  }
-
-  cuentasActivas.forEach(mesa=>{
-    const item = document.createElement("div");
-    item.className = "headerMesaItem";
-
-    const btnMesa = document.createElement("button");
-    btnMesa.type = "button";
-    btnMesa.className = "headerMesaName" + (mesaActual === mesa ? " active" : "");
-    btnMesa.textContent = mesa;
-    btnMesa.onclick = ()=> seleccionarCuentaDesdeHeader(mesa);
-
-    const btnPrint = document.createElement("button");
-    btnPrint.type = "button";
-    btnPrint.className = "headerMiniBtn headerMiniPrint";
-    btnPrint.textContent = "Imprimir";
-    btnPrint.onclick = (e)=>{
-      e.stopPropagation();
-      imprimirCuentaDirecta(mesa);
-    };
-
-    const btnClose = document.createElement("button");
-    btnClose.type = "button";
-    btnClose.className = "headerMiniBtn headerMiniClose";
-    btnClose.textContent = "Cerrar";
-    btnClose.onclick = (e)=>{
-      e.stopPropagation();
-      cerrarCuentaDirecta(mesa);
-    };
-
-    item.appendChild(btnMesa);
-    item.appendChild(btnPrint);
-    item.appendChild(btnClose);
-
-    headerActivas.appendChild(item);
-  });
-}
-
-function renderMesas(){
-  activasGrid.innerHTML = "";
-
-  const cuentasVisibles = getCuentasVisibles();
-  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
-
-  renderHeaderActivas();
-
-  if(!cuentasActivas.length){
-    activasGrid.innerHTML = `
-      <div style="
-        grid-column:1 / -1;
-        border-radius:18px;
-        padding:18px;
-        background:#fff;
-        border:2px dashed #d4e2f2;
-        color:#61758d;
-        font-weight:900;
-        text-align:center;
-        font-size:16px;
-      ">
-        No hay cuentas activas en esta sección.
+  let html = '';
+  itemsActuales.forEach(item => {
+    const precio = getPrecioUnitario(item);
+    const importe = Number(item.qty || 0) * precio;
+    html += `
+      <div class="detailItem" data-item-id="${item.id}">
+        <div class="detailName">${escapeHtml(item.producto_nombre)}</div>
+        <div class="detailQty">${item.qty} unidades</div>
+        <div class="detailPrice">${money(importe)}</div>
+        <div style="clear:both"></div>
+        ${item.nota ? `<div style="font-size:12px; color:#666;">• ${escapeHtml(item.nota)}</div>` : ''}
+        ${userRole === "admin" ? `
+          <div class="admin-buttons">
+            <button class="admin-btn admin-edit" onclick="event.stopPropagation(); editarPrecio('${item.id}')">✏️ Precio</button>
+            <button class="admin-btn admin-delete" onclick="event.stopPropagation(); eliminarProducto('${item.id}')">🗑️ Eliminar</button>
+          </div>
+        ` : ''}
       </div>
     `;
+  });
+  modalDetalleItems.innerHTML = html;
+}
+
+// ==================== ADMIN FUNCTIONS ====================
+async function editarPrecio(itemId) {
+  if (userRole !== "admin") return;
+  const item = itemsActuales.find(i => i.id === itemId);
+  if (!item) return;
+  currentEditingItemId = itemId;
+  editPriceInput.value = getPrecioUnitario(item);
+  editPriceBackdrop.style.display = "flex";
+}
+
+async function guardarPrecio() {
+  const newPrice = parseFloat(editPriceInput.value);
+  if (isNaN(newPrice) || newPrice < 0) {
+    showToast("Precio inválido", "error");
     return;
   }
+  const { error } = await supabase
+    .from("comandas_items")
+    .update({ precio_unitario: newPrice })
+    .eq("id", currentEditingItemId);
+  if (error) {
+    showToast("Error al actualizar precio", "error");
+    console.error(error);
+  } else {
+    showToast("Precio actualizado", "success");
+    await cargarCuenta(mesaActual);
+    renderDetalleProductosModal();
+    const total = getTotalCuenta();
+    mesaActionTotal.textContent = money(total);
+  }
+  editPriceBackdrop.style.display = "none";
+  currentEditingItemId = null;
+}
 
+async function eliminarProducto(itemId) {
+  if (userRole !== "admin") return;
+  if (!confirm("¿Eliminar este producto de la cuenta?")) return;
+  const { error } = await supabase.from("comandas_items").delete().eq("id", itemId);
+  if (error) {
+    showToast("Error al eliminar", "error");
+    console.error(error);
+  } else {
+    showToast("Producto eliminado", "success");
+    await cargarCuenta(mesaActual);
+    renderDetalleProductosModal();
+    const total = getTotalCuenta();
+    mesaActionTotal.textContent = money(total);
+  }
+}
+
+function mostrarAjusteTotal() {
+  if (userRole !== "admin") return;
+  adjustMotivo.value = "";
+  adjustValor.value = "";
+  adjustTotalBackdrop.style.display = "flex";
+}
+
+async function aplicarAjusteTotal() {
+  const motivo = adjustMotivo.value.trim();
+  const valor = parseFloat(adjustValor.value);
+  if (isNaN(valor) || valor === 0) {
+    showToast("Valor inválido", "error");
+    return;
+  }
+  if (!motivo) {
+    showToast("Escribe un motivo", "error");
+    return;
+  }
+  const nombreAjuste = valor < 0 ? `Descuento: ${motivo}` : `Recargo: ${motivo}`;
+  const { error } = await supabase
+    .from("comandas_items")
+    .insert([{
+      comanda_id: comandaActual.id,
+      producto_id: "ajuste_admin",
+      producto_nombre: nombreAjuste,
+      categoria: "AJUSTE",
+      plato: "General",
+      nota: `Ajuste manual por admin: ${motivo}`,
+      qty: 1,
+      cocina: false,
+      precio_unitario: valor
+    }]);
+  if (error) {
+    showToast("Error al aplicar ajuste", "error");
+    console.error(error);
+  } else {
+    showToast(`Ajuste aplicado: ${nombreAjuste}`, "success");
+    await cargarCuenta(mesaActual);
+    renderDetalleProductosModal();
+    const total = getTotalCuenta();
+    mesaActionTotal.textContent = money(total);
+  }
+  adjustTotalBackdrop.style.display = "none";
+}
+
+// ==================== FUNCIONES DE CARGA Y RENDER ====================
+async function cargarCuenta(mesa) {
+  if (!supabaseReady) { setSyncStatus("Supabase no configurado", "bad"); return false; }
+  setSyncStatus(`Cargando ${mesa}...`, "warn");
+  mesaActual = mesa;
+
+  try {
+    const { data: comanda, error: errCom } = await supabase
+      .from("comandas")
+      .select("*")
+      .eq("mesa", mesa)
+      .eq("estado", "abierta")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (errCom || !comanda) {
+      comandaActual = null;
+      itemsActuales = [];
+      setSyncStatus(`No hay cuenta abierta en ${mesa}`, "warn");
+      return false;
+    }
+
+    comandaActual = comanda;
+    const { data: items, error: errItems } = await supabase
+      .from("comandas_items")
+      .select("*")
+      .eq("comanda_id", comanda.id)
+      .order("created_at", { ascending: true });
+
+    if (errItems) { setSyncStatus("Error al cargar productos", "bad"); return false; }
+    itemsActuales = items || [];
+    setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
+    return true;
+  } catch (error) { console.error(error); setSyncStatus("Error al cargar cuenta", "bad"); return false; }
+}
+
+async function cargarEstadoMesas() {
+  if (!supabaseReady) { activasGrid.innerHTML = `<div class="emptyState">Conectando...</div>`; return; }
+  const cuentasVisibles = CUENTAS_FIJAS[tipoVista];
+  try {
+    const { data: comandas, error: errComandas } = await supabase
+      .from("comandas")
+      .select("id, mesa, estado")
+      .eq("estado", "abierta")
+      .in("mesa", cuentasVisibles);
+    if (errComandas) { activasGrid.innerHTML = `<div class="emptyState">Error al cargar</div>`; return; }
+    const abiertas = comandas || [];
+    mesasConCuenta = new Set(abiertas.map(x => x.mesa));
+    resumenMesas = {};
+    for (const com of abiertas) {
+      const { data: items } = await supabase
+        .from("comandas_items")
+        .select("qty, producto_id, precio_unitario")
+        .eq("comanda_id", com.id);
+      const lista = items || [];
+      const total = lista.reduce((acc, it) => acc + (Number(it.qty || 0) * (it.precio_unitario ?? PRECIOS[it.producto_id] ?? 0)), 0);
+      resumenMesas[com.mesa] = { total };
+    }
+    renderMesas();
+  } catch (error) { console.error(error); activasGrid.innerHTML = `<div class="emptyState">Error: ${error.message}</div>`; }
+}
+
+function renderMesas() {
+  const cuentasVisibles = CUENTAS_FIJAS[tipoVista];
+  const cuentasActivas = cuentasVisibles.filter(mesa => mesasConCuenta.has(mesa));
+  if (!cuentasActivas.length) {
+    activasGrid.innerHTML = `<div class="emptyState" style="grid-column:1/-1;">No hay cuentas activas</div>`;
+    return;
+  }
+  activasGrid.innerHTML = "";
   cuentasActivas.forEach(mesa => {
     const btn = document.createElement("button");
-    btn.type = "button";
-
-    let cls = "mesaBtn activeMesa";
-    if (mesaActual === mesa) cls += " selected";
-    btn.className = cls;
-
-    const info = resumenMesas[mesa] || { total: 0, items: 0 };
-    const totalMesa = money(info.total || 0);
-
-    const iconHtml = tipoVista === "mesas"
-      ? `<div class="mesaTop"></div><div class="mesaLegs"><span></span><span></span></div>`
-      : tipoVista === "llevar"
-      ? `<div style="font-size:44px;">🥡</div>`
-      : `<div style="font-size:44px;">🛒</div>`;
-
+    btn.className = "mesaBtn";
+    const info = resumenMesas[mesa] || { total: 0 };
     btn.innerHTML = `
       <div class="mesaCard">
-        ${iconHtml}
         <div class="mesaText">${escapeHtml(mesa)}</div>
-        <div class="mesaAmount">${totalMesa}</div>
-        <div class="mesaState">Cuenta activa</div>
+        <div class="mesaAmount">${money(info.total)}</div>
+        <div class="mesaState">💰 Activa</div>
       </div>
     `;
-
     btn.onclick = async () => {
-      mesaActual = mesa;
-      pillMesa.textContent = mesa;
-      renderMesas();
-      await cargarCuenta();
+      const cargado = await cargarCuenta(mesa);
+      if (cargado && comandaActual) {
+        const total = getTotalCuenta();
+        mesaActionTitle.textContent = `Cuenta - ${mesa}`;
+        mesaActionTotal.textContent = money(total);
+        renderDetalleProductosModal();
+        accordionContent.classList.remove("open");
+        accordionHeader.querySelector("span:last-child").textContent = "▼";
+        mesaActionBackdrop.style.display = "flex";
+      } else {
+        showToast(`No se pudo cargar la cuenta de ${mesa}`, "error");
+      }
     };
-
     activasGrid.appendChild(btn);
   });
 }
 
-async function cargarEstadoMesas(){
-  if(!supabaseReady){
-    mesasConCuenta = new Set();
-    resumenMesas = {};
-    renderMesas();
-    return;
-  }
-
-  const cuentasVisibles = getCuentasVisibles();
-
-  const { data: comandas, error: errComandas } = await supabase
-    .from("comandas")
-    .select("id, mesa, estado")
-    .eq("estado", "abierta")
-    .in("mesa", cuentasVisibles);
-
-  if(errComandas){
-    console.error(errComandas);
-    mesasConCuenta = new Set();
-    resumenMesas = {};
-    renderMesas();
-    return;
-  }
-
-  const abiertas = comandas || [];
-  mesasConCuenta = new Set(abiertas.map(x => x.mesa).filter(Boolean));
-  resumenMesas = {};
-
-  for (const com of abiertas) {
-    const { data: items } = await supabase
-      .from("comandas_items")
-      .select("qty, producto_id, precio_unitario")
-      .eq("comanda_id", com.id);
-
-    const lista = items || [];
-    const total = lista.reduce((acc, it) => {
-      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
-        : Number(PRECIOS[it.producto_id] || 0);
-      return acc + (Number(it.qty || 0) * precio);
-    }, 0);
-
-    const totalItems = lista.reduce((acc, it) => acc + Number(it.qty || 0), 0);
-
-    resumenMesas[com.mesa] = {
-      total,
-      items: totalItems
-    };
-  }
-
-  renderMesas();
-}
-
-async function cargarCuenta(){
-  if(!supabaseReady){
-    setSyncStatus("Configura SUPABASE_URL y SUPABASE_ANON_KEY", "bad");
-    return;
-  }
-
-  const mesa = mesaActual;
-  if(!mesa){
-    alert("Selecciona una cuenta.");
-    return;
-  }
-
-  pillMesa.textContent = mesa;
-  setSyncStatus(`Buscando cuenta en ${mesa}...`, "warn");
-
-  const { data: comanda, error: errCom } = await supabase
-    .from("comandas")
-    .select("*")
-    .eq("mesa", mesa)
-    .eq("estado", "abierta")
-    .order("created_at", { ascending:false })
-    .limit(1)
-    .maybeSingle();
-
-  if(errCom){
-    console.error(errCom);
-    setSyncStatus("Error al buscar la cuenta", "bad");
-    alert("No se pudo consultar la cuenta.");
-    return;
-  }
-
-  if(!comanda){
-    comandaActual = null;
-    itemsActuales = [];
-    kpiMesa.textContent = mesa;
-    kpiMesero.textContent = "—";
-    detalleCuenta.innerHTML = `<div class="emptyState">No hay cuenta abierta en ${escapeHtml(mesa)}.</div>`;
-    setSyncStatus(`No hay cuenta abierta en ${mesa}`, "warn");
-    await cargarEstadoMesas();
-    return;
-  }
-
-  comandaActual = comanda;
-
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("*")
-    .eq("comanda_id", comanda.id)
-    .order("created_at", { ascending:true });
-
-  if(errItems){
-    console.error(errItems);
-    setSyncStatus("Error al cargar productos", "bad");
-    alert("No se pudieron cargar los productos.");
-    return;
-  }
-
-  itemsActuales = items || [];
-  renderCuenta();
-  setSyncStatus(`Cuenta cargada: ${mesa}`, "ok");
-  await cargarEstadoMesas();
-}
-
-function renderCuenta(){
-  if(!comandaActual){
-    resetVista();
-    return;
-  }
-
-  kpiMesa.textContent = comandaActual.mesa || "—";
-  kpiMesero.textContent = comandaActual.mesero || "—";
-  pillMesa.textContent = comandaActual.mesa || "Sin seleccionar";
-
-  const grupos = agruparItemsPorPlato(itemsActuales);
+// Impresión con tamaño más grande
+function buildCuentaPrint() {
+  if (!comandaActual) return "";
   const total = getTotalCuenta();
-
-  let html = `
-    <div class="mainSummary">
-      <div class="mesaGrande">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
-      <div class="sub">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
-    </div>
-    <div class="detalle">
-  `;
-
-  if(!itemsActuales.length){
-    html += `<div class="emptyState">La cuenta está vacía.</div>`;
-  } else {
-    grupos.forEach(group => {
-      const countGrupo = group.items.reduce((a, x) => a + Number(x.qty || 0), 0);
-
-      html += `
-        <div class="platoCard">
-          <div class="platoHead">
-            <div class="platoTitle">${escapeHtml(group.plato)}</div>
-            <div class="platoBadge">${countGrupo} productos</div>
-          </div>
-      `;
-
-      group.items.forEach(item => {
-        const precio = getPrecioUnitario(item);
-        const importe = Number(item.qty || 0) * precio;
-
-        html += `
-          <div class="line">
-            <div class="lineLeft">
-              <div class="lineTitle">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || item.name || "Producto")}</div>
-              ${item.nota ? `<div class="lineMeta">• ${escapeHtml(item.nota)}</div>` : ``}
-            </div>
-            <div class="lineRight">
-              <div class="linePrice">${money(precio)} c/u</div>
-              <div class="lineTotal">${money(importe)}</div>
-              ${userRole === "admin" ? `
-                <div class="adminTools">
-                  <button class="btnSmall btnMiniBlue" onclick="editarPrecio('${item.id}')">Precio</button>
-                  <button class="btnSmall btnMiniRed" onclick="eliminarProducto('${item.id}')">Borrar</button>
-                </div>
-              ` : ``}
-            </div>
-          </div>
-        `;
-      });
-
-      html += `</div>`;
-    });
-
-    html += `
-      <div class="totalBox">
-        <div class="totalRow">
-          <span>Total</span>
-          <strong>${money(total)}</strong>
+  let html = `<div style="text-align:center; font-weight:900; font-size:26px; margin-bottom:12px;">GUADALUPE VICTORIA</div>
+    <div style="text-align:center; font-weight:900; font-size:22px;">${escapeHtml(comandaActual.mesa)}</div>
+    <div style="text-align:center; font-size:16px;">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
+    <div style="text-align:center; font-size:14px;">${new Date().toLocaleString()}</div>
+    <div style="border-top:2px dashed #000; margin:12px 0;"></div>`;
+  itemsActuales.forEach(item => {
+    const precio = getPrecioUnitario(item);
+    const importe = Number(item.qty || 0) * precio;
+    html += `<div style="margin:8px 0;">
+        <div style="font-weight:900; font-size:20px;">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre)}</div>
+        <div style="display:flex; justify-content:space-between; font-size:18px;">
+          <span>${money(precio)} c/u</span>
+          <span>${money(importe)}</span>
         </div>
-      </div>
-    `;
-  }
-
-  html += `</div>`;
-  detalleCuenta.innerHTML = html;
-}
-
-function findItemById(id){
-  return itemsActuales.find(x => String(x.id) === String(id));
-}
-
-async function editarPrecio(id){
-  if(userRole !== "admin") return;
-  const item = findItemById(id);
-  if(!item) return;
-
-  openEditModal(
-    `Cambiar precio de ${item.producto_nombre}`,
-    "Escribe el nuevo precio unitario.",
-    "precio",
-    item,
-    String(getPrecioUnitario(item))
-  );
-}
-
-async function eliminarProducto(id){
-  if(userRole !== "admin") return;
-  const item = findItemById(id);
-  if(!item) return;
-
-  if(!confirm(`¿Eliminar "${item.producto_nombre}" de la cuenta?`)) return;
-
-  const { error } = await supabase
-    .from("comandas_items")
-    .delete()
-    .eq("id", item.id);
-
-  if(error){
-    console.error(error);
-    alert("No se pudo eliminar el producto.");
-    return;
-  }
-
-  await cargarCuenta();
-}
-
-async function crearAjusteAdmin(){
-  if(userRole !== "admin"){
-    alert("Solo admin puede hacer ajustes.");
-    return;
-  }
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
-
-  openEditModal(
-    "Ajuste admin",
-    "Ejemplo: -50 para descuento o 30 para recargo.",
-    "ajuste",
-    null,
-    ""
-  );
-}
-
-async function guardarEdicion(){
-  if(currentEditAction === "precio" && currentEditItem){
-    const nuevo = Number(editValue.value);
-    if(isNaN(nuevo) || nuevo < 0){
-      alert("Pon un precio válido.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("comandas_items")
-      .update({ precio_unitario: nuevo })
-      .eq("id", currentEditItem.id);
-
-    if(error){
-      console.error(error);
-      alert("No se pudo actualizar el precio.");
-      return;
-    }
-
-    closeEditModal();
-    await cargarCuenta();
-    return;
-  }
-
-  if(currentEditAction === "ajuste"){
-    const ajuste = Number(editValue.value);
-    if(isNaN(ajuste) || ajuste === 0){
-      alert("Pon un ajuste válido.");
-      return;
-    }
-
-    const { error } = await supabase
-      .from("comandas_items")
-      .insert([{
-        comanda_id: comandaActual.id,
-        producto_id: "ajuste_admin",
-        producto_nombre: ajuste < 0 ? "Descuento admin" : "Recargo admin",
-        categoria: "AJUSTE",
-        plato: "General",
-        nota: "Ajuste manual admin",
-        qty: 1,
-        cocina: false,
-        precio_unitario: ajuste
-      }]);
-
-    if(error){
-      console.error(error);
-      alert("No se pudo guardar el ajuste.");
-      return;
-    }
-
-    closeEditModal();
-    await cargarCuenta();
-  }
-}
-
-async function cerrarCuentaDefinitiva(){
-  if(!supabaseReady){
-    setSyncStatus("Configura Supabase primero", "bad");
-    return;
-  }
-
-  if(!comandaActual){
-    alert("Primero carga una cuenta.");
-    return;
-  }
-
-  setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
-
-  const { error } = await supabase
-    .from("comandas")
-    .update({
-      estado: "cerrada",
-      updated_at: new Date().toISOString()
-    })
-    .eq("id", comandaActual.id);
-
-  if(error){
-    console.error(error);
-    setSyncStatus("Error al cerrar la cuenta", "bad");
-    alert("No se pudo cerrar la cuenta.");
-    return;
-  }
-
-  closeCobroModal();
-  alert("Cuenta cerrada correctamente.");
-  comandaActual = null;
-  itemsActuales = [];
-  await cargarEstadoMesas();
-
-  if (mesaActual) {
-    kpiMesa.textContent = mesaActual;
-    kpiMesero.textContent = "—";
-    detalleCuenta.innerHTML = `<div class="emptyState">La cuenta de ${escapeHtml(mesaActual)} ya fue cerrada.</div>`;
-    pillMesa.textContent = mesaActual;
-  }
-
-  setSyncStatus(`Cuenta cerrada: ${mesaActual}`, "ok");
-}
-
-function buildCuentaPrint(){
-  if(!comandaActual) return "";
-
-  const total = getTotalCuenta();
-  const grupos = agruparItemsPorPlato(itemsActuales);
-
-  let html = `
-    <div class="ticket">
-      <div class="c b lg">CUENTA</div>
-      <div class="c b">${escapeHtml(comandaActual.mesa || "Cuenta")}</div>
-      <div class="c">Mesero: ${escapeHtml(comandaActual.mesero || "—")}</div>
-      <div class="hr"></div>
-  `;
-
-  grupos.forEach(group => {
-    html += `<div class="g">${escapeHtml(group.plato)}</div>`;
-
-    group.items.forEach(item => {
-      const precio = getPrecioUnitario(item);
-      const importe = Number(item.qty || 0) * precio;
-
-      html += `
-        <div class="it">
-          <div class="itn">${escapeHtml(item.qty)} x ${escapeHtml(item.producto_nombre || "Producto")}</div>
-          ${item.nota ? `<div class="sub">• ${escapeHtml(item.nota)}</div>` : ``}
-          <div class="priceRow">
-            <span>${money(precio)} c/u</span>
-            <span>${money(importe)}</span>
-          </div>
-        </div>
-      `;
-    });
-
-    html += `<div class="hr"></div>`;
+      </div>`;
   });
-
-  html += `
-      <div class="totalRowPrint">
-        <span>TOTAL</span>
-        <span>${money(total)}</span>
-      </div>
+  html += `<div style="border-top:2px dashed #000; margin:12px 0;"></div>
+    <div style="display:flex; justify-content:space-between; font-size:32px; font-weight:900; margin-top:8px;">
+      <span>TOTAL</span><span>${money(total)}</span>
     </div>
-  `;
-
+    <div style="text-align:center; margin-top:16px; font-size:16px;">¡Gracias por su visita!</div>`;
   return html;
 }
 
-function openFechaResumenModal(){
+function imprimirTicket() {
+  if (!comandaActual) { showToast("No hay cuenta cargada", "error"); return; }
+  const contenido = buildCuentaPrint();
+  const ventana = window.open('', '_blank', 'width=500,height=700');
+  if (!ventana) { showToast("Permite ventanas emergentes para imprimir", "error"); return; }
+  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Ticket</title><style>
+    @page { size: 104mm auto; margin: 0; }
+    body { font-family: monospace; padding: 8px; width: 104mm; margin: 0 auto; font-size: 16px; }
+    </style></head><body>${contenido}<script>
+    window.onload = function() { setTimeout(function() { window.print(); setTimeout(function() { window.close(); }, 1000); }, 300); };
+    <\/script></body></html>`);
+  ventana.document.close();
+}
+
+// Cierre de cuenta con método de pago (automático)
+async function cerrarCuentaConMetodo(paymentMethod, montoRecibido = null) {
+  if (!comandaActual) { showToast("No hay cuenta cargada", "error"); return; }
+  const total = getTotalCuenta();
+  let pago = paymentMethod !== "efectivo" ? total : montoRecibido;
+  if (pago !== null && pago < total && !confirm(`El pago (${money(pago)}) es menor al total (${money(total)}). ¿Deseas continuar?`)) return;
+  setSyncStatus(`Cerrando ${comandaActual.mesa}...`, "warn");
+  try {
+    const { error } = await supabase
+      .from("comandas")
+      .update({ 
+        estado: "cerrada", 
+        updated_at: new Date().toISOString(),
+        metodo_pago: paymentMethod
+      })
+      .eq("id", comandaActual.id);
+    if (error) throw error;
+    const metodoTexto = { efectivo: "💵 Efectivo", tarjeta: "💳 Tarjeta", transferencia: "🏦 Transferencia" }[paymentMethod];
+    showToast(`✅ Cuenta ${comandaActual.mesa} cerrada. Método: ${metodoTexto}`, "success");
+    mesaActionBackdrop.style.display = "none";
+    comandaActual = null;
+    itemsActuales = [];
+    mesaActual = "";
+    await cargarEstadoMesas();
+    setSyncStatus("Cuenta cerrada", "ok");
+  } catch (error) { console.error(error); showToast("Error al cerrar la cuenta", "error"); }
+}
+
+// Flujo de cobro: muestra métodos y al elegir uno, cierra automáticamente
+function mostrarSeleccionMetodo() {
+  if (!comandaActual) { showToast("No hay cuenta cargada", "error"); return; }
+  paymentMethodBackdrop.style.display = "flex";
+}
+
+// Manejo de clic en método de pago
+paymentMethodGrid.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".paymentMethodBtn");
+  if (!btn) return;
+  const method = btn.getAttribute("data-method");
+  paymentMethodBackdrop.style.display = "none";
+  
+  if (method === "efectivo") {
+    let monto = prompt("Ingresa el monto recibido en efectivo:", "0");
+    if (monto === null) return; // canceló
+    monto = parseFloat(monto) || 0;
+    await cerrarCuentaConMetodo("efectivo", monto);
+  } else {
+    await cerrarCuentaConMetodo(method);
+  }
+});
+
+btnCancelPaymentMethod.onclick = () => {
+  paymentMethodBackdrop.style.display = "none";
+};
+
+mesaActionPayBtn.onclick = mostrarSeleccionMetodo;
+mesaActionCancelBtn.onclick = () => mesaActionBackdrop.style.display = "none";
+mesaActionPrintBtn.onclick = imprimirTicket;
+
+// ==================== RESUMEN PDF (sin cambios relevantes) ====================
+function getRangoLocalDia(fechaStr) {
+  const [y,m,d] = fechaStr.split("-").map(Number);
+  const inicio = new Date(y,m-1,d,0,0,0,0);
+  const fin = new Date(y,m-1,d,23,59,59,999);
+  return { inicioISO: inicio.toISOString(), finISO: fin.toISOString(), fechaBonita: inicio.toLocaleDateString("es-MX") };
+}
+
+async function obtenerDatosResumenDia(fechaStr) {
+  if (!supabaseReady) return null;
+  const { inicioISO, finISO, fechaBonita } = getRangoLocalDia(fechaStr);
+  const { data: comandas } = await supabase
+    .from("comandas")
+    .select("id, mesa, mesero, estado, updated_at, metodo_pago")
+    .eq("estado","cerrada")
+    .gte("updated_at",inicioISO)
+    .lte("updated_at",finISO);
+  if (!comandas?.length) return { fechaBonita, totalGeneral:0, totalComandas:0, porTipoCuenta:{mesas:{total:0,comandas:0},llevar:{total:0,comandas:0},carrito:{total:0,comandas:0}}, rankingMeseros:[], todosProductos:[], detalleComandas:[], porMetodoPago:{efectivo:{total:0,comandas:0},tarjeta:{total:0,comandas:0},transferencia:{total:0,comandas:0}} };
+  const ids = comandas.map(c=>c.id);
+  let items = [];
+  if (ids.length) {
+    const { data: it } = await supabase.from("comandas_items").select("comanda_id,producto_nombre,qty,precio_unitario,producto_id").in("comanda_id",ids);
+    items = it||[];
+  }
+  const itemsPorComanda = {};
+  items.forEach(it => { if (!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = []; itemsPorComanda[it.comanda_id].push(it); });
+  const comandasConTotal = comandas.map(com => {
+    const arr = itemsPorComanda[com.id]||[];
+    const total = arr.reduce((acc,it)=> acc + (it.qty * (it.precio_unitario ?? PRECIOS[it.producto_id] ?? 0)), 0);
+    return {...com, total};
+  }).filter(c=>c.total>0);
+  if (!comandasConTotal.length) return { fechaBonita, totalGeneral:0, totalComandas:0, porTipoCuenta:{mesas:{total:0,comandas:0},llevar:{total:0,comandas:0},carrito:{total:0,comandas:0}}, rankingMeseros:[], todosProductos:[], detalleComandas:[], porMetodoPago:{efectivo:{total:0,comandas:0},tarjeta:{total:0,comandas:0},transferencia:{total:0,comandas:0}} };
+  let totalGeneral=0;
+  const porTipoCuenta = { mesas:{total:0,comandas:0}, llevar:{total:0,comandas:0}, carrito:{total:0,comandas:0} };
+  const porMesero = {};
+  const productos = {};
+  const detalleComandas = [];
+  const porMetodoPago = { efectivo:{total:0,comandas:0}, tarjeta:{total:0,comandas:0}, transferencia:{total:0,comandas:0} };
+  comandasConTotal.forEach(com => {
+    const arr = itemsPorComanda[com.id]||[];
+    const total = com.total;
+    totalGeneral += total;
+    const mesero = com.mesero||"Sin mesero";
+    if (!porMesero[mesero]) porMesero[mesero] = { total:0, comandas:0 };
+    porMesero[mesero].total += total; porMesero[mesero].comandas++;
+    const mesaNombre = (com.mesa||"").toLowerCase();
+    if (mesaNombre.includes("para llevar")) porTipoCuenta.llevar.total += total, porTipoCuenta.llevar.comandas++;
+    else if (mesaNombre.includes("carrito")) porTipoCuenta.carrito.total += total, porTipoCuenta.carrito.comandas++;
+    else porTipoCuenta.mesas.total += total, porTipoCuenta.mesas.comandas++;
+    const metodo = com.metodo_pago || "no_definido";
+    if (porMetodoPago[metodo]) {
+      porMetodoPago[metodo].total += total;
+      porMetodoPago[metodo].comandas++;
+    } else if (metodo !== "no_definido") {
+      porMetodoPago[metodo] = { total, comandas:1 };
+    }
+    arr.forEach(it => {
+      const nombre = it.producto_nombre||"Producto";
+      if (!productos[nombre]) productos[nombre] = { qty:0, total:0 };
+      productos[nombre].qty += it.qty;
+      productos[nombre].total += it.qty * (it.precio_unitario ?? PRECIOS[it.producto_id] ?? 0);
+    });
+    detalleComandas.push({ mesa:com.mesa, mesero, total, updated_at:com.updated_at, metodo_pago:com.metodo_pago || "No especificado" });
+  });
+  detalleComandas.sort((a,b)=>b.total-a.total);
+  const rankingMeseros = Object.entries(porMesero).sort((a,b)=>b[1].total-a[1].total);
+  const todosProductos = Object.entries(productos).sort((a,b)=>b[1].total-a[1].total);
+  return { fechaBonita, totalGeneral, totalComandas:comandasConTotal.length, porTipoCuenta, rankingMeseros, todosProductos, detalleComandas, porMetodoPago };
+}
+
+async function descargarResumenPDF(fechaStr) {
+  if (!fechaStr) { showToast("Selecciona una fecha", "error"); return; }
+  if (!window.jspdf?.jsPDF) { showToast("No se pudo cargar la librería PDF", "error"); return; }
+  const data = await obtenerDatosResumenDia(fechaStr);
+  if (!data) return;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:"p", unit:"pt", format:"a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginX = 40, topSafeY = 56;
+  const contentWidth = pageWidth - (marginX*2);
+  const nowStr = new Date().toLocaleString("es-MX");
+  const avgTicket = data.totalComandas ? (data.totalGeneral/data.totalComandas) : 0;
+  const colors = { navy:[20,55,105], blue:[21,101,192], sky:[236,244,253], line:[216,228,243], text:[25,40,60], muted:[95,115,140], zebra:[248,251,255] };
+  const formatMoney = (n) => money(n);
+  const drawHeader = () => {
+    doc.setFillColor(...colors.navy); doc.rect(0,0,pageWidth,32,"F");
+    doc.setDrawColor(...colors.line); doc.setLineWidth(1); doc.roundedRect(marginX,topSafeY-18,contentWidth,92,12,12,"S");
+    doc.setFont("helvetica","bold"); doc.setFontSize(18); doc.setTextColor(...colors.text); doc.text("Resumen de ventas del día",marginX+14,topSafeY+8);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(...colors.muted); doc.text(`Fecha: ${data.fechaBonita}`,marginX+14,topSafeY+28);
+    doc.text(`Generado: ${nowStr}`,marginX+14,topSafeY+44);
+    if (data.totalComandas===0) doc.text("*Nota: No se registraron ventas en esta fecha",marginX+14,topSafeY+60);
+  };
+  const drawKpiCard = (x,y,w,h,label,value) => {
+    doc.setFillColor(...colors.sky); doc.setDrawColor(...colors.line); doc.roundedRect(x,y,w,h,10,10,"FD");
+    doc.setFont("helvetica","bold"); doc.setFontSize(9.5); doc.setTextColor(...colors.muted); doc.text(label.toUpperCase(),x+10,y+16);
+    doc.setFont("helvetica","bold"); doc.setFontSize(14); doc.setTextColor(...colors.text); doc.text(String(value),x+10,y+35);
+  };
+  const buildTableTheme = (fontSize=10) => ({
+    margin: { left:marginX, right:marginX },
+    headStyles: { fillColor:colors.blue, textColor:[255,255,255], fontStyle:"bold", fontSize, halign:"left" },
+    bodyStyles: { textColor:colors.text, fontSize, lineColor:colors.line, lineWidth:0.5 },
+    alternateRowStyles: { fillColor:colors.zebra },
+    styles: { cellPadding: { top:6, right:6, bottom:6, left:6 }, overflow:"linebreak", valign:"middle" },
+    tableLineColor: colors.line, tableLineWidth: 0.6
+  });
+  drawHeader();
+  const kpiY = topSafeY+88; const gap=10; const cardW = (contentWidth-(gap*2))/3; const cardH=48;
+  drawKpiCard(marginX,kpiY,cardW,cardH,"Total vendido",formatMoney(data.totalGeneral));
+  drawKpiCard(marginX+cardW+gap,kpiY,cardW,cardH,"Cuentas cerradas",data.totalComandas);
+  drawKpiCard(marginX+(cardW+gap)*2,kpiY,cardW,cardH,"Ticket promedio",formatMoney(avgTicket));
+  let y = kpiY+cardH+26;
+  if (data.totalComandas===0) {
+    doc.setFont("helvetica","normal"); doc.setFontSize(12); doc.text("No hay ventas registradas en esta fecha.",marginX,y+30);
+    const totalPages = doc.internal.getNumberOfPages();
+    for(let i=1;i<=totalPages;i++){ doc.setPage(i); doc.setFontSize(9); doc.setTextColor(...colors.muted); doc.text(`Página ${i} de ${totalPages}`,pageWidth-marginX,pageHeight-16,{align:"right"}); }
+    doc.save(`resumen_${data.fechaStr}_sin_ventas.pdf`);
+    return;
+  }
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Ventas por método de pago",marginX,y);
+  y+=10;
+  const metodosBody = [];
+  if (data.porMetodoPago.efectivo) metodosBody.push(["Efectivo", String(data.porMetodoPago.efectivo.comandas), formatMoney(data.porMetodoPago.efectivo.total)]);
+  if (data.porMetodoPago.tarjeta) metodosBody.push(["Tarjeta", String(data.porMetodoPago.tarjeta.comandas), formatMoney(data.porMetodoPago.tarjeta.total)]);
+  if (data.porMetodoPago.transferencia) metodosBody.push(["Transferencia", String(data.porMetodoPago.transferencia.comandas), formatMoney(data.porMetodoPago.transferencia.total)]);
+  if (metodosBody.length === 0) metodosBody.push(["Sin datos", "0", formatMoney(0)]);
+  doc.autoTable({...buildTableTheme(10), startY:y, head:[["Método","Cuentas","Total"]], body:metodosBody, columnStyles:{1:{halign:"center",cellWidth:90},2:{halign:"right",cellWidth:110}} });
+  y = doc.lastAutoTable.finalY+22;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Por tipo de cuenta",marginX,y);
+  y+=10;
+  doc.autoTable({...buildTableTheme(10), startY:y, head:[["Tipo","Cuentas","Total"]], body:[["Mesas",String(data.porTipoCuenta.mesas.comandas),formatMoney(data.porTipoCuenta.mesas.total)],["Para llevar",String(data.porTipoCuenta.llevar.comandas),formatMoney(data.porTipoCuenta.llevar.total)],["Carrito afuera",String(data.porTipoCuenta.carrito.comandas),formatMoney(data.porTipoCuenta.carrito.total)]], columnStyles:{1:{halign:"center",cellWidth:90},2:{halign:"right",cellWidth:110}} });
+  y = doc.lastAutoTable.finalY+22;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Ventas por mesero",marginX,y);
+  y+=10;
+  doc.autoTable({...buildTableTheme(10), startY:y, head:[["Mesero","Cuentas","Total"]], body:data.rankingMeseros.length?data.rankingMeseros.map(([m,i])=>[m,String(i.comandas),formatMoney(i.total)]):[["Sin registros","0",formatMoney(0)]], columnStyles:{1:{halign:"center",cellWidth:90},2:{halign:"right",cellWidth:110}} });
+  y = doc.lastAutoTable.finalY+22;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Comandas cerradas (con método de pago)",marginX,y);
+  y+=10;
+  doc.autoTable({...buildTableTheme(9.5), startY:y, head:[["Cuenta","Mesero","Hora","Método","Total"]], body:data.detalleComandas.map(c=>[c.mesa,c.mesero,new Date(c.updated_at).toLocaleTimeString(),c.metodo_pago,formatMoney(c.total)]), columnStyles:{2:{halign:"center",cellWidth:80},3:{halign:"center",cellWidth:80},4:{halign:"right",cellWidth:90}} });
+  y = doc.lastAutoTable.finalY+22;
+  doc.setFont("helvetica","bold"); doc.setFontSize(12); doc.text("Todos los productos vendidos",marginX,y);
+  y+=10;
+  doc.autoTable({...buildTableTheme(9.5), startY:y, head:[["Producto","Cantidad","Total"]], body:data.todosProductos.map(([n,i])=>[n,String(i.qty),formatMoney(i.total)]), columnStyles:{1:{halign:"center",cellWidth:90},2:{halign:"right",cellWidth:110}} });
+  const totalPages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=totalPages;i++){ doc.setPage(i); doc.setFontSize(9); doc.setTextColor(...colors.muted); doc.text(`Página ${i} de ${totalPages}`,pageWidth-marginX,pageHeight-16,{align:"right"}); }
+  doc.save(`resumen_ventas_${data.fechaStr}.pdf`);
+  showToast("✅ PDF generado correctamente", "success");
+}
+
+function openFechaResumenModal() {
   const hoy = new Date();
-  const yyyy = hoy.getFullYear();
-  const mm = String(hoy.getMonth() + 1).padStart(2, "0");
-  const dd = String(hoy.getDate()).padStart(2, "0");
+  const yyyy = hoy.getFullYear(), mm = String(hoy.getMonth()+1).padStart(2,"0"), dd = String(hoy.getDate()).padStart(2,"0");
   fechaResumenInput.value = `${yyyy}-${mm}-${dd}`;
   fechaResumenBackdrop.style.display = "flex";
 }
+function closeFechaResumenModal() { fechaResumenBackdrop.style.display = "none"; }
 
-function closeFechaResumenModal(){
-  fechaResumenBackdrop.style.display = "none";
-}
-
-function getRangoLocalDia(fechaStr){
-  const [y, m, d] = fechaStr.split("-").map(Number);
-
-  const inicio = new Date(y, m - 1, d, 0, 0, 0, 0);
-  const fin = new Date(y, m - 1, d, 23, 59, 59, 999);
-
-  return {
-    inicioISO: inicio.toISOString(),
-    finISO: fin.toISOString(),
-    fechaBonita: inicio.toLocaleDateString("es-MX", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit"
-    })
-  };
-}
-
-async function buildResumenGeneralVentas(fechaStr){
-  if(!supabaseReady) return "";
-
-  if(!fechaStr){
-    alert("Elige una fecha.");
-    return "";
-  }
-
-  const { inicioISO, finISO, fechaBonita } = getRangoLocalDia(fechaStr);
-
-  const { data: comandas, error: errComandas } = await supabase
-    .from("comandas")
-    .select("id, mesa, mesero, estado, created_at, updated_at")
-    .eq("estado", "cerrada")
-    .gte("updated_at", inicioISO)
-    .lte("updated_at", finISO)
-    .order("updated_at", { ascending: false });
-
-  if(errComandas){
-    console.error(errComandas);
-    alert("No se pudo consultar el resumen del día.");
-    return "";
-  }
-
-  const listaComandas = comandas || [];
-
-  if(!listaComandas.length){
-    return `*RESUMEN DEL DÍA (${fechaBonita})*\n\nNo hay cuentas cerradas registradas en esa fecha.`;
-  }
-
-  const idsComandas = listaComandas.map(c => c.id);
-
-  const { data: items, error: errItems } = await supabase
-    .from("comandas_items")
-    .select("comanda_id, producto_id, producto_nombre, qty, precio_unitario")
-    .in("comanda_id", idsComandas);
-
-  if(errItems){
-    console.error(errItems);
-    alert("No se pudieron consultar los productos del resumen.");
-    return "";
-  }
-
-  const listaItems = items || [];
-  const itemsPorComanda = {};
-
-  listaItems.forEach(it=>{
-    if(!itemsPorComanda[it.comanda_id]) itemsPorComanda[it.comanda_id] = [];
-    itemsPorComanda[it.comanda_id].push(it);
-  });
-
-  let totalGeneral = 0;
-  const productos = {};
-  const porMesero = {};
-  const porTipoCuenta = {
-    mesas: { total:0, comandas:0 },
-    llevar: { total:0, comandas:0 },
-    carrito: { total:0, comandas:0 }
-  };
-
-  listaComandas.forEach(com=>{
-    const arr = itemsPorComanda[com.id] || [];
-
-    const totalComanda = arr.reduce((acc, it)=>{
-      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
-        : Number(PRECIOS[it.producto_id] || 0);
-      return acc + (Number(it.qty || 0) * precio);
-    }, 0);
-
-    totalGeneral += totalComanda;
-
-    const mesero = com.mesero || "Sin mesero";
-    if(!porMesero[mesero]) porMesero[mesero] = { total:0, comandas:0 };
-    porMesero[mesero].total += totalComanda;
-    porMesero[mesero].comandas += 1;
-
-    const mesaNombre = (com.mesa || "").toLowerCase();
-    if(mesaNombre.includes("para llevar")){
-      porTipoCuenta.llevar.total += totalComanda;
-      porTipoCuenta.llevar.comandas += 1;
-    }else if(mesaNombre.includes("carrito")){
-      porTipoCuenta.carrito.total += totalComanda;
-      porTipoCuenta.carrito.comandas += 1;
-    }else{
-      porTipoCuenta.mesas.total += totalComanda;
-      porTipoCuenta.mesas.comandas += 1;
-    }
-
-    arr.forEach(it=>{
-      const nombre = it.producto_nombre || "Producto";
-      if(!productos[nombre]) productos[nombre] = { qty:0, total:0 };
-
-      const precio = (it.precio_unitario != null && it.precio_unitario !== "")
-        ? Number(it.precio_unitario || 0)
-        : Number(PRECIOS[it.producto_id] || 0);
-
-      productos[nombre].qty += Number(it.qty || 0);
-      productos[nombre].total += Number(it.qty || 0) * precio;
-    });
-  });
-
-  const topProductos = Object.entries(productos)
-    .sort((a,b)=> b[1].total - a[1].total)
-    .slice(0,10);
-
-  const rankingMeseros = Object.entries(porMesero)
-    .sort((a,b)=> b[1].total - a[1].total);
-
-  let texto = `*RESUMEN DEL DÍA (${fechaBonita})*\n\n`;
-  texto += `Solo cuentas cerradas\n\n`;
-  texto += `Total vendido: *${money(totalGeneral)}*\n`;
-  texto += `Total de cuentas cerradas: *${listaComandas.length}*\n\n`;
-
-  texto += `*Por tipo de cuenta:*\n`;
-  texto += `• Mesas: ${porTipoCuenta.mesas.comandas} cuentas / ${money(porTipoCuenta.mesas.total)}\n`;
-  texto += `• Para llevar: ${porTipoCuenta.llevar.comandas} cuentas / ${money(porTipoCuenta.llevar.total)}\n`;
-  texto += `• Carrito afuera: ${porTipoCuenta.carrito.comandas} cuentas / ${money(porTipoCuenta.carrito.total)}\n\n`;
-
-  texto += `*Ventas por mesero:*\n`;
-  if(!rankingMeseros.length){
-    texto += `Sin registros.\n\n`;
-  }else{
-    rankingMeseros.forEach(([mesero, info])=>{
-      texto += `• ${mesero}: ${info.comandas} cuentas / ${money(info.total)}\n`;
-    });
-    texto += `\n`;
-  }
-
-  texto += `*Top productos del día:*\n`;
-  if(!topProductos.length){
-    texto += `Sin productos registrados.\n`;
-  }else{
-    topProductos.forEach(([nombre, info])=>{
-      texto += `• ${nombre}: ${info.qty} pzas / ${money(info.total)}\n`;
-    });
-  }
-
-  return texto;
-}
-
-async function mandarResumenGeneralWhatsapp(fechaStr){
-  const texto = await buildResumenGeneralVentas(fechaStr);
-  if(!texto) return;
-
-  const url = `https://wa.me/${WHATSAPP_RESUMEN}?text=${encodeURIComponent(texto)}`;
-  window.open(url, "_blank");
-}
-
-function imprimirHtmlTicket(htmlContenido){
-  if(!htmlContenido) return;
-
-  const returnUrl = location.href;
-  const win = window.open("", "_blank");
-
-  if(!win){
-    alert("El navegador bloqueó la ventana de impresión. Activa las ventanas emergentes.");
-    return;
-  }
-
-  const ticketDoc = `
-    <!doctype html>
-    <html lang="es">
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-      <title>Ticket</title>
-      <style>
-        @page{
-          size:80mm auto;
-          margin:0;
-        }
-
-        html, body{
-          margin:0;
-          padding:0;
-          width:80mm;
-          max-width:80mm;
-          background:#fff;
-          overflow-x:hidden;
-        }
-
-        body{
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          color:#000;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-
-        .ticket{
-          width:72mm;
-          margin:0 auto;
-          box-sizing:border-box;
-          padding:2mm 1.5mm 3mm;
-          font-size:16px;
-          line-height:1.25;
-          color:#000;
-          background:#fff;
-        }
-
-        .c{text-align:center}
-        .b{font-weight:900}
-        .lg{font-size:18px}
-        .hr{border-top:1px dashed #000;margin:5px 0}
-        .g{
-          font-weight:900;
-          margin-top:6px;
-          font-size:16px;
-          text-transform:uppercase;
-        }
-        .it{margin:5px 0}
-        .itn{
-          font-weight:900;
-          font-size:18px;
-          line-height:1.15;
-        }
-        .sub{
-          padding-left:6px;
-          font-size:15px;
-          white-space:pre-wrap;
-        }
-        .priceRow{
-          display:flex;
-          justify-content:space-between;
-          gap:8px;
-          font-size:15px;
-          margin-top:2px;
-        }
-        .totalRowPrint{
-          display:flex;
-          justify-content:space-between;
-          gap:8px;
-          font-size:26px;
-          font-weight:900;
-          margin-top:8px;
-        }
-
-        .screen-bar{
-          position:sticky;
-          top:0;
-          background:#fff;
-          padding:8px;
-          border-bottom:1px solid #ddd;
-          text-align:center;
-          font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-        }
-        .screen-bar button{
-          border:none;
-          border-radius:10px;
-          padding:10px 14px;
-          font-weight:800;
-          font-size:14px;
-          background:#1565c0;
-          color:#fff;
-          margin:0 4px;
-          cursor:pointer;
-        }
-
-        @media print{
-          .screen-bar{ display:none !important; }
-        }
-      </style>
-    </head>
-    <body>
-      <div class="screen-bar">
-        <button onclick="window.print()">Imprimir</button>
-        <button onclick="window.location.href='${returnUrl}'">Regresar</button>
-      </div>
-      ${htmlContenido}
-    </body>
-    </html>
-  `;
-
-  win.document.open();
-  win.document.write(ticketDoc);
-  win.document.close();
-}
-
-function imprimirCuenta(){
-  if(!comandaActual){
-    alert("Primero selecciona una cuenta.");
-    return;
-  }
-  imprimirHtmlTicket(buildCuentaPrint());
-}
-
-async function cambiarTipoVista(nuevoTipo){
+async function cambiarTipoVista(nuevoTipo) {
   tipoVista = nuevoTipo;
   mesaActual = "";
   comandaActual = null;
   itemsActuales = [];
-  pillMesa.textContent = "Sin seleccionar";
-  kpiMesa.textContent = "—";
-  kpiMesero.textContent = "—";
-  detalleCuenta.innerHTML = `<div class="emptyState">Selecciona una cuenta.</div>`;
-  headerActivas.innerHTML = "";
-  updateTipoUI();
+  btnTipoMesas.classList.toggle("active", tipoVista==="mesas");
+  btnTipoLlevar.classList.toggle("active", tipoVista==="llevar");
+  btnTipoCarrito.classList.toggle("active", tipoVista==="carrito");
   await cargarEstadoMesas();
-  renderMesas();
 }
 
-loginRol.addEventListener("change", ()=>{
-  pinWrap.style.display = loginRol.value === "admin" ? "block" : "none";
+// Event listeners
+accordionHeader.addEventListener("click", () => {
+  const isOpen = accordionContent.classList.contains("open");
+  if (isOpen) { accordionContent.classList.remove("open"); accordionHeader.querySelector("span:last-child").textContent = "▼"; }
+  else { accordionContent.classList.add("open"); accordionHeader.querySelector("span:last-child").textContent = "▲"; }
 });
-
-cobroPago.addEventListener("input", recalcularCambio);
-cobroPago.addEventListener("keydown", (e)=>{
-  if(e.key === "Enter"){
-    e.preventDefault();
-    cobroPago.blur();
-    recalcularCambio();
-    document.getElementById("btnCobroConfirmar").scrollIntoView({
-      behavior:"smooth",
-      block:"center"
-    });
-  }
-});
-
-document.getElementById("btnCambiarModo").onclick = openLoginModal;
-document.getElementById("btnCerrarLogin").onclick = closeLoginModal;
-document.getElementById("btnEntrarLogin").onclick = ()=>{
+document.getElementById("btnCambiarModo").onclick = () => loginBackdrop.style.display = "flex";
+document.getElementById("btnCerrarLogin").onclick = () => loginBackdrop.style.display = "none";
+document.getElementById("btnEntrarLogin").onclick = () => {
   const rol = loginRol.value;
-  if(rol === "admin"){
-    if(loginPin.value !== ADMIN_PIN){
-      alert("PIN admin incorrecto.");
-      return;
-    }
-  }
+  if (rol === "admin" && loginPin.value !== ADMIN_PIN) { showToast("PIN incorrecto", "error"); return; }
   userRole = rol;
-  updateRoleUI();
-  closeLoginModal();
-  renderCuenta();
+  roleInfo.textContent = `👤 Modo: ${userRole==="admin"?"Administrador 👑":"Operador"}`;
+  loginBackdrop.style.display = "none";
+  showToast(`Modo ${userRole==="admin"?"Administrador":"Operador"} activado`, "success");
+  if (comandaActual && mesaActionBackdrop.style.display === "flex") renderDetalleProductosModal();
 };
-
-document.getElementById("btnEditCancel").onclick = closeEditModal;
-document.getElementById("btnEditSave").onclick = guardarEdicion;
-
-document.getElementById("btnCobroCancelar").onclick = closeCobroModal;
-document.getElementById("btnCobroConfirmar").onclick = async ()=>{
-  await cerrarCuentaDefinitiva();
-};
-
-document.getElementById("btnCerrar").onclick = openCobroModal;
-document.getElementById("btnCuenta").onclick = imprimirCuenta;
+document.getElementById("btnActualizarMesas").onclick = async () => { await cargarEstadoMesas(); };
 document.getElementById("btnResumen").onclick = openFechaResumenModal;
-
 document.getElementById("btnFechaResumenCancelar").onclick = closeFechaResumenModal;
-document.getElementById("btnFechaResumenEnviar").onclick = async ()=>{
+document.getElementById("btnFechaResumenEnviar").onclick = async () => {
   const fecha = fechaResumenInput.value;
-  if(!fecha){
-    alert("Selecciona una fecha.");
-    return;
-  }
-  await mandarResumenGeneralWhatsapp(fecha);
-  closeFechaResumenModal();
+  if (!fecha) { showToast("Selecciona una fecha", "error"); return; }
+  const btn = document.getElementById("btnFechaResumenEnviar");
+  const originalText = btn.textContent;
+  btn.textContent = "⏳ Generando PDF...";
+  btn.disabled = true;
+  try { await descargarResumenPDF(fecha); closeFechaResumenModal(); } catch(e) { console.error(e); showToast("Error al generar PDF", "error"); }
+  finally { btn.textContent = originalText; btn.disabled = false; }
 };
+loginRol.addEventListener("change", () => { pinWrap.style.display = loginRol.value === "admin" ? "block" : "none"; });
+btnTipoMesas.onclick = () => cambiarTipoVista("mesas");
+btnTipoLlevar.onclick = () => cambiarTipoVista("llevar");
+btnTipoCarrito.onclick = () => cambiarTipoVista("carrito");
 
-document.getElementById("btnActualizarMesas").onclick = async ()=>{
+// Admin modals
+btnCancelPrice.onclick = () => editPriceBackdrop.style.display = "none";
+btnConfirmPrice.onclick = guardarPrecio;
+btnCancelAdjust.onclick = () => adjustTotalBackdrop.style.display = "none";
+btnConfirmAdjust.onclick = aplicarAjusteTotal;
+
+// Exponer funciones globales para admin
+window.editarPrecio = editarPrecio;
+window.eliminarProducto = eliminarProducto;
+window.mostrarAjusteTotal = mostrarAjusteTotal;
+
+// Inicialización
+if (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase) {
+  try {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseReady = true;
+    setSyncStatus("Supabase conectado","ok");
+  } catch(e) { console.error(e); setSyncStatus("Error de conexión","bad"); }
+} else { setSyncStatus("Configuración pendiente","warn"); }
+roleInfo.textContent = "👤 Modo: Operador";
+(async function init() {
   await cargarEstadoMesas();
-  if (mesaActual) await cargarCuenta();
-};
-document.getElementById("btnAjusteAdmin").onclick = crearAjusteAdmin;
-
-btnTipoMesas.onclick = ()=> cambiarTipoVista("mesas");
-btnTipoLlevar.onclick = ()=> cambiarTipoVista("llevar");
-btnTipoCarrito.onclick = ()=> cambiarTipoVista("carrito");
-
-if(supabaseReady){
-  setSyncStatus("Supabase conectado. Selecciona una cuenta.", "ok");
-}else{
-  setSyncStatus("Supabase pendiente de configurar", "warn");
-}
-
-updateRoleUI();
-updateTipoUI();
-
-(async function init(){
-  await cargarEstadoMesas();
-  renderMesas();
 })();
 </script>
 </body>
